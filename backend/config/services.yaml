@@ -1,0 +1,116 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
+parameters:
+  .container.dumper.inline_factories: true
+
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+    bind:
+      App\Service\FileStorage\StorageProviderInterface $storageProvider: '@App\Service\FileStorage\NuxeoStorageProvider'
+      $startScheduleNow: '%env(resolve:APP_SCHEDULER_START_NOW)%'
+
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
+  App\:
+    resource: '../src/'
+    exclude:
+      - '../src/DependencyInjection/'
+      - '../src/Entity/'
+      - '../src/Kernel.php'
+
+  # add more service definitions when explicit configuration is needed
+  # please note that last definitions always *replace* previous ones
+
+  #OAuth
+  App\Service\OAuthService:
+    arguments:
+      $clientId: '%env(resolve:OAUTH_CLIENTID)%'
+      $clientSecret: '%env(resolve:OAUTH_CLIENTSECRET)%'
+      $redirectUri: '%env(resolve:OAUTH_REDIRECTURI)%'
+      $urlAuthorize: '%env(resolve:OAUTH_URLAUTHORIZE)%'
+      $urlAccessToken: '%env(resolve:OAUTH_URLACCESSTOKEN)%'
+      $urlResourceOwnerDetails: '%env(resolve:OAUTH_URLRESOURCEOWNERDETAILS)%'
+
+  #LDAP
+  App\Service\LdapService:
+    arguments:
+      $ldapHost: '%env(resolve:LDAP_HOST)%'
+      $ldapPort: '%env(resolve:LDAP_PORT)%'
+      $ldapSSL: '%env(resolve:LDAP_SSL)%'
+      $ldapUsername: '%env(resolve:LDAP_USERNAME)%'
+      $ldapPassword: '%env(resolve:LDAP_PASSWORD)%'
+      $ldapDn: '%env(resolve:LDAP_DN)%'
+
+  App\Service\SiScol\ApogeeProvider:
+    arguments:
+      $username: '%env(resolve:APOGEE_USER)%'
+      $password: '%env(resolve:APOGEE_PWD)%'
+      $db: '%env(resolve:APOGEE_DB)%'
+
+  App\State\Utilisateur\UtilisateurManager:
+    arguments:
+      $scolProvider: '@App\Service\SiScol\ApogeeProvider'
+
+  App\Command\InitDonneesCommand:
+    arguments:
+      $loader: '@fidry_alice_data_fixtures.doctrine.purger_loader'
+
+  App\Scheduler\RappelEnvoiRH\RappelEnvoiRHScheduler:
+    arguments:
+      $heurePassage: '%env(resolve:APP_HEURE_RAPPEL_ENVOI_RH)%'
+
+  App\Scheduler\RappelInterventions\RappelInterventionsScheduler:
+    arguments:
+      $heurePassage: '%env(resolve:APP_HEURE_RAPPEL_INTERVENTIONS)%'
+
+  App\Scheduler\MajInscriptions\MajInscriptionsScheduler:
+    arguments:
+      $heurePassage: '%env(resolve:APP_HEURE_MAJ_INSCRIPTIONS)%'
+
+  App\Scheduler\TestMailer\TestMailerHandler:
+    arguments:
+      $envoyer: '%env(resolve:APP_ENVOYER_MAILS_TEST)%'
+
+  App\Service\HtmlToPdfConverter:
+    arguments:
+      $apiUri: '%env(resolve:HTMLTOPDFAPI_URL)%'
+      $appId: '%env(resolve:HTMLTOPDFAPI_APPID)%'
+      $apiKey: '%env(resolve:HTMLTOPDFAPI_APIKEY)%'
+
+  App\Serializer\DemandeDenormalizer:
+    arguments:
+      $itemNormalizer: '@api_platform.jsonld.normalizer.item'
+
+  App\Serializer\ReponseDenormalizer:
+    arguments:
+      $itemNormalizer: '@api_platform.jsonld.normalizer.item'
+
+  App\Command\InitQuestionnaireCommand:
+    arguments:
+      $loader: '@fidry_alice_data_fixtures.doctrine.purger_loader'
+
+  App\Util\ProfilBeneficiaireFakerProvider: ~
+
+  App\Scheduler\MajFormations\MajFormations:
+    arguments:
+      $scolProvider: '@App\Service\SiScol\ApogeeProvider'
+
+  App\Service\FileStorage\FileSystemStorageProvider:
+    arguments:
+      $basePath: '%env(resolve:STORAGE_BASE_PATH)%'
+  App\Service\FileStorage\NuxeoStorageProvider:
+    arguments:
+      $apiUrl: '%env(resolve:NUXEO_API_URL)%'
+      $user: '%env(resolve:NUXEO_API_USER)%'
+      $password: '%env(resolve:NUXEO_API_PASS)%'
+      $espace: '%env(resolve:NUXEO_ESPACE)%'
+  App\Service\AntivirusService:
+    arguments:
+      $server: '%env(resolve:CLAMAV_SERVER)%'
+      $port: '%env(resolve:CLAMAV_PORT)%'

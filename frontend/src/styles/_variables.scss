@@ -1,0 +1,55 @@
+@import "colors";
+
+// --- Variables principales l'application : couleurs, ...
+
+$primary: var(--color-primary);
+$primary-contrast: var(--color-primary-contrast);
+$primary-light: var(--color-primary-light);
+
+$app: var(--color-app);
+$app-light: var(--color-app-light);
+$app-contrast: var(--color-app-contrast);
+
+// ---
+
+$warning: var(--color-warning);
+$warning-light: var(---color-warning-light);
+$error: var(--color-error);
+$error-light: var(--color-error-light);
+$success: var(--color-success);
+$success-light: var(--color-success-light);
+
+// ---
+
+$text: #333;
+$white: #fff;
+
+$light-grey: #f7f8fc;
+$light-grey-border: #edeef3;
+$light-grey-border-dark: #d9d9d9;
+$light-color: #AAA;
+
+$legende: #666;
+
+$radius: 7px;
+$fw-bold: 600;
+$fw-semi-bold: 500;
+$fw-regular: 400;
+$fw-light: 300;
+
+
+// --- Couleurs utilisées dans l'application
+
+$orange: map-get($colors-regular, "orange");
+
+$intervenant: map-get($colors-regular, "indigo");
+$intervenant-light: map-get($colors-xlight, "indigo");
+
+$renfort: map-get($colors-regular, "pink");
+$renfort-light: map-get($colors-xlight, "pink");
+
+$beneficiaire: map-get($colors-regular, "purple");
+$beneficiaire-light: map-get($colors-xlight, "purple");
+
+$demandeur: map-get($colors-regular, "amber");
+$demandeur-light: map-get($colors-xlight, "amber");

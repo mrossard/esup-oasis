@@ -1,0 +1,281 @@
+// --- Surcharge des styles pour l'accessibilité ---
+
+@import "variables";
+
+$fontDyslexieArial: "Arial";
+$fontDyslexieOpenDys: "OpenDys";
+
+body.accessibilite-contraste {
+  color: #000 !important;
+
+  .full-app {
+    background: $white !important;
+  }
+
+  .text-primary, .logo, .rbc-today .week-header, .rbc-today .week-header .date, .ant-btn-link, .today-carret, a, .ant-empty-description {
+    color: $primary-contrast !important;
+  }
+
+  .ant-picker-calendar .today, .ant-picker-calendar table.ant-picker-content thead tr th {
+    color: #000 !important;
+  }
+
+  .bg-primary, .ant-float-btn-primary, .ant-picker-calendar .has-event:after {
+    background-color: $primary-contrast !important;
+  }
+
+  .border-primary {
+    border-color: $primary-contrast !important;
+  }
+
+  .bg-primary-light, .ant-alert-info {
+    background-color: #f7f8fc !important;
+  }
+
+  .ant-alert-info {
+    border: none !important;
+  }
+
+  .user-space .role, .ant-layout-footer, .ant-picker-calendar .ant-picker-cell,
+  .ant-statistic .ant-statistic-title, .ant-list .ant-list-item .ant-list-item-meta .ant-list-item-meta-description {
+    color: #555 !important;
+  }
+
+  .statistic-danger, .statistic-warning {
+    background-color: #FFF;
+  }
+
+  .calendar-sider {
+    border-right: 1.5px solid #edeef3;
+  }
+
+  .statistic-warning .ant-statistic-content-value span, .statistic-warning svg {
+    color: #b56004 !important;
+    fill: #b56004 !important;
+  }
+
+  .ant-segmented .ant-segmented-item-selected {
+    background-color: $primary-contrast;
+    color: white;
+  }
+
+  @each $key, $val in $colors-dark {
+    .checkbox-#{$key} {
+      .ant-checkbox-inner {
+        background-color: #{$val};
+        border-color: #{$val};
+      }
+
+      &:hover {
+        .ant-checkbox-inner {
+          background-color: var(--color-dark-#{$key}) !important;
+          border-color: var(--color-dark-#{$key}) !important;
+        }
+      }
+
+      &:not(.ant-checkbox-wrapper-checked) {
+        opacity: 1;
+      }
+    }
+
+    .bg-#{$key}-xlight {
+      background-color: #FFF !important;
+    }
+    .bg-#{$key}-xxlight {
+      background-color: #FFF !important;
+    }
+  }
+
+  .not-affecte {
+    background-color: transparent !important;
+  }
+
+
+  .ant-ribbon .ant-ribbon-text {
+    color: #000;
+  }
+
+  .text-warning, .ant-tag-warning {
+    color: #b56004 !important;
+  }
+
+  .text-success {
+    color: #0a7d00 !important;
+  }
+
+  .ant-tag-warning {
+    background-color: #FFF;
+  }
+
+  .bg-warning {
+    background-color: #b56004 !important;
+  }
+
+  .legende, .text-legende, .ant-typography-secondary {
+    color: #555 !important;
+  }
+
+  .ant-tag-green, .ant-badge-color-green {
+    background-color: var(--color-dark-green) !important;
+    border-color: var(--color-dark-green) !important;
+    color: #FFF !important;
+  }
+
+  .ant-tag-orange, .ant-badge-color-orange {
+    background-color: var(--color-dark-orange) !important;
+    border-color: var(--color-dark-orange) !important;
+    color: #FFF !important;
+  }
+
+  .ant-tag-red, .ant-badge-color-red {
+    background-color: var(--color-dark-red) !important;
+    border-color: var(--color-dark-red) !important;
+    color: #FFF !important;
+  }
+
+  .ant-tag-blue, .ant-badge-color-blue {
+    background-color: var(--color-dark-blue) !important;
+    border-color: var(--color-dark-blue) !important;
+    color: #FFF !important;
+  }
+
+  .ant-tag-purple, .ant-badge-color-purple {
+    background-color: var(--color-dark-purple) !important;
+    border-color: var(--color-dark-purple) !important;
+    color: #FFF !important;
+  }
+
+  .ant-tag-cyan, .ant-badge-color-cyan {
+    background-color: var(--color-dark-cyan) !important;
+    border-color: var(--color-dark-cyan) !important;
+    color: #FFF !important;
+  }
+
+  .ant-tag-yellow, .ant-badge-color-yellow {
+    background-color: var(--color-dark-yellow) !important;
+    border-color: var(--color-dark-yellow) !important;
+    color: #FFF !important;
+  }
+
+  .ant-tag:not(.ant-tag-green):not(.ant-tag-orange):not(.ant-tag-red):not(.ant-tag-blue):not(.ant-tag-purple):not(.ant-tag-cyan):not(.ant-tag-yellow) {
+    background-color: #FFF !important;
+    border-color: #000 !important;
+    color: #000 !important;
+  }
+
+  .ant-steps .ant-steps-item-wait > .ant-steps-item-container > .ant-steps-item-content > .ant-steps-item-title {
+    color: #444 !important;
+  }
+
+  .ant-select-dropdown .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background-color: var(--color-app) !important;
+  }
+
+  .ant-steps .ant-steps-item-finish .ant-steps-item-icon {
+    background-color: $primary-contrast !important;
+    & > .ant-steps-icon {
+      color: #fff !important;
+    }
+  }
+
+  .ant-upload {
+    border: none;
+  }
+
+  .ant-input-outlined, .ant-select-outlined, .ant-input-number-outlined, .ant-upload-btn {
+    background: #ffffff;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #000;
+    border-radius: 0 !important;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    .ant-select-selector {
+      border: none !important;
+      box-shadow: none !important;
+    }
+
+    .ant-select-selection-item {
+      font-weight: 500;
+    }
+  }
+
+  .ant-input-outlined.ant-input-status-error:not(.ant-input-disabled) {
+    border-width: 2px;
+  }
+
+  .ant-select-outlined {
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+  }
+
+  .ant-input-number-input, header .ant-btn {
+    font-weight: 500;
+  }
+
+  .ant-select .ant-select-arrow {
+    color: #000;
+  }
+
+  main .ant-btn:not(.contrast-no-border) {
+    border-radius: 0;
+    border-width: 2px;
+    border-style: solid;
+    border-color: #000;
+    font-weight: 500;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .bg-beneficiaire, .bg-intervenant {
+    background-color: #000 !important;
+    color: #fff;
+  }
+}
+
+body.accessibilite-dyslexie-arial, body.accessibilite-dyslexie-open-dys {
+  .libelle-evenement {
+    line-height: 1.5;
+  }
+
+  .rbc-event-label {
+    font-size: 1rem;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .calendar .rbc-header button .date {
+    font-size: 1rem;
+  }
+}
+
+body.accessibilite-dyslexie-open-dys {
+  &, .rbc-label, .month-header, .rbc-header button {
+    font-family: $fontDyslexieOpenDys, serif !important;
+  }
+}
+
+body.accessibilite-dyslexie-arial {
+  &, .rbc-label, .month-header, .rbc-header button {
+    font-family: $fontDyslexieArial, serif !important;
+  }
+}
+
+body.accessibilite-police-large {
+  .ant-tag, .header button, .identite, .ant-steps-item-title, .rbc-event, .legende {
+    font-size: 1.2rem !important;
+  }
+
+  .role {
+    font-size: 1rem !important;
+  }
+
+  .header .ant-menu-submenu-title .anticon {
+    font-size: 1.5rem !important;
+  }
+
+  .fs-09 {
+    font-size: 1.1rem !important;
+  }
+}

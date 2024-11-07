@@ -1,0 +1,16 @@
+App\Entity\TypeEquipement:
+  typeEquipement1:
+    libelle: 'Ordinateur'
+    actif: true
+  typeEquipement2:
+    libelle: 'Logiciel spécifique'
+    actif: true
+  typeEquipement3:
+    libelle: '1/2 temps supplémentaire'
+    actif: true
+  typeEquipement4:
+    libelle: 'Sujet format adapté'
+    actif: true
+  typeEquipement5:
+    libelle: 'Autre matériel'
+    actif: true

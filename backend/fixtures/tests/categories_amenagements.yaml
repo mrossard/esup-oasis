@@ -1,0 +1,4 @@
+App\Entity\CategorieAmenagement:
+  categorie_amenagement_1:
+    libelle: "une catégorie"
+    actif: true

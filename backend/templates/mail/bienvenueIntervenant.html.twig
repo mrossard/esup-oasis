@@ -1,0 +1,107 @@
+{% extends 'mail/base.html.twig' %}
+
+{% block body %}
+    <span class="preheader">Bienvenue</span>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+        <tr>
+            <td>&nbsp;</td>
+            <td class="container">
+                <div class="content">
+                    <table role="presentation" class="main">
+                        <tr>
+                            <td class="wrapper">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td align="center">
+                                            <a href="{{ frontUrl }}" referrerpolicy="no-referrer"
+                                               target="_blank"
+                                               aria-label="Se rendre sur le site AppliPhase de l'université de Bordeaux">
+                                                <img border="0" class="img-responsive"
+                                                     src="{{ backUrl }}/images/logo-appliphase-email.png"
+                                                     alt="" aria-hidden="true" style="max-width: 300px"/></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                                <tr>
+                                                    <td>
+                                                        <h1>
+                                                            Bienvenue sur Appliphase!
+                                                        </h1>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>Bonjour {{ intervenant.prenom }} {{ intervenant.nom }},</p>
+                                            <p>Vous venez d'être créé en tant qu'intervenant pour le service PHASE dans
+                                                notre application Appliphase. Nous vous invitons à vous y connecter,
+                                                avec vos identifiants ent, via ce lien: <a
+                                                        href="{{ frontUrl }}">Appliphase</a></p>
+
+                                            <p>En cliquant sur "Planning", vous verrez toutes les interventions passées
+                                                ou futures qui ont été saisies pour vous.</p>
+                                            <p>En cliquant sur "Services faits" vous verrez les heures qui ont été
+                                                déclarées aux RH sur les périodes passées, mais aussi les heures qui
+                                                vont être déclarées pour la période en cours. Le montant de la
+                                                rémunération qui y est indiqué est le montant brut.</p>
+                                            <p>Vous recevrez peu avant la clôture de chaque période un mail vous
+                                                demandant de vous connecter à Appliphase pour vérifier la saisie des
+                                                heures qui vous concernent.
+                                                Pour toute heure manquante ou erronée, veuillez vous adresser
+                                                directement à la personne qui vous a recruté(e) pour l'évènement
+                                                concerné.</p>
+                                            <p>Vos informations personnelles de paie sont disponibles le lendemain du
+                                                versement de votre salaire dans l'ENT (dans Ma carriere - Bulletins de
+                                                salaire puis
+                                                cliquer sur rémunération). Vous trouverez votre bulletin de paie
+                                                officiel sur le site de <a href="https://ensap.gouv.fr">L’Espace
+                                                    Numérique Sécurisé de l’Agent Public</a> après activation de votre
+                                                compte. Vous y aurez accès même après la fermeture de votre ENT.</p>
+                                            <hr/>
+
+                                            <p class="last">Cordialement,<br/>
+                                                Le service PHASE</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="footer">
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    <a
+                                            href="https://u-bordeaux.fr" referrerpolicy="no-referrer"
+                                            target="_blank">
+                                        <img border="0" width="50" style="width: 50px"
+                                             src="{{ backUrl }}/images/universite-bordeaux-medaillon.png"
+                                             alt="Logo Université de Bordeaux"/>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="content-block">
+                                <span class="apple-link"><a
+                                            href="https://u-bordeaux.fr" referrerpolicy="no-referrer"
+                                            target="_blank">Université de Bordeaux</a> • <a
+                                            href="{{ frontUrl }}" referrerpolicy="no-referrer"
+                                            target="_blank">AppliPhase</a></span>
+                                    <br><a href="{{ frontUrl }}/mon-compte">Réglez les paramètres de
+                                        notification</a> dans la section "Mon compte" d'AppliPhase.
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+{% endblock %}
+

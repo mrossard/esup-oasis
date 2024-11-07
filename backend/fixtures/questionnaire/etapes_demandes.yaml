@@ -1,0 +1,50 @@
+App\Entity\EtapeDemande:
+  etape_avant_de_commencer:
+    libelle: "Avant de commencer"
+    ordre: 0
+  etape_avant_de_commencer_sportifs_hn:
+    libelle: "Avant de commencer"
+    ordre: 0
+  etape_avant_de_commencer_sportifs_bn_tbn:
+    libelle: "Avant de commencer"
+    ordre: 0
+  etape_informations_generales:
+    libelle: "Informations générales"
+    ordre: 1
+  etape_specifique_sportif_hn:
+    libelle: "Sportifs"
+    ordre: 2
+  etape_specifique_sportif_bn_tbn:
+    libelle: "Sportifs"
+    ordre: 2
+  etape_specifique_handicap:
+    libelle: "Handicaps"
+    ordre: 2
+  etape_specifique_incapacite_temporaire:
+    libelle: "Incapacite temporaire"
+    ordre: 2
+  etape_specifique_elu_engage:
+    libelle: "Engagés ou élus"
+    ordre: 2
+  etape_specifique_femme_enceinte:
+    libelle: "Femme enceinte"
+    ordre: 2
+  etape_specifique_charge_famille:
+    libelle: "Chargé de famille"
+    ordre: 2
+  etape_specifique_plusieurs_cursus:
+    libelle: "Plusieurs cursus"
+    ordre: 2
+  etape_specifique_salarie_entrepreneur:
+    libelle: "Salarié ou entrepreneur"
+    ordre: 2
+  etape_specifique_artiste:
+    libelle: "Artiste confirmé"
+    ordre: 2
+  etape_souhaits_amenagement:
+    si_demande_accompagnement: true
+    libelle: "Situation, contraintes et aménagements demandés"
+    ordre: 3
+  etape_validation:
+    libelle: "Finalisation de la demande"
+    ordre: 4

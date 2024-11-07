@@ -1,0 +1,115 @@
+@import "/src/styles/variables";
+@import "/src/styles/helpers";
+
+.calendar-sider {
+
+  .collapse-trigger {
+    position: fixed;
+    left: 260px;
+    top: 60px;
+    z-index: 30;
+    transition: left 0.3s ease-in-out;
+
+    .ant-btn {
+      @extend .shadow-1;
+    }
+  }
+
+  .with-value {
+    .label, .ant-select-selection-item {
+      font-weight: $fw-semi-bold;
+    }
+  }
+
+
+  &.ant-layout-sider-collapsed {
+    flex: 0 0 20px !important;
+    max-width: 20px !important;
+    min-width: 20px !important;
+    width: 20px !important;
+
+    .collapse-trigger {
+      left: 0;
+    }
+
+    .sider-content {
+      display: none;
+    }
+  }
+
+  .ant-layout-sider-children {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+  }
+
+
+  &.ant-layout-sider {
+    background: $light-grey;
+  }
+
+  .filters {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+
+    li.filter {
+      margin-bottom: 2rem;
+      padding: 0 15px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    .label {
+      font-size: 1.05rem;
+      color: $text;
+    }
+  }
+
+  @each $key, $val in $colors-regular {
+    .checkbox-#{$key} {
+      .ant-checkbox-inner {
+        background-color: #{$val};
+        border-color: #{$val};
+      }
+
+      &:hover {
+        .ant-checkbox-inner {
+          background-color: var(--color-dark-#{$key}) !important;
+          border-color: var(--color-dark-#{$key}) !important;
+        }
+      }
+
+      &:not(.ant-checkbox-wrapper-checked) {
+        opacity: .45;
+      }
+    }
+  }
+
+}
+
+.event-annule {
+  border: 3px dashed !important;
+  opacity: .5;
+
+  &:hover {
+    opacity: 1;
+    transition: all .3s ease-in-out;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .calendar-sider {
+    &.ant-layout-sider-collapsed {
+      flex: 0 0 20px !important;
+      max-width: 0 !important;
+      min-width: 0 !important;
+      width: 0 !important;
+    }
+  }
+}

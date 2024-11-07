@@ -1,0 +1,31 @@
+@import "../../styles/variables";
+
+.progress {
+  background-color: #fff;
+  border-radius: 2 * $radius;
+  position: relative;
+  margin: 15px 0;
+  height: 30px;
+  width: 300px;
+  border: 1px solid $light-grey-border;
+}
+
+.progress-done {
+  border-radius: 2 * $radius;
+  color: $text;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 0;
+  opacity: 0;
+  transition: 1s ease 0.3s;
+  font-size: 14px;
+}
+
+.CircularProgressbar .CircularProgressbar-text {
+  font-size: 36px !important;
+  color: #000 !important;
+  fill: #000 !important;
+  font-weight: 500;
+}

@@ -1,0 +1,17 @@
+App\Entity\EtapeDemande:
+  etape1_commune:
+    libelle: "étape 1"
+    ordre: 1
+  etape2_sportifs:
+    libelle: "etape 2 sportifs"
+    ordre: 2
+  etape2_artistes:
+    libelle: "etape 2 artistes"
+    ordre: 2
+  etape3_validation:
+    libelle: "Finalisation de la demande"
+    ordre: 3
+  etape2_si_accompagnement:
+    libelle: "Accompagnement"
+    ordre: 2
+    si_demande_accompagnement: true

@@ -1,0 +1,8 @@
+App\Entity\CampagneDemande:
+  campagne_sportifs:
+    typeDemande: '@type_demande_sportifs'
+    commission: '@commission_sport'
+    libelle: 'campagne sportifs 2020'
+    debut: <date_create('2020-01-01')>
+    fin: <date_create('2020-02-01')>
+    dateCommission: <date_create('2020-02-15')>

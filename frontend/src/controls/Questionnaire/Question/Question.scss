@@ -1,0 +1,41 @@
+@import "/src/styles/_variables.scss";
+
+.question-aide {
+  list-style-position: inside;
+}
+
+.questionnaire-blocage {
+
+}
+
+.question-checkbox {
+  &.ant-checkbox-group {
+    flex-direction: column;
+  }
+}
+
+.question-file-preview {
+  .ant-upload.ant-upload-drag {
+    display: none !important;
+  }
+}
+
+.questionnaire-file {
+  .question-file-item {
+    margin: 5px 0 !important;
+    padding: 10px 16px !important;
+    border: 1px solid $light-grey-border-dark;
+    border-radius: $radius;
+    height: auto !important;
+    background-color: white !important;
+
+    .ant-btn {
+      width: auto !important;
+    }
+  }
+
+  .ant-upload-list-item-actions {
+    display: flex;
+    gap: 12px;
+  }
+}

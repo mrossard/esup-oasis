@@ -1,0 +1,4 @@
+App\Entity\Commission:
+  commission_sport:
+    libelle: Commission Sportifs
+    actif: true

@@ -1,0 +1,107 @@
+/*
+ * Copyright (c) 2024. Esup - Université de Bordeaux
+ *
+ * This file is part of the Esup-Oasis project (https://github.com/EsupPortail/esup-oasis).
+ * For full copyright and license information please view the LICENSE file distributed with the source code.
+ *
+ * @author Julien Lemonnier <julien.lemonnier@u-bordeaux.fr>
+ */
+
+import { Modal } from "antd";
+import { useApi } from "../../../context/api/ApiProvider";
+import { NB_MAX_ITEMS_PER_PAGE } from "../../../constants";
+import { ITypeDemande } from "../../../api/ApiTypeHelpers";
+import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
+import React from "react";
+import { useAuth } from "../../../auth/AuthProvider";
+import { TypesDemandesListItems } from "./TypesDemandesListItems";
+
+export default function NouvelleDemandeModale(props: {
+   open: boolean;
+   setOpen: (open: boolean) => void;
+   onClose?: () => Promise<void>;
+}) {
+   const screens = useBreakpoint();
+   const auth = useAuth();
+   const { data: typesDemandes } = useApi().useGetCollectionPaginated({
+      path: "/types_demandes",
+      enabled: true,
+      page: 1,
+      itemsPerPage: NB_MAX_ITEMS_PER_PAGE,
+   });
+
+   const { data: demandes } = useApi().useGetCollectionPaginated({
+      path: "/demandes",
+      query: { format_simple: true },
+      enabled: true,
+      page: 1,
+      itemsPerPage: NB_MAX_ITEMS_PER_PAGE,
+   });
+
+   function getTypesDemandesPostulables(): ITypeDemande[] {
+      return (typesDemandes?.items || []).filter((typeDemande) => {
+         return (
+            typeDemande.actif &&
+            typeDemande.campagneEnCours &&
+            demandes?.items.every((demande) => demande.campagne !== typeDemande.campagneEnCours)
+         );
+      });
+   }
+
+   function getTypesDemandesBientot(): ITypeDemande[] {
+      return (typesDemandes?.items || []).filter((typeDemande) => {
+         return (
+            typeDemande.actif &&
+            !typeDemande.campagneEnCours &&
+            typeDemande.campagneSuivante &&
+            demandes?.items.every((demande) => demande.campagne !== typeDemande.campagneSuivante)
+         );
+      });
+   }
+
+   if (!typesDemandes || !demandes) return null;
+   if (!props.open) return null;
+
+   return (
+      <Modal
+         centered
+         title={
+            <h2 autoFocus className="m-0">
+               Nouvelle demande
+            </h2>
+         }
+         open={props.open}
+         onCancel={() => {
+            props.setOpen(false);
+         }}
+         onOk={() => {
+            if (props.onClose === undefined) {
+               props.setOpen(false);
+               return;
+            }
+
+            props.onClose().then(() => {
+               props.setOpen(false);
+            });
+         }}
+         width={screens.lg ? 800 : "95%"}
+         okText="Fermer"
+         cancelButtonProps={{ style: { display: "none" } }}
+      >
+         <TypesDemandesListItems
+            titre="Campagnes en cours"
+            items={getTypesDemandesPostulables()}
+            ajout
+            demandeurId={auth.user?.["@id"] as string}
+         />
+         {getTypesDemandesBientot().length > 0 && (
+            <TypesDemandesListItems
+               titre="Prochaines campagnes"
+               items={getTypesDemandesBientot()}
+               demandeurId={auth.user?.["@id"] as string}
+               ajout={false}
+            />
+         )}
+      </Modal>
+   );
+}

@@ -1,0 +1,13 @@
+{% apply inline_css(source('@styles/email.css')) %}
+    <!doctype html>
+    <html lang="fr">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <title>AppliPhase : Université de Bordeaux</title>
+    </head>
+    <body>
+    {% block body %}{% endblock %}
+    </body>
+    </html>
+{% endapply %}

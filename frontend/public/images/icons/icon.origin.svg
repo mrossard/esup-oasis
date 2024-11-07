@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Calque_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 334 334">
+  <!-- Generator: Adobe Illustrator 29.0.0, SVG Export Plug-In . SVG Version: 2.1.0 Build 186)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #337ab7;
+      }
+
+      .st0, .st1, .st2 {
+        isolation: isolate;
+      }
+
+      .st0, .st2 {
+        font-family: NoirPro-Medium, 'Noir Pro';
+        font-size: 110px;
+        font-weight: 500;
+      }
+
+      .st3 {
+        fill: #fff;
+        fill-rule: evenodd;
+      }
+
+      .st2 {
+        fill: #e30f47;
+      }
+    </style>
+  </defs>
+  <path class="st3" d="M0,0h333.3v333.3H0V0Z"/>
+  <g>
+    <g class="st1">
+      <text class="st2" transform="translate(27.1 246.8)"><tspan x="0" y="0">oasis</tspan></text>
+    </g>
+    <g class="st1">
+      <text class="st0" transform="translate(27.1 145.7)"><tspan x="0" y="0">esup</tspan></text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,59 @@
+App\Entity\TypeEvenement:
+  # cf /migrations/VersionInit.php
+  renfort-phase:
+    id: -1
+    libelle: 'Renfort au Service Phase'
+    actif: true
+    couleur: 'lime'
+    visible_par_defaut: true
+    avec_validation: true
+    forfait: false
+  typeEvenement1:
+    libelle: 'Secrétariat d’épreuve'
+    actif: true
+    couleur: 'pink'
+    visible_par_defaut: true
+    avec_validation: false
+    forfait: false
+  typeEvenement2:
+    libelle: 'Tutorat disciplinaire'
+    actif: true
+    couleur: 'deepOrange'
+    visible_par_defaut: true
+    avec_validation: false
+    forfait: false
+  typeEvenement3:
+    libelle: 'Tutorat méthodologique'
+    actif: true
+    couleur: 'cyan'
+    visible_par_defaut: true
+    avec_validation: false
+    forfait: false
+  typeEvenement4:
+    libelle: 'Aide au travail personnel sur site'
+    actif: true
+    couleur: 'purple'
+    visible_par_defaut: true
+    avec_validation: false
+    forfait: false
+  typeEvenement5:
+    libelle: 'Cours de compensation'
+    actif: true
+    couleur: 'orange'
+    visible_par_defaut: true
+    avec_validation: false
+    forfait: false
+  typeEvenement6:
+    libelle: 'Sessions différées'
+    actif: true
+    couleur: 'teal'
+    visible_par_defaut: true
+    avec_validation: false
+    forfait: false
+  typeEvenement7:
+    libelle: 'Prise de Notes'
+    actif: true
+    couleur: 'indigo'
+    visible_par_defaut: false
+    avec_validation: false
+    forfait: true

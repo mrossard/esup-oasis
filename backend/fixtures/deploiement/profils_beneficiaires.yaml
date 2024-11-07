@@ -1,0 +1,43 @@
+App\Entity\ProfilBeneficiaire:
+  profil_a_determiner:
+    id: -1
+    libelle: 'A déterminer'
+    actif: true
+  profil1:
+    libelle: 'Handicap permanent'
+    actif: true
+    avec_typologie: true
+  profil2:
+    libelle: 'Incapacité temporaire'
+    actif: true
+    avec_typologie: true
+  profil3:
+    libelle: 'Sportif HN'
+    actif: true
+  profil4:
+    libelle: 'Sportif TBN'
+    actif: true
+  profil5:
+    libelle: 'Sportif BN'
+    actif: true
+  profil6:
+    libelle: 'Artistes confirmés'
+    actif: true
+  profil7:
+    libelle: 'Salariés'
+    actif: true
+  profil8:
+    libelle: 'Elus'
+    actif: true
+  profil9:
+    libelle: 'Engagé'
+    actif: true
+  profil10:
+    libelle: 'Chargée de famille'
+    actif: true
+  profil11:
+    libelle: 'Double inscrit'
+    actif: true
+  profil12:
+    libelle: 'Autre'
+    actif: true

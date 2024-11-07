@@ -1,0 +1,16 @@
+@import "src/styles/variables.scss";
+
+.tabs-tab-card {
+  .ant-tabs-nav {
+    margin-bottom: 0;
+  }
+
+  .ant-tabs-content-holder {
+    padding: 16px 28px;
+    background-color: $white;
+    border-left: 1px solid $light-grey-border;
+    border-right: 1px solid $light-grey-border;
+    border-bottom: 1px solid $light-grey-border;
+    border-radius: 0 0 $radius $radius;
+  }
+}

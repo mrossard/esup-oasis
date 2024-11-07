@@ -1,0 +1,13 @@
+App\Entity\Utilisateur:
+  mrossard:
+    uid: 'mrossard'
+    email: 'mrossard@app.fr'
+    nom: 'ROSSARD'
+    prenom: 'Manuel'
+    admin: true
+  jlemon100p:
+    uid: 'jlemon100p'
+    email: 'jlemon100p@app.fr'
+    nom: 'LEMONNIER'
+    prenom: 'Julien'
+    admin: true

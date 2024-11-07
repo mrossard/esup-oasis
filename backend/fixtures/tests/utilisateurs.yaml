@@ -1,0 +1,127 @@
+App\Entity\Utilisateur:
+  admin:
+    uid: 'admin'
+    email: 'admin@app.fr'
+    nom: 'admin'
+    prenom: 'admin'
+    admin: true
+    roles: [ 'ROLE_ADMIN', 'ROLE_GESTIONNAIRE', 'ROLE_PLANIFICATEUR', 'ROLE_USER' ]
+  gestionnaire:
+    uid: 'gestionnaire'
+    email: 'gestionnaire@app.fr'
+    nom: 'gestionnaire'
+    prenom: 'gestionnaire'
+    admin: false
+    services:
+      - '@service1'
+      - '@service2'
+    beneficiairesGeres:
+      - '@beneficiaire1'
+    roles: [ 'ROLE_GESTIONNAIRE','ROLE_PLANIFICATEUR' ]
+  gestionnaire2:
+    uid: 'gestionnaire2'
+    email: 'gestionnaire2@app.fr'
+    nom: 'gestionnaire 2'
+    prenom: 'gestionnaire 2'
+    admin: false
+    services:
+      - '@service3'
+    beneficiairesGeres:
+      - '@beneficiaire2'
+    roles: [ 'ROLE_GESTIONNAIRE', 'ROLE_PLANIFICATEUR', ]
+  renfort:
+    uid: 'renfort'
+    email: 'renfort@app.fr'
+    nom: 'renfort'
+    prenom: 'renfort'
+    admin: false
+    services:
+      - '@service3'
+    roles: [ 'ROLE_USER', 'ROLE_PLANIFICATEUR', 'ROLE_RENFORT' ]
+  intervenant:
+    uid: 'intervenant'
+    email: 'intervenant@app.fr'
+    nom: 'intervenant'
+    prenom: 'intervenant'
+    admin: false
+    emailPerso: 'darkwarrior192@hotmail.fr'
+    roles: [ 'ROLE_INTERVENANT' ]
+  intervenant-2:
+    uid: 'intervenant2'
+    email: 'intervenant2@app.fr'
+    nom: 'intervenant2'
+    prenom: 'intervenant2'
+    admin: false
+    roles: [ 'ROLE_INTERVENANT' ]
+  beneficiaire:
+    uid: 'beneficiaire'
+    email: 'beneficiaire@app.fr'
+    nom: 'beneficiaire'
+    prenom: 'beneficiaire'
+    admin: false
+    roles: [ 'ROLE_BENEFICIAIRE' ]
+  beneficiaire-2:
+    uid: 'beneficiaire2'
+    email: 'beneficiaire2@app.fr'
+    nom: 'beneficiaire2'
+    prenom: 'beneficiaire2'
+    admin: false
+    roles: [ 'ROLE_BENEFICIAIRE' ]
+  nouveau-beneficiaire:
+    uid: 'nouveau-beneficiaire'
+    email: 'nouveau-beneficiaire@app.fr'
+    nom: 'nouveau-beneficiaire'
+    prenom: 'nouveau-beneficiaire'
+    admin: false
+    roles: [ 'ROLE_USER' ]
+  nouveau_renfort:
+    uid: 'nouveaurenfort'
+    email: 'nouveaurenfort@app.fr'
+    nom: 'nouveaurenfort'
+    prenom: 'nouveaurenfort'
+    roles: [ 'ROLE_USER' ]
+    admin: false
+  nouvel_intervenant:
+    uid: 'nouvelintervenant'
+    email: 'nouvelintervenant@app.fr'
+    nom: 'nouvelintervenant'
+    prenom: 'nouvelintervenant'
+    admin: false
+    roles: [ 'ROLE_USER' ]
+  nouveau_gestionnaire:
+    uid: 'nouveaugestionnaire'
+    email: 'nouveaugestionnaire@app.fr'
+    nom: 'nouveaugestionnaire'
+    prenom: 'nouveaugestionnaire'
+    admin: false
+    roles: [ 'ROLE_USER' ]
+  enseignant-1:
+    uid: 'enseignant'
+    email: 'enseignant@app.fr'
+    nom: 'enseignant'
+    prenom: 'enseignant'
+    admin: false
+    roles: [ 'ROLE_USER' ]
+  enseignant-2:
+    uid: 'enseignant2'
+    email: 'enseignant2@app.fr'
+    nom: 'enseignant2'
+    prenom: 'enseignant2'
+    admin: false
+    roles: [ 'ROLE_USER' ]
+  demandeur:
+    uid: 'demandeur'
+    email: 'demandeur@app.fr'
+    nom: 'demandeur'
+    prenom: 'demandeur'
+    admin: false
+    numeroEtudiant: 123456
+    roles: [ 'ROLE_DEMANDEUR' ]
+  demandeur-2:
+    uid: 'demandeur2'
+    email: 'demandeur2@app.fr'
+    nom: 'demandeur2'
+    prenom: 'demandeur2'
+    admin: false
+    numeroEtudiant: 1234567
+    roles: [ 'ROLE_DEMANDEUR' ]

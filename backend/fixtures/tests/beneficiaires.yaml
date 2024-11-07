@@ -1,0 +1,11 @@
+App\Entity\Beneficiaire:
+  beneficiaire1:
+    utilisateur: '@beneficiaire'
+    profil: '@profil4'
+    debut: <date_create('2020-01-01')>
+    gestionnaire: '@gestionnaire'
+  beneficiaire2:
+    utilisateur: '@beneficiaire-2'
+    profil: '@profil1'
+    debut: <date_create('2020-01-01')>
+    gestionnaire: '@gestionnaire2'

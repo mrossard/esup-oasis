@@ -1,0 +1,5 @@
+App\Entity\Formation:
+  formation_1:
+    composante: '@composante_1'
+    libelle: 'formation 1'
+    codeExterne: 'CODE_F_1'

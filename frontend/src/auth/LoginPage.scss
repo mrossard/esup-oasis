@@ -1,0 +1,112 @@
+@import "src/styles/variables";
+
+.login-image {
+  display: flex;
+  background-color: $light-grey;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  svg, img {
+    max-width: 700px;
+    max-height: 70vh;
+    width: 80%;
+  }
+}
+
+.assistance {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+}
+
+.login-form {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  flex-direction: column;
+  padding-top: 50px;
+  background: #FFF;
+
+  .ant-avatar {
+    margin-bottom: 25px;
+  }
+
+  .content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    z-index: 1;
+
+    .legende {
+      width: 70%;
+      text-align: center;
+      margin: 32px auto;
+      color: #000;
+    }
+  }
+}
+
+.login-footer {
+  position: absolute;
+  bottom: 40px;
+  font-style: italic;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 0 20px !important;
+  z-index: 0;
+  width: 90%;
+}
+
+.subtitle {
+  margin-top: 0;
+  font-weight: lighter;
+}
+
+@media screen and (max-width: 992px) {
+  .login-image {
+    background-size: 40%;
+    flex: 0 0 100%;
+  }
+
+  .login-footer {
+    position: relative;
+    bottom: 20px;
+    margin-top: 80px;
+  }
+}
+
+.login-image #robot {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: lightSpeedInLeft .5s ease-out, floating 20s 3s linear infinite;
+}
+
+.hide-cursor {
+  .typed-cursor {
+    opacity: 0 !important;
+  }
+}
+
+.footer-cookie {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #FFF;
+  padding: 10px;
+  text-align: center;
+  font-size: 12px;
+  z-index: 1000;
+  opacity: .6;
+
+  &:hover {
+    opacity: 1;
+    color: #000 !important;
+  }
+}

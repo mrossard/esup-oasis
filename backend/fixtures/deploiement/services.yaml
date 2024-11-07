@@ -1,0 +1,19 @@
+App\Entity\Service:
+  service1:
+    libelle: 'Collège Droit, science politique, économie et gestion'
+    actif: true
+  service2:
+    libelle: 'Collège Sciences de la santé - Médiaquitaine'
+    actif: true
+  service3:
+    libelle: "Collège Sciences de l'Homme"
+    actif: true
+  service4:
+    libelle: 'Collège Sciences et technologies - Licence / DAEUB / Classe prépa'
+    actif: true
+  service5:
+    libelle: 'Collège Sciences et technologies - Master / ISVV / INSPE'
+    actif: true
+  service6:
+    libelle: 'IUT de Bordeaux'
+    actif: true

@@ -1,0 +1,32 @@
+.oasis-modal {
+  max-width: 1000px;
+  min-width: 400px;
+
+  .dynamic-delete-button {
+    position: relative;
+    top: 2px;
+    margin: 0 8px;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .dynamic-delete-button:hover {
+    // color: #777;
+  }
+
+  .dynamic-delete-button[disabled] {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.border-undefined-light {
+  border-color: transparent !important;
+}
+
+.oasis-modal-overflow .ant-modal-body {
+  max-height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}

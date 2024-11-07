@@ -1,0 +1,755 @@
+App\Entity\Question:
+  #############################################################################
+  # Question "figée" besoin accompagnement
+  #############################################################################
+  question_besoin_accompagnement:
+    id: -1
+    libelle: "Souhaitez-vous un accompagnement par le service Phase?"
+    aide: ""
+    type_reponse: "select"
+    obligatoire: true
+    choix_multiple: false
+    reponse_conservable: true
+    optionsReponse:
+      - '@reponse_oui_question_besoin_accompagnement'
+      - '@reponse_non_question_besoin_accompagnement'
+  #############################################################################
+  # etape_avant_de_commencer
+  #############################################################################
+  info_debut:
+    libelle: "A propos de ce service"
+    aide: >
+      \<p>Vous allez commencer à remplir le dossier permettant de faire une demande d'accompagnement par le service PHASE.<br />
+        Ce questionnaire vous prendra entre 5 et 15 minutes selon votre profil.</p>
+      <p>
+        Les informations fournies s'enregistrent automatiquement. Vous aurez donc la possibilité de reprendre votre dossier de demande
+        ultérieurement avant de le valider définitivement.<br/>
+        Votre demande ne sera transmise au service PHASE qu'une fois complète et lorsque vous aurez cliqué sur "Valider" dans le dernier
+        écran de finalisation. <br />
+        Si vous ne savez pas comment remplir certains champs, n'hésitez pas à contacter la personne en charge de 
+        l'accompagnement spécifique au service PHASE sur votre campus. Vous trouverez son contact sur cette page : 
+        <a target="_blank" href="https://www.u-bordeaux.fr/formation/accompagnement-et-reussite-des-etudes/etudiants-besoins-specifiques">Étudiants à besoins spécifiques</a>.<br /> 
+      </p>
+    type_reponse: "info"
+  infos_debut_specifique_sportifs_hn:
+    libelle: "Informations complémentaires"
+    aide: >
+      \<p>Vous renseignez un formulaire en ligne pour demander l’obtention du statut de sportif de haut niveau de 
+      l’Université de Bordeaux.</p>
+      <p>L’obtention de ce statut est un préalable obligatoire pour demander un accompagnement personnalisé par le 
+      service Phase pour mener à bien votre projet sportif et pédagogique.</p>
+      <p>Vous devez exprimer votre demande impérativement avant la date de fin de campagne indiquée précédemment.</p>
+    type_reponse: "info"
+  infos_debut_specifique_sportifs_bn_tbn:
+    libelle: "Informations complémentaires"
+    aide: >
+      \<p>Vous renseignez un formulaire en ligne pour demander l’obtention du statut de sportif de très bon niveau 
+      ou bon niveau de l’Université de Bordeaux.</p>
+      <p>L’obtention de ce statut est un préalable obligatoire pour demander un accompagnement personnalisé par le 
+      service Phase pour mener à bien votre projet sportif et pédagogique.</p>
+      <p>Vous devez exprimer votre demande impérativement avant la date de fin de campagne indiquée précédemment.</p>
+    type_reponse: "info"
+  #############################################################################
+  # etape_informations_generales
+  #############################################################################
+  question_commune_num_tel:
+    libelle: "Numéro de téléphone"
+    aide: ""
+    type_reponse: "text"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+    champ_cible: 'tel_perso'
+  question_commune_email_perso:
+    libelle: "Email personnel"
+    aide: ""
+    type_reponse: "text"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+    champ_cible: 'email_perso'
+  question_commune_contact_urgence:
+    libelle: "Contact en cas d'urgence"
+    aide: "Nous attendons son nom, son prénom, son lien avec vous ainsi que son numéro de téléphone et/ou son mail"
+    type_reponse: "textarea"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+    champ_cible: 'contact_urgence'
+  #############################################################################
+  # etape_specifique_sportif
+  #############################################################################
+  question_sportif_liste_ministerielle:
+    libelle: "Êtes-vous inscrit(e) sur les listes ministérielles?"
+    aide: ""
+    type_reponse: "select"
+    optionsReponse:
+      - '@reponse_oui_question_listes_ministerielles_sportifs'
+      - '@reponse_oui_mais_question_listes_ministerielles_sportifs'
+      - '@reponse_non_question_listes_ministerielles_sportifs'
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  question_sportif_numero_psqs:
+    libelle: "Votre numéro PSQS"
+    aide: ""
+    type_reponse: "text"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+    table_options: 'sportif_haut_niveau'
+  question_sportif_ministere_niveau:
+    libelle: "Veuillez préciser :"
+    aide: ""
+    type_reponse: "checkbox"
+    optionsReponse:
+      - '@reponse_elite_sportif_niveau'
+      - '@reponse_senior_sportif_niveau'
+      - '@reponse_releve_sportif_niveau'
+      - '@reponse_reconversion_sportif_niveau'
+      - '@reponse_espoir_sportif_niveau'
+      - '@reponse_collectifs_nationaux_sportif_niveau'
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  question_sportif_discipline:
+    libelle: "Quelle est votre discipline sportive ?"
+    aide: ""
+    type_reponse: "select"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+    table_options: "discipline_sportive"
+  question_sportif_professionnel:
+    libelle: "Etes-vous sportif professionnel ?"
+    type_reponse: "select"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+    optionsReponse:
+      - '@reponse_oui_question_sportif_professionnel'
+      - '@reponse_non_question_sportif_professionnel'
+  question_sportif_club_professionnel:
+    libelle: "Veuillez préciser pour quel club :"
+    aide: "liste prédéfinie, si le votre manque...?"
+    type_reponse: "select"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+    table_options: "clubs_professionnels"
+  question_sportif_centre_labellise:
+    libelle: "Etes-vous dans un centre de formation labellisé ?"
+    type_reponse: "select"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+    optionsReponse:
+      - '@reponse_oui_question_sportif_centre_labellise'
+      - '@reponse_non_question_sportif_centre_labellise'
+  question_sportif_club_centre_formation:
+    libelle: "Veuillez préciser pour quel club :"
+    aide: ""
+    type_reponse: "select"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+    table_options: "clubs_centre_formation"
+  info_sportif_hn_non_eligible:
+    libelle: "Situation incompatible avec ce type de demande"
+    type_reponse: 'info'
+    aide: >
+      \<p>Votre situation n'est pas compatible avec le statut Sportif Haut Niveau de l'université, veuillez 
+      faire une demande de statut "Sportif de bon ou très bon niveau"</p>
+    obligatoire: true
+  question_sportif_club_autre:
+    libelle: "Quel est le nom de votre club ?"
+    aide: ""
+    type_reponse: "text"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  question_sportif_entrainement:
+    libelle: "Combien d’heures par semaine vous entrainez-vous au sein de votre club ?"
+    aide: ""
+    type_reponse: "numeric"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  question_sportifs_resultats:
+    libelle: "Vos performances et résultats sportifs récents et significatifs"
+    aide: ""
+    type_reponse: "textarea"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  question_sportifs_rattachement_creps:
+    libelle: "Etes-vous rattaché(e) au CREPS de Talence?"
+    aide: ""
+    type_reponse: "select"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+    optionsReponse:
+      - '@reponse_oui_question_sportif_creps'
+      - '@reponse_non_question_sportif_creps'
+  info_pas_eligible_hn:
+    type_reponse: 'info'
+    obligatoire: true
+    libelle: 'Vous ne répondez pas aux critères pour les sportifs HN'
+    aide: >
+      \<p>Vous ne répondez pas aux critères pour obtenir le statut sportif haut niveau, 
+        faites plutôt une demande de statut sportif bon ou très Bon niveau.
+      </p>
+  piece_sportifs_attestation_niveau:
+    libelle: "Attestation de niveau de pratique signée par un cadre technique fédéral"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_sportifs_hn_attestation_psqs:
+    libelle: "Attestation de sportif haut niveau via votre espace réservé PSQS"
+    aide: ""
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: false
+    choix_multiple: false
+  piece_sportifs_lettre_presentation:
+    libelle: "Lettre de présentation"
+    obligatoire: true
+    aide: >
+      \<ul>Expliquez :
+        <li>Vos objectifs sportifs à court et moyen terme</li>
+        <li>Vos projets d’études à court et moyen terme</li>
+        <li>Vos attentes à propos du dispositif d’accompagnement Phase pour la réalisation 
+            de votre double projet (sport et études)</li>
+      </ul>
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_sportifs_cv:
+    libelle: "CV Sportif"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_sportifs_convention_formation:
+    libelle: "Convention de formation"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_sportifs_contrat_pro:
+    libelle: "Contrat pro"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  #############################################################################
+  # etape_specifique_handicap
+  #############################################################################
+  question_handicap_typologie:
+    libelle: "Votre typologie de handicap"
+    aide: "liste prédéfinie, si le votre manque...?"
+    type_reponse: "select"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: true
+    table_options: "typologie_handicap"
+  question_handicap_notif_mdph:
+    libelle: "Avez-vous une notification MDPH ?"
+    aide: ""
+    type_reponse: "select"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+    optionsReponse:
+      - '@reponse_oui_question_notif_mdph'
+      - '@reponse_non_question_notif_mdph'
+  question_handicap_autre_accompagnement:
+    libelle: "Si vous avez des accompagnements hors université (PCH, RQTH, suivi médico social …), vous pouvez les préciser"
+    aide: ""
+    type_reponse: "textarea"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  piece_certificat_medical:
+    libelle: "Certificat médical"
+    type_reponse: "file"
+    aide: >
+      \<p>Par un médecin spécialiste stipulant l’incapacité générée par votre état de santé ou autre 
+      justificatif handicap</p>
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  piece_fiche_parcoursup:
+    libelle: "Fiche de liaison parcoursup"
+    type_reponse: "file"
+    aide: ""
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  piece_amenagement_bac:
+    libelle: "Avis d'aménagement au baccalauréat"
+    type_reponse: "file"
+    aide: ""
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  piece_avis_amenagement_ese:
+    libelle: "Avis d'aménagement délivré par l'Espace Santé Etudiants (ESE)"
+    type_reponse: "file"
+    aide: ""
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  piece_handicap_autres:
+    libelle: "Autres types de documents"
+    type_reponse: "file"
+    aide: >
+      \<p>Bilans (orthophonique/ ophtalmologique / psychomoteur / psychologique...), 
+      bulletin d'hospitalisation, …</p>
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: true
+  #############################################################################
+  # etape_specifique_incapacite_temporaire
+  #############################################################################
+  question_incapacite_typologie:
+    libelle: "Votre typologie de handicap"
+    aide: "liste prédéfinie, si le votre manque...?"
+    type_reponse: "select"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+    table_options: "typologie_handicap"
+  question_incapacite_periode_debut:
+    libelle: "Date de début de votre incapacité :"
+    type_reponse: "date"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  question_incapacite_periode_fin:
+    libelle: "Date de fin de votre incapacité :"
+    type_reponse: "date"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  question_incapacite_autre_accompagnement:
+    libelle: "Si vous avez des accompagnements hors université (suivi médico social …), vous pouvez les préciser"
+    aide: ""
+    type_reponse: "textarea"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  piece_incapacite_certificat:
+    libelle: "Certificat médical"
+    type_reponse: "file"
+    aide: >
+      \<p>Par un médecin spécialiste stipulant l’incapacité générée par votre état de santé et la durée 
+      d'invalidité.</p>
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  #############################################################################
+  # etape_specifique_elu_engage
+  #############################################################################
+  question_engages_type_engagement:
+    libelle: "Type d'engagement"
+    type_reponse: "checkbox"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: true
+  #    table_options: "type_engagement" => impossible, besoin de lier des questions/PJ
+  question_engages_debut:
+    libelle: "Date de début de votre engagement/mandat :"
+    type_reponse: "date"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  question_engages_duree:
+    libelle: "Votre durée d'engagement/mandat (en mois) :"
+    type_reponse: "numeric"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  question_engages_nb_heures:
+    libelle: "Nombre d'heures moyenne par semaine :"
+    type_reponse: "numeric"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  piece_engagement_lettre:
+    libelle: "Lettre de description de votre engagement"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: false
+    choix_multiple: false
+  piece_engagement_contrat_volontariat:
+    libelle: "Contrat de volontariat signé"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_engagement_statuts_association:
+    libelle: "Statuts de l'association"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_engagement_cr_ag_association:
+    libelle: "Compte-rendu d'AG indiquant votre responsabilité au sein du bureau"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_engagement_contrat_reserve:
+    libelle: "Contrat de réserve opérationnelle signé"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_engagement_contrat_service_civique:
+    libelle: "Contrat de service civique signé"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: true
+    choix_multiple: false
+  piece_arrete_resultat_elections:
+    libelle: "Arrêté portant proclamation des résultats des élections"
+    obligatoire: true
+    type_reponse: "file"
+    reponse_conservable: false
+    choix_multiple: false
+  #############################################################################
+  # etape_specifique_femme_enceinte
+  #############################################################################
+  question_femme_enceinte_date_accouchement:
+    libelle: "Quelle est la date présumée de votre accouchement?"
+    type_reponse: "date"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  question_femme_enceinte_periode_interruption:
+    libelle: "Périodes anticipées d’arrêt et de reprise de formation"
+    type_reponse: "textarea"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  question_femme_enceinte_grossesse_pathologique:
+    libelle: "Votre grossesse est-elle pathologique?"
+    type_reponse: "select"
+    obligatoire: false
+    choix_multiple: false
+    optionsReponse:
+      - '@reponse_oui_question_grossesse_pathologique'
+      - '@reponse_non_question_grossesse_pathologique'
+  piece_certificat_grossesse:
+    libelle: "Certificat de grossesse"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  #############################################################################
+  # etape_specifique_charge_famille
+  #############################################################################
+  question_charge_famille_enfants:
+    libelle: "Précisez le nombre d'enfant que vous avez ainsi que leur âge"
+    type_reponse: "textarea"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  piece_livret_famille:
+    libelle: "Livret de famille"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: true
+  #############################################################################
+  # etape_specifique_plusieurs_cursus
+  #############################################################################
+  question_double_cursus_etablissement:
+    libelle: "Etablissement de votre seconde formation"
+    type_reponse: "text"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  question_double_cursus_formation:
+    libelle: "Précisez l'année et l'intitulé de la formation"
+    type_reponse: "text"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  piece_double_cursus_lettre_presentation:
+    libelle: "Lettre de présentation de votre double projet"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  piece_double_cursus_certif_scolarite:
+    libelle: "Certificat de scolarité OU justificatif d’inscription de votre seconde formation"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  #############################################################################
+  # etape_specifique_salarie_entrepreneur
+  #############################################################################
+  question_salarie_activite:
+    libelle: "Décrivez votre activité"
+    aide: "Il doit figurer l'intitulé et le descriptif du poste"
+    type_reponse: "textarea"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  question_salarie_type_contrat:
+    libelle: "Quel est votre type de contrat"
+    aide: "Votre contrat doit au moins couvrir un semestre"
+    type_reponse: "select"
+    obligatoire: true
+    choix_multiple: false
+    optionsReponse:
+      - '@reponse_cdi_type_contrat'
+      - '@reponse_cdd_type_contrat'
+      - '@reponse_entrepreneur_type_contrat'
+      - '@reponse_autre_type_contrat'
+  infos_salarie_entrepreneur:
+    libelle: "Informations complémentaires"
+    aide: >
+      \<p>Si vous souhaitez être accompagné·e dans la structuration de votre projet d’entreprenariat vous pouvez 
+      postuler au statut d’étudiant entrepreneur·se via le <a href="https://snee.enseignementsup-recherche.gouv.fr">site 
+      du ministère de enseignement supérieur et de la recherche</a> et vous rapprocher de l’incubateur étudiant 
+      UBee Lab : <a href="amandine.boutang@u-bordeaux.fr">Amandine Boutang</a>.</p>
+      <p>Pour plus d'information, vous pouvez également consulter le site UBee Lab : https://ubeelab.u-bordeaux.fr/ </p>
+      <p><strong>Si vous êtes salarié, afin de bénéficier de l'accompagnement du service PHASE, votre contrat doit être au 
+      minimum de 15h par semaine et doit couvrir au minimum un semestre (4 mois) de septembre à décembre pour le 
+      premier semestre et de janvier à avril pour le second.</strong></p>
+    type_reponse: "info"
+  piece_salarie_attestation_crous:
+    libelle: "Si vous êtes boursier, attestation CROUS"
+    type_reponse: "file"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false
+  piece_salarie_contrat_travail:
+    libelle: "Copie du contrat de travail signé par vous et par l'employeur"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  piece_salarie_bulletins_salaire:
+    libelle: "Bulletin de salaire du premier mois et du dernier mois du semestre"
+    type_reponse: "file"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: true
+  piece_entrepreneur_lettre_presentation:
+    libelle: "Lettre de présentation de votre projet entrepreneurial"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  piece_entrepreneur_attestation:
+    libelle: "Atestation de statut national d’étudiant.e entrepreneur.se ou un justificatif de création de structure"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  #############################################################################
+  # etape_specifique_artiste
+  #############################################################################
+  question_artiste_discipline:
+    libelle: "Votre discipline artistique"
+    type_reponse: "select"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+    table_options: "discipline_artistique"
+  question_artiste_conservatoire:
+    libelle: "Êtes-vous en formation au conservatoire de Bordeaux Jacques Thibaud ?"
+    type_reponse: "select"
+    obligatoire: true
+    choix_multiple: false
+    reponse_conservable: false
+    optionsReponse:
+      - '@reponse_oui_question_artiste_conservatoire'
+      - '@reponse_non_question_artiste_conservatoire'
+  question_artiste_cours_autre_etablissement:
+    libelle: "Suivez-vous des cours dans un autre établissement ?"
+    type_reponse: "select"
+    obligatoire: true
+    choix_multiple: false
+    reponse_conservable: false
+    optionsReponse:
+      - '@reponse_oui_question_artiste_cours_autre_etablissement'
+      - '@reponse_non_question_artiste_cours_autre_etablissement'
+  question_artiste_autre_etablissement:
+    libelle: "Dans quel établissement ?"
+    type_reponse: "select"
+    obligatoire: true
+    choix_multiple: false
+    reponse_conservable: false
+    table_options: "etablissement_artistique"
+  question_artiste_niveau:
+    libelle: "Quel est votre niveau atteint ?"
+    type_reponse: "textarea"
+    obligatoire: false
+    choix_multiple: false
+    reponse_conservable: false
+  question_artiste_prix_productions:
+    libelle: "Précisez vos prix ou titres ou productions artistiques ainsi que vos participations à des évènements artistiques marquants"
+    type_reponse: "textarea"
+    obligatoire: true
+    choix_multiple: false
+    reponse_conservable: true
+  question_artiste_troupe:
+    libelle: "Êtes-vous dans une troupe ou un orchestre ?"
+    type_reponse: "select"
+    obligatoire: true
+    choix_multiple: false
+    reponse_conservable: false
+    optionsReponse:
+      - '@reponse_oui_question_artiste_troupe'
+      - '@reponse_non_question_artiste_troupe'
+  question_artiste_pro:
+    libelle: "Votre activité artistique est-elle professionnelle ?"
+    type_reponse: "select"
+    obligatoire: true
+    choix_multiple: false
+    reponse_conservable: true
+    optionsReponse:
+      - '@reponse_oui_question_artiste_pro'
+      - '@reponse_non_question_artiste_pro'
+  question_artiste_volume_horaire:
+    libelle: "Indiquez le volume horaire que vous consacrez en moyenne par semaine à votre pratique artistique"
+    type_reponse: "numeric"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  piece_artiste_lettre_presentation:
+    libelle: "Lettre de présentation de votre projet artistique"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  piece_artiste_certif_scol:
+    libelle: "Attestation de scolarité qui indique votre formation hors université"
+    type_reponse: "file"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  piece_artiste_autres_docs:
+    libelle: "Tout document qui permette de justifier votre pratique artistique et d'évaluer votre niveau de contrainte"
+    aide: >
+      \<p>Par exemple des justificatifs de participation à des manifestations professionnelles, une revue de presse, 
+      des justificatifs de contrats de prestations etc…</p>
+    type_reponse: "file"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: true
+  #############################################################################
+  # etape_souhaits_amenagement
+  #############################################################################
+  question_amenagements_premiere_demande_phase:
+    libelle: "Est-ce votre première demande d'accompagnement par le service PHASE?"
+    aide: ""
+    type_reponse: "select"
+    optionsReponse:
+      - '@reponse_oui_question_suivi_phase'
+      - '@reponse_non_question_suivi_phase'
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  question_amenagements_situation:
+    libelle: "Expliquez en quelques mots votre situation ou votre statut"
+    type_reponse: "textarea"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  question_amenagements_difficultes_enseignements:
+    libelle: "Quelles sont vos difficultés pendant les enseignements ?"
+    type_reponse: "textarea"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  question_amenagements_difficultes_evaluations:
+    libelle: "Quelles sont vos difficultés pendant les évaluations ?"
+    type_reponse: "textarea"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  question_amenagements_difficultes_vie_univ:
+    libelle: "Quelles sont vos difficultés pendant les moments de vie universitaire ?"
+    aide: "Culture, sport, engagement étudiant, restauration..."
+    type_reponse: "textarea"
+    obligatoire: true
+    reponse_conservable: true
+    choix_multiple: false
+  question_amenagements_pedagogiques_texte:
+    libelle: "Quels sont les aménagements que vous souhaiteriez mettre en place pendant les enseignements ?"
+    type_reponse: "textarea"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  question_amenagements_examens_texte:
+    libelle: "Quels sont les aménagements que vous souhaiteriez mettre en place pendant les évaluations ?"
+    type_reponse: "textarea"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  question_amenagements_vie_univ:
+    libelle: "Quels sont les aménagements que vous souhaiteriez mettre en place pendant les moments de vie universitaire ?"
+    type_reponse: "textarea"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  question_amenagements_modifier_demande:
+    libelle: "Souhaiteriez-vous faire évoluer votre demande d'aménagement ?"
+    type_reponse: "select"
+    optionsReponse:
+      - '@reponse_oui_question_amenagements_modifier_demande'
+      - '@reponse_non_question_amenagements_modifier_demande'
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  question_amenagements_pedagogiques:
+    libelle: "Quels sont les aménagements que vous souhaiteriez mettre en place pendant les enseignements ?"
+    type_reponse: "checkbox"
+    table_options: "categorie_amenagement_pedagogique"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: true
+  question_amenagements_examens:
+    libelle: "Quels sont les aménagements que vous souhaiteriez mettre en place pendant les évaluations ?"
+    type_reponse: "checkbox"
+    table_options: "categorie_amenagement_examens"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: true
+  question_amenagements_info_enseignants:
+    libelle: "Souhaitez-vous transmettre un message à vos enseignants ?"
+    aide: "Les données à caractère médical (diagnostic) ne pourront pas être communiquées, sauf si elles sont impératives pour la qualité du suivi du cursus. Soyez concis.e"
+    type_reponse: "textarea"
+    obligatoire: false
+    reponse_conservable: true
+    choix_multiple: false
+  #############################################################################
+  # etape_validation
+  #############################################################################
+  info_finalisation_demande_consentement:
+    type_reponse: "info"
+    libelle: "consentement"
+    aide: >
+      \<p>Je certifie sincères et véritables les informations contenues dans le présent dossier.<br />
+      J’ai conscience que mes demandes de statut et/ou d’accompagnement d’aménagements nécessitent une analyse de mon dossier et des justificatifs déposés.</p>
+      <p>Je m'engage à signaler tout changement au cours de l’année universitaire au service PHASE ainsi qu’à faire une actualisation de mes demandes d’accompagnement à chaque rentrée universitaire.</p>
+  info_traitement_donnees:
+    type_reponse: "info"
+    libelle: "traitement des données"
+    aide: >
+      \<p>Pour plus d'informations sur le traitement des données du service PHASE cliquez <a href="/rpgd-demandeurs" target="_blank">ici</a>
+  question_valider_demande:
+    libelle: "Valider"
+    type_reponse: "submit"
+    obligatoire: false
+    reponse_conservable: false
+    choix_multiple: false

@@ -1,0 +1,310 @@
+App\Entity\QuestionEtapeDemande:
+  etape_avant_de_commencer_info_debut:
+    etape: '@etape_avant_de_commencer'
+    question: '@info_debut'
+    ordre: 1
+  etape_avant_de_commencer_sportifs_info_debut_hn:
+    etape: '@etape_avant_de_commencer_sportifs_hn'
+    question: '@info_debut'
+    ordre: 1
+  etape_avant_de_commencer_sportifs_info_debut_bn_tbn:
+    etape: '@etape_avant_de_commencer_sportifs_bn_tbn'
+    question: '@info_debut'
+    ordre: 1
+  etape_avant_de_commencer_sportifs_info_specifique_hn:
+    etape: '@etape_avant_de_commencer_sportifs_hn'
+    question: '@infos_debut_specifique_sportifs_hn'
+    ordre: 2
+  etape_avant_de_commencer_sportifs_info_specifique_bn_tbn:
+    etape: '@etape_avant_de_commencer_sportifs_bn_tbn'
+    question: '@infos_debut_specifique_sportifs_bn_tbn'
+    ordre: 2
+  etape_informations_generales_question_1:
+    etape: '@etape_informations_generales'
+    question: '@question_commune_num_tel'
+    ordre: 1
+  etape_informations_generales_question_2:
+    etape: '@etape_informations_generales'
+    question: '@question_commune_email_perso'
+    ordre: 2
+  etape_informations_generales_question_3:
+    etape: '@etape_informations_generales'
+    question: '@question_commune_contact_urgence'
+    ordre: 3
+
+  etape_sportifs_hn_question_1:
+    etape: '@etape_specifique_sportif_hn'
+    question: '@question_sportif_liste_ministerielle'
+    ordre: 1
+  #  etape_sportifs_hn_question_2:
+  #    etape: '@etape_specifique_sportif_hn'
+  #    question: '@question_sportif_discipline'
+  #    ordre: 2
+  #  etape_sportif_hn_question_3:
+  #    etape: '@etape_specifique_sportif_hn'
+  #    question: '@question_sportif_professionnel'
+  #    ordre: 3
+  #  etape_sportif_hn_question_4:
+  #    etape: '@etape_specifique_sportif_hn'
+  #    question: '@question_sportif_entrainement'
+  #    ordre: 4
+  #  etape_sportif_hn_question_5:
+  #    etape: '@etape_specifique_sportif_hn'
+  #    question: '@question_sportifs_resultats'
+  #    ordre: 5
+  #  etape_sportif_hn_question_6:
+  #    etape: '@etape_specifique_sportif_hn'
+  #    question: '@question_sportifs_rattachement_creps'
+  #    ordre: 6
+  #  etape_sportif_hn_lettre_presentation:
+  #    etape: '@etape_specifique_sportif_hn'
+  #    question: '@piece_sportifs_lettre_presentation'
+  #    ordre: 7
+  #  etape_sportif_hn_cv_sportif:
+  #    etape: '@etape_specifique_sportif_hn'
+  #    question: '@piece_sportifs_cv'
+  #    ordre: 8
+
+  etape_sportifs_bn_tbn_question_1:
+    etape: '@etape_specifique_sportif_bn_tbn'
+    question: '@question_sportif_discipline'
+    ordre: 1
+  etape_sportifs_bn_tbn_question_2:
+    etape: '@etape_specifique_sportif_bn_tbn'
+    question: '@piece_sportifs_attestation_niveau'
+    ordre: 2
+  etape_sportif_bn_tbn_question_3:
+    etape: '@etape_specifique_sportif_bn_tbn'
+    question: '@question_sportif_entrainement'
+    ordre: 3
+  etape_sportif_bn_tbn_question_5:
+    etape: '@etape_specifique_sportif_bn_tbn'
+    question: '@question_sportifs_resultats'
+    ordre: 4
+  etape_sportif_bn_tbn_question_6:
+    etape: '@etape_specifique_sportif_bn_tbn'
+    question: '@question_sportifs_rattachement_creps'
+    ordre: 5
+  etape_sportif_bn_tbn_lettre_presentation:
+    etape: '@etape_specifique_sportif_bn_tbn'
+    question: '@piece_sportifs_lettre_presentation'
+    ordre: 6
+  etape_sportif_bn_tbn_cv_sportif:
+    etape: '@etape_specifique_sportif_bn_tbn'
+    question: '@piece_sportifs_cv'
+    ordre: 7
+
+  etape_handicap_question_1:
+    etape: '@etape_specifique_handicap'
+    question: '@question_handicap_typologie'
+    ordre: 1
+  etape_handicap_question_2:
+    etape: '@etape_specifique_handicap'
+    question: '@question_handicap_notif_mdph'
+    ordre: 2
+  etape_handicap_question3:
+    etape: '@etape_specifique_handicap'
+    question: '@question_handicap_autre_accompagnement'
+    ordre: 3
+  etape_handicap_piece_certificat:
+    etape: '@etape_specifique_handicap'
+    question: '@piece_certificat_medical'
+    ordre: 4
+  etape_handicap_piece_fiche_parcoursup:
+    etape: '@etape_specifique_handicap'
+    question: '@piece_fiche_parcoursup'
+    ordre: 5
+  etape_handicap_piece_amenagement_bac:
+    etape: '@etape_specifique_handicap'
+    question: '@piece_amenagement_bac'
+    ordre: 6
+  etape_handicap_piece_amenagement_ese:
+    etape: '@etape_specifique_handicap'
+    question: '@piece_avis_amenagement_ese'
+    ordre: 7
+  etape_handicap_piece_handicap_autres:
+    etape: '@etape_specifique_handicap'
+    question: '@piece_handicap_autres'
+    ordre: 8
+  etape_incapacite_question_1:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@question_incapacite_typologie'
+    ordre: 1
+  etape_incapacite_question_2:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@question_incapacite_periode_debut'
+    ordre: 2
+  etape_incapacite_question_3:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@question_incapacite_periode_fin'
+    ordre: 3
+  etape_incapacite_question_4:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@question_incapacite_autre_accompagnement'
+    ordre: 4
+  etape_incapacite_piece_certif:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@piece_incapacite_certificat'
+    ordre: 5
+  etape_incapacite_fiche_parcoursup:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@piece_fiche_parcoursup'
+    ordre: 6
+  etape_incapacite_piece_amenagement_bac:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@piece_amenagement_bac'
+    ordre: 7
+  etape_incapacite_piece_amenagement_ese:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@piece_avis_amenagement_ese'
+    ordre: 8
+  etape_incapacite_piece_handicap_autres:
+    etape: '@etape_specifique_incapacite_temporaire'
+    question: '@piece_handicap_autres'
+    ordre: 9
+  etape_engages_question_1:
+    etape: '@etape_specifique_elu_engage'
+    question: '@question_engages_type_engagement'
+    ordre: 1
+  etape_engages_question_2:
+    etape: '@etape_specifique_elu_engage'
+    question: '@question_engages_debut'
+    ordre: 2
+  etape_engages_question_3:
+    etape: '@etape_specifique_elu_engage'
+    question: '@question_engages_duree'
+    ordre: 3
+  etape_engages_question_4:
+    etape: '@etape_specifique_elu_engage'
+    question: '@question_engages_nb_heures'
+    ordre: 4
+  etape_engages_piece_lettre:
+    etape: '@etape_specifique_elu_engage'
+    question: '@piece_engagement_lettre'
+    ordre: 5
+  etape_femme_enceinte_question_1:
+    etape: '@etape_specifique_femme_enceinte'
+    question: '@question_femme_enceinte_date_accouchement'
+    ordre: 1
+  etape_femme_enceinte_question_2:
+    etape: '@etape_specifique_femme_enceinte'
+    question: '@question_femme_enceinte_periode_interruption'
+    ordre: 2
+  etape_femme_enceinte_question_3:
+    etape: '@etape_specifique_femme_enceinte'
+    question: '@question_femme_enceinte_grossesse_pathologique'
+    ordre: 3
+  etape_femme_enceinte_piece_certificat:
+    etape: '@etape_specifique_femme_enceinte'
+    question: '@piece_certificat_grossesse'
+    ordre: 4
+  etape_charge_famille_question_1:
+    etape: "@etape_specifique_charge_famille"
+    question: '@question_charge_famille_enfants'
+    ordre: 1
+  etape_charge_famille_livret_famille:
+    etape: "@etape_specifique_charge_famille"
+    question: '@piece_livret_famille'
+    ordre: 2
+  etape_plusieurs_cursus_question_1:
+    etape: '@etape_specifique_plusieurs_cursus'
+    question: '@question_double_cursus_etablissement'
+    ordre: 1
+  etape_plusieurs_cursus_question_2:
+    etape: '@etape_specifique_plusieurs_cursus'
+    question: '@question_double_cursus_formation'
+    ordre: 2
+  etape_plusieurs_cursus_lettre_presentation:
+    etape: '@etape_specifique_plusieurs_cursus'
+    question: '@piece_double_cursus_lettre_presentation'
+    ordre: 3
+  etape_plusieurs_cursus_certif_scol:
+    etape: '@etape_specifique_plusieurs_cursus'
+    question: '@piece_double_cursus_certif_scolarite'
+    ordre: 4
+  etape_salarie_question_1:
+    etape: '@etape_specifique_salarie_entrepreneur'
+    question: '@question_salarie_activite'
+    ordre: 1
+  etape_salarie_question_2:
+    etape: '@etape_specifique_salarie_entrepreneur'
+    question: '@question_salarie_type_contrat'
+    ordre: 2
+  etape_artiste_question_1:
+    etape: "@etape_specifique_artiste"
+    question: "@question_artiste_discipline"
+    ordre: 1
+  etape_artiste_question_2:
+    etape: "@etape_specifique_artiste"
+    question: "@question_artiste_conservatoire"
+    ordre: 2
+  etape_artiste_question_3:
+    etape: "@etape_specifique_artiste"
+    question: "@question_artiste_niveau"
+    ordre: 3
+  etape_artiste_question_4:
+    etape: "@etape_specifique_artiste"
+    question: "@question_artiste_prix_productions"
+    ordre: 4
+  etape_artiste_question_5:
+    etape: "@etape_specifique_artiste"
+    question: "@question_artiste_troupe"
+    ordre: 5
+  etape_artiste_question_6:
+    etape: "@etape_specifique_artiste"
+    question: "@question_artiste_pro"
+    ordre: 6
+  etape_artiste_question_7:
+    etape: "@etape_specifique_artiste"
+    question: "@question_artiste_volume_horaire"
+    ordre: 7
+  etape_artiste_piece_lettre_presentation:
+    etape: "@etape_specifique_artiste"
+    question: "@piece_artiste_lettre_presentation"
+    ordre: 8
+
+  etape_amenagements_question_1:
+    etape: '@etape_souhaits_amenagement'
+    question: '@question_amenagements_situation'
+    ordre: 1
+  etape_amenagements_question_2:
+    etape: '@etape_souhaits_amenagement'
+    question: '@question_amenagements_difficultes_enseignements'
+    ordre: 2
+  etape_amenagements_question_3:
+    etape: '@etape_souhaits_amenagement'
+    question: '@question_amenagements_difficultes_evaluations'
+    ordre: 3
+  etape_amenagements_question_4:
+    etape: '@etape_souhaits_amenagement'
+    question: '@question_amenagements_difficultes_vie_univ'
+    ordre: 4
+  etape_amenagements_question_5:
+    etape: '@etape_souhaits_amenagement'
+    question: '@question_amenagements_pedagogiques_texte'
+    ordre: 5
+  etape_amenagements_question_6:
+    etape: '@etape_souhaits_amenagement'
+    question: '@question_amenagements_examens_texte'
+    ordre: 6
+  etape_amenagements_question_7:
+    etape: '@etape_souhaits_amenagement'
+    question: '@question_amenagements_vie_univ'
+    ordre: 7
+  etape_amenagements_question_8:
+    etape: '@etape_souhaits_amenagement'
+    question: '@question_amenagements_info_enseignants'
+    ordre: 8
+
+  etape_validation_info_consentement:
+    etape: "@etape_validation"
+    question: '@info_finalisation_demande_consentement'
+    ordre: 1
+  etape_validation_traitement_donnees:
+    etape: "@etape_validation"
+    question: '@info_traitement_donnees'
+    ordre: 2
+  etape_validation_question_finale:
+    etape: "@etape_validation"
+    question: '@question_valider_demande'
+    ordre: 999

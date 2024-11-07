@@ -1,0 +1,134 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <style type="text/css">
+        html {
+            background-color: #FFFFFF;
+            height: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 13px;
+            color: #333333;
+            line-height: 1.6em;
+            background-color: #FFFFFF;
+        }
+
+        header {
+            text-align: left;
+        }
+
+        footer {
+            width: 100%;
+            background-color: #FFFFFF;
+            margin-top: 30px;
+            overflow: auto;
+            position: absolute;
+            margin-bottom: 0px;
+            height: 0;
+        }
+
+        #CadreUBx {
+            width: 96%;
+            margin: 1%;
+            padding-bottom: 0.5%;
+            padding-top: 0.5%;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid #CCCCCC;
+            background-image: url("{{ publicRootDir }}/images/FondAngle.png");
+            background-position: bottom left;
+            background-repeat: no-repeat;
+            background-size: 250px 150px;
+        }
+
+        .CrdGeneric {
+            width: 98%;
+            margin-right: auto;
+            margin-left: auto;
+            overflow: auto;
+        {% if app.environment != 'prod' %} background: url('{{ publicRootDir }}/images/filigrane_test.png') repeat;
+        {% endif %}
+        }
+
+        h1 {
+            font-family: "Brixslab", Arial, Helvetica, sans-serif;
+            font-size: 2.2em;
+            line-height: 1.2em;
+            color: #443a31;
+            margin-top: 0.1em;
+            margin-bottom: 0.4em;
+            margin-right: 0.25em;
+            margin-left: 0.25em;
+            border-bottom-width: 1px;
+            border-bottom-style: solid;
+            border-bottom-color: #009de0;
+        }
+
+        table {
+            width: 98%;
+            margin-left: 1%;
+            margin-right: 1%;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+
+        td {
+            padding-left: 5px;
+            padding-right: 5px;
+            padding-top: 2px;
+            padding-bottom: 2px;
+            text-align: left;
+            border-top: 1px solid rgb(190, 190, 190);
+            border-bottom: 1px solid rgb(190, 190, 190);
+        }
+    </style>
+</head>
+<body>
+<h1>Tableau des Services faits</h1>
+</body>
+<div id="CadreUBx">
+    <header>
+        Période : {{ data.periode.debut|date('d-m-Y') }} au {{ data.periode.fin|date('d-m-Y') }}
+    </header>
+
+    <div class="CrdGeneric">
+        <table>
+            <thead>
+            <tr>
+                <th>Email</th>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Catégorie</th>
+                <th>Nombre d'heures</th>
+                <th>Taux horaire</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for ligne in data.lignes %}
+                <tr>
+                    <td>{{ ligne.intervenant.email }}</td>
+                    <td>{{ ligne.intervenant.nom }}</td>
+                    <td>{{ ligne.intervenant.prenom }}</td>
+                    <td>{{ ligne.type.libelle }}</td>
+                    <td>{{ ligne.nbHeures }}</td>
+                    <td>{{ ligne.tauxHoraire.montant }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="CrdGeneric">
+        <p>Généré le {{ "now"|date("m/d/Y") }} par {{ app.user.prenom }} {{ app.user.nom }}</p>
+    </div>
+</div>
+<footer>
+    <div id="FooterContentUBx">&nbsp;</div>
+</footer>
+</html>

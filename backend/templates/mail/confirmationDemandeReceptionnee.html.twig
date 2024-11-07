@@ -1,0 +1,88 @@
+{% extends 'mail/base.html.twig' %}
+
+{% block body %}
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+        <tr>
+            <td>&nbsp;</td>
+            <td class="container">
+                <div class="content">
+                    <table role="presentation" class="main">
+                        <tr>
+                            <td class="wrapper">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td align="center">
+                                            <a href="{{ frontUrl }}" referrerpolicy="no-referrer"
+                                               target="_blank"
+                                               aria-label="Se rendre sur le site AppliPhase de l'université de Bordeaux">
+                                                <img border="0" class="img-responsive"
+                                                     src="{{ backUrl }}/images/logo-appliphase-email.png"
+                                                     alt="" aria-hidden="true" style="max-width: 300px"/></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                                <tr>
+                                                    <td>
+                                                        <h1>
+                                                            Confirmation de réception
+                                                        </h1>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>Bonjour,</p>
+                                            <p>Votre dossier de demande d'accompagnement au titre de
+                                                "{{ typeDemande.libelle }}" a bien été transmis au
+                                                service{% if typeDemande.estPourSportifs() %} Sports Haut et Bon niveau de l'Université de Bordeaux.
+                                            {% else %} PHASE.{% endif %} Il sera traité le plus rapidement
+                                                possible.{% if typeDemande.estPourSportifs() == false %}<br/>
+                                            Si vous ne l'avez pas encore rencontrée, n'hésitez pas à prendre contact
+                                            avec la personne en charge de d'accompagnement spécifique au Service
+                                            PHASE de votre campus.{% endif %}</p>
+
+                                            <p class="last">L'équipe AppliPhase.</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="footer">
+
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    <a
+                                            href="https://u-bordeaux.fr" referrerpolicy="no-referrer"
+                                            target="_blank">
+                                        <img border="0" width="50" style="width: 50px"
+                                             src="{{ backUrl }}/images/universite-bordeaux-medaillon.png"
+                                             alt="Logo Université de Bordeaux"/>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="content-block">
+                                <span class="apple-link"><a
+                                            href="https://u-bordeaux.fr" referrerpolicy="no-referrer"
+                                            target="_blank">Université de Bordeaux</a> • <a
+                                            href="{{ frontUrl }}" referrerpolicy="no-referrer"
+                                            target="_blank">AppliPhase</a></span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+{% endblock %}
+

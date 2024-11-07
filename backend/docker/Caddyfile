@@ -1,0 +1,45 @@
+{
+	{$CADDY_GLOBAL_OPTIONS}
+
+    cache {
+        otter
+
+        log_level warning
+
+        api {
+            souin
+            prometheus
+        }
+
+        cdn {
+            strategy hard
+        }
+
+        key {
+            headers Authorization
+        }
+
+        timeout {
+            backend 60s
+            cache 60s
+        }
+    }
+
+	frankenphp {
+		{$FRANKENPHP_CONFIG}
+	}
+}
+
+{$CADDY_EXTRA_CONFIG}
+
+{$SERVER_NAME:localhost} {
+
+    cache
+
+	root * public/
+	encode zstd br gzip
+
+	{$CADDY_SERVER_EXTRA_DIRECTIVES}
+
+	php_server
+}

@@ -1,0 +1,41 @@
+.steps-avancement {
+
+  .ant-steps-item-process .ant-steps-item-title {
+    font-weight: 500;
+  }
+
+  .ant-steps-item-title {
+    font-size: 16px;
+    line-height: 1.2;
+    white-space: pre-wrap !important;
+  }
+
+  .ant-steps-item-active {
+    font-weight: 500;
+  }
+
+  .ant-steps-item.ant-steps-item-active::before {
+    width: 0 !important;
+  }
+}
+
+.stepper-gestionnaire {
+
+  .ant-steps-item-description {
+    font-size: 12px;
+
+    .ant-typography {
+      font-size: 12px;
+      line-height: 1;
+      white-space: pre-wrap !important;
+    }
+  }
+}
+
+@media screen and (min-width: 768px) {
+  .steps-avancement {
+    .ant-steps-item-content {
+      min-height: auto !important;
+    }
+  }
+}

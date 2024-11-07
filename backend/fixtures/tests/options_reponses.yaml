@@ -1,0 +1,21 @@
+App\Entity\OptionReponse:
+  reponse_oui_question_besoin_accompagnement:
+    id: -1
+    question: '@question_besoin_accompagnement'
+    libelle: "oui"
+  reponse_non_question_besoin_accompagnement:
+    id: -2
+    question: '@question_besoin_accompagnement'
+    libelle: "non"
+  reponse_1_question_commune_1:
+    libelle: blanc
+  reponse_2_question_commune_1:
+    libelle: noir
+  reponse_1_question_sportifs_1:
+    libelle: oui
+    questionsLiees:
+      - '@question_sportifs_2'
+  reponse_2_question_sportifs_1:
+    libelle: non
+    questionsLiees:
+      - '@question_sportifs_sans_numero'

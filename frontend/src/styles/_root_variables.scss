@@ -1,0 +1,84 @@
+@import "variables";
+
+:root {
+  --color-intervenant: #{$intervenant};
+  --color-intervenant-light: #{$intervenant-light};
+  --color-beneficiaire: #{$beneficiaire};
+  --color-beneficiaire-light: #{$beneficiaire-light};
+  --color-renfort: #{$renfort};
+  --color-renfort-light: #{$renfort-light};
+  --color-demandeur: #{$demandeur};
+  --color-demandeur-light: #{$demandeur-light};
+
+  --color-danger: #{$error};
+  --color-danger-light: #{$error-light};
+
+  // --- Pour les types d'évènements
+
+  @each $key, $val in $colors-regular {
+    --color-#{$key}: #{$val};
+  }
+  @each $key, $val in $colors-light {
+    --color-light-#{$key}: #{$val};
+  }
+  @each $key, $val in $colors-xlight {
+    --color-xlight-#{$key}: #{$val};
+  }
+  @each $key, $val in $colors-dark {
+    --color-dark-#{$key}: #{$val};
+  }
+}
+
+@each $key, $val in $colors-regular {
+  .text-#{$key} {
+    color: #{$val} !important;
+  }
+  .bg-#{$key} {
+    background-color: #{$val} !important;
+  }
+  .border-#{$key} {
+    border-color: #{$val} !important;
+  }
+}
+
+@each $key, $val in $colors-dark {
+  .text-#{$key}-dark, .text-#{$key}-dark .ant-select-selection-item {
+    color: #{$val} !important;
+  }
+  .bg-#{$key}-dark {
+    background-color: #{$val} !important;
+  }
+  .border-#{$key}-dark {
+    border-color: #{$val} !important;
+  }
+}
+
+@each $key, $val in $colors-light {
+  .text-#{$key}-light {
+    color: #{$val} !important;
+  }
+  .bg-#{$key}-light, .bg-#{$key}-light td {
+    background-color: #{$val} !important;
+  }
+  .border-#{$key}-light {
+    border-color: #{$val} !important;
+  }
+}
+
+@each $key, $val in $colors-xlight {
+  .text-#{$key}-xlight {
+    color: #{$val} !important;
+  }
+  .bg-#{$key}-xlight {
+    background-color: #{$val} !important;
+  }
+}
+
+@each $key, $val in $colors-xlight {
+  .text-#{$key}-xxlight {
+    color: lighten($val, 3.5%) !important;
+  }
+  .bg-#{$key}-xxlight {
+    background-color: lighten($val, 3.5%) !important;
+  }
+}

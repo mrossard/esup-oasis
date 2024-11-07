@@ -1,0 +1,13 @@
+App\Entity\ValeurParametre:
+  valeur1:
+    valeur: '7 days'
+    debut: <date_create('2020-01-01 08:00')>
+    parametre: '@frequence_rappels'
+  valeur2:
+    valeur: '7 days'
+    debut: <date_create('2020-01-01 08:00')>
+    parametre: '@frequence_maj_inscriptions'
+  valeur3:
+    valeur: '1 day'
+    debut: <date_create('2020-01-01 08:00')>
+    parametre: '@frequence_rappel_envoi_rh'

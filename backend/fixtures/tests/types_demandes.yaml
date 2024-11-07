@@ -1,0 +1,31 @@
+App\Entity\TypeDemande:
+  type_demande_sportifs:
+    libelle: Demande de statut sportif
+    actif: true
+    profilsAssocies:
+      - '@profil3'
+      - '@profil4'
+      - '@profil5'
+    etapes:
+      - '@etape1_commune'
+      - '@etape2_sportifs'
+      - '@etape3_validation'
+  type_demande_artistes:
+    libelle: Demande de statut artiste
+    actif: true
+    profilsAssocies:
+      - '@profil6'
+    etapes:
+      - '@etape1_commune'
+      - '@etape2_artistes'
+      - '@etape3_validation'
+  type_demande_accompagnement_optionnel:
+    accompagnement_optionnel: true
+    libelle: Demande avec accompagnement optionnel
+    actif: true
+    profilsAssocies:
+      - '@profil3'
+    etapes:
+      - '@etape1_commune'
+      - '@etape2_si_accompagnement'
+      - '@etape3_validation'

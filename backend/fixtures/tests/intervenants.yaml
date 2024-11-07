@@ -1,0 +1,26 @@
+App\Entity\Intervenant:
+  intervenant1:
+    utilisateur: '@intervenant'
+    debut: <date_create(yesterday)>
+    fin: <date_create('today +100 years')>
+    competences:
+      - '@competence2'
+    typesEvenements:
+      - '@typeEvenement1'
+      - '@typeEvenement2'
+  intervenant2:
+    utilisateur: '@intervenant-2'
+    debut: <date_create(yesterday)>
+    fin: <date_create('today +100 years')>
+    competences:
+      - '@competence1'
+      - '@competence3'
+    typesEvenements:
+      - '@typeEvenement1'
+      - '@typeEvenement4'
+  intervenant-renfort:
+    utilisateur: '@renfort'
+    debut: <date_create(yesterday)>
+    fin: <date_create('today +100 years')>
+    typesEvenements:
+      - '@renfort-phase'

@@ -1,0 +1,31 @@
+App\Entity\QuestionEtapeDemande:
+  etape1_commune_question_1:
+    etape: '@etape1_commune'
+    question: '@question_commune_1'
+    ordre: 1
+  etape1_commune_question_2:
+    etape: '@etape1_commune'
+    question: '@question_commune_2'
+    ordre: 2
+  etape1_question_pj_1:
+    etape: '@etape1_commune'
+    question: '@question_pj_1'
+    ordre: 3
+  etape2_sportifs_question_1:
+    etape: '@etape2_sportifs'
+    question: '@question_sportifs_1'
+    ordre: 1
+  etape2_sportifs_question_3:
+    etape: '@etape2_sportifs'
+    question: '@question_sportifs_3'
+    ordre: 3
+  etape3_valider:
+    etape: '@etape3_validation'
+    question: '@question_valider_demande'
+    ordre: 999
+  etape_si_accompagnement_question:
+    etape: '@etape2_si_accompagnement'
+    question: '@question_accompagnement'
+    ordre: 1
+
+

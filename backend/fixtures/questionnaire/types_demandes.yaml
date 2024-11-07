@@ -1,0 +1,112 @@
+App\Entity\TypeDemande:
+  type_demande_sportif_hn:
+    libelle: "Demande de statut sportif de haut niveau"
+    profilsAssocies:
+      - '<profilExistant(3)>'
+    etapes:
+      - '@etape_avant_de_commencer_sportifs_hn'
+      - '@etape_informations_generales'
+      - '@etape_specifique_sportif_hn'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+    accompagnement_optionnel: true
+
+  type_demande_sportif_bn_tbn:
+    libelle: "Demande de statut sportif de bon niveau"
+    profilsAssocies:
+      - '<profilExistant(4)>'
+      - '<profilExistant(5)>'
+    etapes:
+      - '@etape_avant_de_commencer_sportifs_bn_tbn'
+      - '@etape_informations_generales'
+      - '@etape_specifique_sportif_bn_tbn'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+    accompagnement_optionnel: true
+
+  type_demande_handicap:
+    libelle: "Handicap permanent"
+    profilsAssocies:
+      - '<profilExistant(1)>'
+    etapes:
+      - '@etape_avant_de_commencer'
+      - '@etape_informations_generales'
+      - '@etape_specifique_handicap'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+
+  type_demande_incapacite:
+    libelle: "Incapacité temporaire"
+    profilsAssocies:
+      - '<profilExistant(2)>'
+    etapes:
+      - '@etape_avant_de_commencer'
+      - '@etape_informations_generales'
+      - '@etape_specifique_incapacite_temporaire'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+
+  type_demande_elu_engage:
+    libelle: "Elu ou engagé"
+    profilsAssocies:
+      - '<profilExistant(8)>'
+      - '<profilExistant(9)>'
+    etapes:
+      - '@etape_avant_de_commencer'
+      - '@etape_informations_generales'
+      - '@etape_specifique_elu_engage'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+
+  type_demande_femme_enceinte:
+    libelle: "Femme enceinte"
+    etapes:
+      - '@etape_avant_de_commencer'
+      - '@etape_informations_generales'
+      - '@etape_specifique_femme_enceinte'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+
+  type_demande_charge_famille:
+    libelle: "Chargé de famille"
+    profilsAssocies:
+      - '<profilExistant(10)>'
+    etapes:
+      - '@etape_avant_de_commencer'
+      - '@etape_informations_generales'
+      - '@etape_specifique_charge_famille'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+
+  type_demande_plusieurs_cursus:
+    libelle: "Double cursus"
+    profilsAssocies:
+      - '<profilExistant(11)>'
+    etapes:
+      - '@etape_avant_de_commencer'
+      - '@etape_informations_generales'
+      - '@etape_specifique_plusieurs_cursus'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+
+  type_demande_salarie_entrepreneur:
+    libelle: "Salarié ou entrepreneur"
+    profilsAssocies:
+      - '<profilExistant(7)>'
+    etapes:
+      - '@etape_avant_de_commencer'
+      - '@etape_informations_generales'
+      - '@etape_specifique_salarie_entrepreneur'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'
+
+  type_demande_artiste:
+    libelle: "Artiste confirmé"
+    profilsAssocies:
+      - '<profilExistant(6)>'
+    etapes:
+      - '@etape_avant_de_commencer'
+      - '@etape_informations_generales'
+      - '@etape_specifique_artiste'
+      - '@etape_souhaits_amenagement'
+      - '@etape_validation'

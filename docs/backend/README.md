@@ -1,0 +1,152 @@
+# Oasis - backend
+
+Application backend :
+
+* API REST
+* Traitements différés
+
+## Composants techniques
+
+Développé en PHP 8.3, avec les frameworks Symfony 7 (https://symfony.com/)
+et Api Platform 3.2 (https://api-platform.com/), et utilise une base Postgresql (testé sur version 13+).
+
+Déploiement avec docker / K8S, avec le serveur d'applications frankenphp (https://frankenphp.dev/),
+un module pour Caddy - https://caddyserver.com/.
+
+[OPTIONNEL] Le cache http Souin (https://souin.io/) est utilisé sous la forme d'un module Caddy.
+
+## Dépendances / intégrations
+
+* Pour l'authentification, un serveur OAuth (testé avec un serveur CAS).
+* Pour l'accès aux données de scolarité, une base Apogée (possibilité d'implémenter d'autres connecteurs)
+* Pour l'édition PDF, un service gotenberg (https://gotenberg.dev/).
+* Pour le stockage des pièces justificatives, un serveur de GED Nuxeo en option (sinon stockage "fichier")
+* Pour la vérification antivirus des pièces justificatives, un service clamav (https://www.clamav.net/)
+* Pour la récupération des photos des étudiants, possibilité d'utiliser celles stockées
+  dans une base oracle Unicampus (ou d'implémenter une solution locale différente, la version livrée est
+  possiblement spécifique à l'installation locale Unicampus de l'établissement)
+* Pour les envois de mail, un serveur SMTP
+
+## Déploiement
+
+Le déploiement est recommandé via Docker, sont fournis les Dockerfile suivants :
+
+* Dockerfile : pour générer l'image de production du service web
+* Dockerfile-dev : pour générer l'image de développement (activation du module php xdebug...)
+* Dockerfile-worker : pour générer une image dédiée à un conteneur séparé pour les traitements
+  différés (il est possible de tout déployer dans le même conteneur si on le souhaite)
+
+### Build
+
+Pour la production :
+
+```
+$ docker build -t oasis-backend .
+$ docker build -t oasis-backend-worker -f Dockerfile-worker .
+```
+
+Pour le développement :
+
+```
+$ docker build -t oasis-backend -f Dockerfile-dev .
+```
+
+### Configuration technique :
+
+La configuration technique de l'application se fait en renseignant les variables d'environnement
+disponibles dans le fichier
+.env (https://symfony.com/doc/current/configuration.html#configuring-environment-variables-in-env-files) :
+
+* **APP_ENV** : environnement de déploiement (test, staging ou production)
+* **APP_SECRET** : secret utilisé par symfony pour les opérations nécessitant de la
+  sécurité (cf https://symfony.com/doc/current/reference/configuration/framework.html#configuration-framework-secret)
+* **DATABASE_URL** : url de la base de données Postgresql (`postgresql://user:pwd@server:
+  port/dbname?serverVersion=13&charset=utf8`)
+* **FRONT_URL** : url du frontend
+* **BACK_URL** : url du backend
+* **CORS_ALLOW_ORIGIN** : une expression régulière correspondant aux domaines autorisés à faire des
+  requêtes CORS (ie localhost + le domaine du frontend, si différent). Par exemple pour
+  autoriser https://oasis.u-bordeaux.fr
+  en plus de la machine elle-même : `^https?://(localhost|127\.0\.0\.1|oasis\.u-bordeaux\.fr)(:[0-9]+)?$`
+* **JWT_COOKIE_DOMAIN** : le domaine auquel associer le cookie généré par l'authentification
+* **JWT_PASSPHRASE** : la clé d'encodage des JWT
+* **OAUTH_CLIENTID** : l'id de client du backend pour votre serveur oauth,
+* **OAUTH_CLIENTSECRET** : secret associé au clientid
+* **OAUTH_REDIRECTURI** : l'uri vers laquelle rediriger après authentification correcte
+* **OAUTH_URLAUTHORIZE** : l'uri de l'endpoint "authorize" du serveur oauth
+* **OAUTH_URLACCESSTOKEN** : l'uri de l'endpoint permettant d'obtenir un accesstoken oauth
+* **OAUTH_URLRESOURCEOWNERDETAILS** : l'uri de l'endpoint permettant d'obtenir le profil de l'utilisateur connecté
+* **LDAP_HOST** : serveur ldap
+* **LDAP_PORT** : port du serveur ldap
+* **LDAP_SSL** : true ou false suivant le mode d'accès à votre serveur d'accès
+* **LDAP_USERNAME** : nom d'utilisateur pour connexion au LDAP
+* **LDAP_PASSWORD** : mot de passe de connexion au LDAP
+* **LDAP_DN** : base dans laquelle rechercher les individus dans le LDAP
+* **MAILER_DSN** : DSN du serveur smtp (`smtp://user:password@server:port`)
+* **GOTENBERG_DSN** : URL de l'instance Gotenberg
+* **APOGEE_USER** : utilisateur avec droits de lecture dans la base Apogée
+* **APOGEE_PWD** : mot de passe de l'utilisateur Apogée
+* **APOGEE_DB** : url de la base Apogée (`//serveur:port/SID`)
+* [OPTION NUXEO] **NUXEO_API_URL** : url de l'api nuxeo
+* [OPTION NUXEO] **NUXEO_API_USER** : utilisateur nuxeo
+* [OPTION NUXEO] **NUXEO_API_PASS** : mot de passe nuxeo
+* [OPTION NUXEO] **NUXEO_ESPACE** : id de l'espace de stockage nuxeo
+* [OPTION STOCKAGE LOCAL] **STORAGE_BASE_PATH** : chemin de base des PJ sur le système de fichiers (`/data/PJ`)
+* **CLAMAV_SERVER** : serveur clamav (`clamav.univ.fr`)
+* **CLAMAV_PORT** : port du serveur clamav
+* [OPTIONNEL] **UNICAMPUS_USER** : utilisateur avec droits de lecture sur base oracle Unicampus
+* [OPTIONNEL] **UNICAMPUS_PWD** : mot de passe utilisateur Unicampus
+* [OPTIONNEL] **UNICAMPUS_SID** : url de la base Unicampus (`//serveur:port/SID`)
+* [OPTIONNEL] **UNICAMPUS_SUFFIXES** : suffixes ajoutés par unicampus aux numéros étudiants (`["suffixe1","suffixe2"]`;
+  les RNE des établissements concernés pour l'instance Unicampus utilisée)
+
+Les valeurs renseignées dans le fichier .env peuvent être surchargées par des variables d'environnement au niveau
+système (https://symfony.com/doc/current/configuration.html#overriding-environment-variables-defined-by-the-system), ou
+encore via un fichier
+.env.local (https://symfony.com/doc/current/configuration.html#overriding-environment-values-via-env-local).
+
+### Exécution
+
+Une fois l'image (ou les images) docker et la configuration prêtes, vous pouvez démarrer le conteneur de manière
+classique :
+
+```
+$ docker run oasis-backend
+```
+
+Pour le développement, vous pouvez passer quelques paramètres supplémentaires pour servir directement les fichiers sur
+lesquels vous travaillez et activer xdebug par exemple :
+
+```
+$ docker run --add-host=host.docker.internal:ip.machine.dev \
+  -v $PWD:/app \ 
+  -v $PWD/docker/xdebug-conf.ini:/usr/local/etc/php/conf.d/99-xdebug-conf.ini oasis-backend
+```
+
+Au premier démarrage la base (qui doit être créée au préalable) sera initialisée automatiquement / mise à jour si
+nécessaire.  
+Pour le développement, vous pouvez créer et mettre à jour la base à la main après le premier démarrage du conteneur si
+vous le souhaitez (en ignorant les erreurs) :
+
+```
+$ php bin/console doctrine:database:create
+$ php bin/console doctrine:migrations:migrate
+```
+
+### Conseils pratiques
+
+L'application génère (si nécessaire) au démarrage des clés servant à signer les token JWT qu'elle émet. Ces clés sont
+présentes dans le dossier config/jwt.  
+Afin d'éviter des déconnexions intempestives au redéploiement et/ou des soucis d'authentification si vous déployez
+plusieurs instances en parallèle, vous devez monter ce dossier en tant que volume docker, partagé par toutes les
+instances de l'application.
+
+## Docs complémentaires
+
+* [Paramétrage technico-fonctionnel](parametrage.md)
+* [Emails](emails.md)
+* [Traitements asynchrones](traitements_asynchrones.md)
+* [Authentification](auth.md)
+* [Connecteurs](connecteurs.md)
+* [Stockage de fichiers](pieces_justificatives.md)
+* [Questionnaire des demandes](questionnaires.md)

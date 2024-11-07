@@ -1,0 +1,223 @@
+App\Entity\OptionReponse:
+  reponse_oui_question_besoin_accompagnement:
+    id: -1
+    question: '@question_besoin_accompagnement'
+    libelle: "oui"
+  reponse_non_question_besoin_accompagnement:
+    id: -2
+    question: '@question_besoin_accompagnement'
+    libelle: "non"
+  reponse_oui_question_listes_ministerielles_sportifs:
+    question: '@question_sportif_liste_ministerielle'
+    libelle: "oui"
+    questionsLiees:
+      - '@question_sportif_numero_psqs'
+      - '@question_sportif_ministere_niveau'
+      - '@piece_sportifs_hn_attestation_psqs'
+      - '@question_sportif_discipline'
+      - '@question_sportif_entrainement'
+      - '@question_sportifs_resultats'
+      - '@question_sportifs_rattachement_creps'
+      - '@piece_sportifs_lettre_presentation'
+      - '@piece_sportifs_cv'
+  reponse_oui_mais_question_listes_ministerielles_sportifs:
+    question: '@question_sportif_liste_ministerielle'
+    libelle: "oui, mais la plateforme ne trouve pas la correspondance"
+    questionsLiees:
+      - '@question_sportif_ministere_niveau'
+      - '@piece_sportifs_hn_attestation_psqs'
+      - '@question_sportif_discipline'
+      - '@question_sportif_entrainement'
+      - '@question_sportifs_resultats'
+      - '@question_sportifs_rattachement_creps'
+      - '@piece_sportifs_lettre_presentation'
+      - '@piece_sportifs_cv'
+  reponse_non_question_listes_ministerielles_sportifs:
+    libelle: "non"
+    question: '@question_sportif_liste_ministerielle'
+    questionsLiees:
+      - '@question_sportif_professionnel'
+  reponse_elite_sportif_niveau:
+    libelle: "Elite"
+    question: "@question_sportif_ministere_niveau"
+  reponse_senior_sportif_niveau:
+    libelle: "Senior"
+    question: "@question_sportif_ministere_niveau"
+  reponse_releve_sportif_niveau:
+    libelle: "Relève"
+    question: "@question_sportif_ministere_niveau"
+  reponse_reconversion_sportif_niveau:
+    libelle: "Reconversion"
+    question: "@question_sportif_ministere_niveau"
+  reponse_espoir_sportif_niveau:
+    libelle: "Espoir"
+    question: "@question_sportif_ministere_niveau"
+  reponse_collectifs_nationaux_sportif_niveau:
+    libelle: "Collectifs nationaux"
+    question: "@question_sportif_ministere_niveau"
+  reponse_oui_question_sportif_professionnel:
+    libelle: "oui"
+    question: '@question_sportif_professionnel'
+    questionsLiees:
+      - '@question_sportif_club_professionnel'
+      - '@piece_sportifs_contrat_pro'
+      - '@question_sportif_discipline'
+      - '@question_sportif_entrainement'
+      - '@question_sportifs_resultats'
+      - '@question_sportifs_rattachement_creps'
+      - '@piece_sportifs_lettre_presentation'
+      - '@piece_sportifs_cv'
+  reponse_non_question_sportif_professionnel:
+    libelle: "non"
+    question: '@question_sportif_professionnel'
+    questionsLiees:
+      - '@question_sportif_centre_labellise'
+  reponse_oui_question_sportif_centre_labellise:
+    libelle: "oui"
+    question: '@question_sportif_centre_labellise'
+    questionsLiees:
+      - '@question_sportif_club_centre_formation'
+      - '@piece_sportifs_convention_formation'
+      - '@question_sportif_discipline'
+      - '@question_sportif_entrainement'
+      - '@question_sportifs_resultats'
+      - '@question_sportifs_rattachement_creps'
+      - '@piece_sportifs_lettre_presentation'
+      - '@piece_sportifs_cv'
+  reponse_non_question_sportif_centre_labellise:
+    libelle: "non"
+    question: '@question_sportif_centre_labellise'
+    questionsLiees:
+      - '@info_sportif_hn_non_eligible'
+  reponse_oui_question_sportif_creps:
+    libelle: "oui"
+    question: '@question_sportifs_rattachement_creps'
+  reponse_non_question_sportif_creps:
+    libelle: "non"
+    question: '@question_sportifs_rattachement_creps'
+  reponse_oui_question_notif_mdph:
+    libelle: "oui"
+    question: '@question_handicap_notif_mdph'
+  reponse_non_question_notif_mdph:
+    libelle: "non"
+    question: '@question_handicap_notif_mdph'
+  reponse_asso_type_engagement:
+    libelle: "Responsabilité associative"
+    question: "@question_engages_type_engagement"
+    questionsLiees:
+      - '@piece_engagement_statuts_association'
+      - '@piece_engagement_cr_ag_association'
+  reponse_reserviste_type_engagement:
+    libelle: "Réserve militaire"
+    question: "@question_engages_type_engagement"
+    questionsLiees:
+      - '@piece_engagement_contrat_reserve'
+  reponse_service_civique_type_engagement:
+    libelle: "Service civique"
+    question: "@question_engages_type_engagement"
+    questionsLiees:
+      - '@piece_engagement_contrat_service_civique'
+  reponse_volontariat_militaire_type_engagement:
+    libelle: "Volontariat militaire"
+    question: "@question_engages_type_engagement"
+    questionsLiees:
+      - '@piece_engagement_contrat_volontariat'
+  reponse_elu_ub_type_engagement:
+    libelle: "Elu(e) UB"
+    question: "@question_engages_type_engagement"
+    questionsLiees:
+      - '@piece_arrete_resultat_elections'
+  reponse_elu_crous_engagement:
+    libelle: "Elu(e) CROUS"
+    question: "@question_engages_type_engagement"
+    questionsLiees:
+      - '@piece_arrete_resultat_elections'
+  reponse_oui_question_grossesse_pathologique:
+    libelle: "oui"
+    question: '@question_femme_enceinte_grossesse_pathologique'
+  reponse_non_question_grossesse_pathologique:
+    libelle: "non"
+    question: '@question_femme_enceinte_grossesse_pathologique'
+  reponse_cdi_type_contrat:
+    libelle: "CDI"
+    question: '@question_salarie_type_contrat'
+    questionsLiees:
+      - '@piece_salarie_contrat_travail'
+      - '@piece_salarie_bulletins_salaire'
+  reponse_cdd_type_contrat:
+    libelle: "CDD"
+    question: '@question_salarie_type_contrat'
+    questionsLiees:
+      - '@piece_salarie_contrat_travail'
+      - '@piece_salarie_bulletins_salaire'
+  reponse_entrepreneur_type_contrat:
+    libelle: "Entrepreneur"
+    question: '@question_salarie_type_contrat'
+    questionsLiees:
+      - '@piece_entrepreneur_lettre_presentation'
+      - '@piece_entrepreneur_attestation'
+  reponse_autre_type_contrat:
+    libelle: "Autre"
+    question: '@question_salarie_type_contrat'
+    questionsLiees:
+      - '@piece_salarie_contrat_travail'
+      - '@piece_salarie_bulletins_salaire'
+  reponse_oui_question_artiste_conservatoire:
+    libelle: 'oui'
+    question: '@question_artiste_conservatoire'
+    questionsLiees:
+      - '@piece_artiste_certif_scol'
+  reponse_non_question_artiste_conservatoire:
+    libelle: 'non'
+    question: '@question_artiste_conservatoire'
+    questionsLiees:
+      - '@question_artiste_cours_autre_etablissement'
+  reponse_oui_question_artiste_cours_autre_etablissement:
+    libelle: 'oui'
+    question: '@question_artiste_cours_autre_etablissement'
+    questionsLiees:
+      - '@question_artiste_autre_etablissement'
+      - '@piece_artiste_certif_scol'
+  reponse_non_question_artiste_cours_autre_etablissement:
+    libelle: 'non'
+    question: '@question_artiste_cours_autre_etablissement'
+    questionsLiees:
+      - '@piece_artiste_autres_docs'
+  reponse_oui_question_artiste_troupe:
+    libelle: 'oui'
+    question: '@question_artiste_troupe'
+  reponse_non_question_artiste_troupe:
+    libelle: 'non'
+    question: '@question_artiste_troupe'
+  reponse_oui_question_artiste_pro:
+    libelle: 'oui'
+    question: '@question_artiste_pro'
+  reponse_non_question_artiste_pro:
+    libelle: 'non'
+    question: '@question_artiste_pro'
+  reponse_oui_question_suivi_phase:
+    libelle: "oui"
+    question: '@question_amenagements_premiere_demande_phase'
+    questionsLiees:
+      - '@question_amenagements_situation'
+      - '@question_amenagements_difficultes_enseignements'
+      - '@question_amenagements_difficultes_evaluations'
+      - '@question_amenagements_difficultes_vie_univ'
+      - '@question_amenagements_pedagogiques_texte'
+      - '@question_amenagements_examens_texte'
+      - '@question_amenagements_vie_univ'
+  reponse_non_question_suivi_phase:
+    libelle: "non"
+    question: '@question_amenagements_premiere_demande_phase'
+    questionsLiees:
+      - '@question_amenagements_modifier_demande'
+  reponse_oui_question_amenagements_modifier_demande:
+    libelle: "oui"
+    question: '@question_amenagements_modifier_demande'
+    questionsLiees:
+      - '@question_amenagements_pedagogiques_texte'
+      - '@question_amenagements_examens_texte'
+      - '@question_amenagements_vie_univ'
+  reponse_non_question_amenagements_modifier_demande:
+    libelle: "non"
+    question: '@question_amenagements_modifier_demande'

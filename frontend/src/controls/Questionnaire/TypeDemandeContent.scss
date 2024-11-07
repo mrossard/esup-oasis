@@ -1,0 +1,41 @@
+@import "../../styles/helpers";
+
+.type-demande {
+  .ant-steps-label-vertical .ant-steps-item-title {
+    font-size: 14px;
+    line-height: 1.2;
+    white-space: pre-wrap !important;
+  }
+
+  .ant-steps-item-active .ant-steps-item-title {
+    font-weight: 500;
+    color: var(--color-primary) !important;
+  }
+
+  .question-item {
+    display: block;
+    @extend .pb-2;
+
+    .ant-form-item-label > label.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+      font-size: 26px;
+      margin-left: 8px;
+    }
+
+    .ant-form-item-label > label::after {
+      display: none;
+    }
+
+    .ant-form-item-required {
+      flex-direction: row-reverse;
+    }
+
+    .ant-radio-group .ant-radio-wrapper {
+      display: flex;
+    }
+  }
+
+  .question {
+    @extend .mb-1;
+    font-weight: 500;
+  }
+}

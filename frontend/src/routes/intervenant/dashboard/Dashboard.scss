@@ -1,0 +1,52 @@
+.ant-statistic .ant-statistic-content {
+  font-size: 2rem !important;
+}
+
+.statistic-warning {
+  .ant-statistic-content-value span {
+    color: #f0ad4e;
+  }
+
+  svg {
+    fill: #f0ad4e;
+  }
+}
+
+
+.statistic-danger {
+  .ant-statistic-content-value span {
+    color: #d9534f;
+  }
+
+  svg {
+    fill: #d9534f;
+  }
+}
+
+.services-faits {
+  h4 {
+    margin-top: 0;
+  }
+}
+
+@keyframes appear-down {
+  0% {
+    opacity: 0;
+    top: -200px;
+    width: 0;
+  }
+  50% {
+    opacity: 25%;
+    top: 0;
+    width: 25%;
+  }
+  100% {
+    opacity: 100%;
+    width: 100%;
+  }
+}
+
+.appear-down {
+  position: relative;
+  // animation: appear-down .5s;
+}

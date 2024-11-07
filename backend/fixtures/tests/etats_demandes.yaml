@@ -1,0 +1,41 @@
+App\Entity\EtatDemande:
+  demande_en_cours:
+    id: 1
+    libelle: 'En cours'
+    actif: true
+  demande_receptionnee:
+    id: 2
+    libelle: 'Réceptionnée'
+    actif: true
+  demande_conforme:
+    id: 3
+    libelle: 'Conforme'
+    actif: true
+  demande_validee:
+    id: 4
+    libelle: 'Validée'
+    actif: true
+  demande_refusee:
+    id: 5
+    libelle: 'Refusée'
+    actif: true
+  profil_valide:
+    id: 6
+    libelle: 'Profil validé'
+    actif: true
+  avis_commission_demande:
+    id: 7
+    libelle: 'Avis commission demandé'
+    actif: true
+  non_conforme:
+    id: 8
+    libelle: 'Non conforme'
+    actif: true
+  attente_validation_charte:
+    id: 9
+    libelle: 'Attente validation charte'
+    actif: true
+  attente_validation_accompagnement:
+    id: 10
+    libelle: 'Attente validation accompagnement'
+    actif: true

@@ -1,0 +1,70 @@
+@import "/src/lib/react-modern-calendar-datepicker/DatePicker.css";
+@import "src/styles/variables";
+
+.small-calendar {
+  background: transparent;
+  box-shadow: none;
+  width: 100%;
+  min-height: auto;
+}
+
+.ant-picker-calendar {
+  .ant-picker-calendar-header {
+    justify-content: center;
+    flex-direction: row-reverse;
+  }
+
+  table.ant-picker-content thead tr th {
+    color: $legende;
+    padding-bottom: 10px;
+  }
+
+  .ant-picker-cell {
+    color: $light-grey-border-dark;
+
+    .bg-app {
+      color: $text;
+    }
+  }
+
+  .ant-picker-cell-in-view {
+    color: $text
+  }
+
+  .ant-picker-calendar-mode-switch {
+    display: none;
+  }
+
+  .today {
+    color: $primary;
+    font-weight: 500;
+  }
+
+  .cell-start {
+    border-radius: 10px 0 0 10px;
+  }
+
+  .cell-end {
+    border-radius: 0 10px 10px 0;
+  }
+
+  .cell-start.cell-end {
+    border-radius: 10px;
+  }
+
+  .has-event:after, .has-event-warning:after {
+    content: "";
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: $primary;
+    top: 30px;
+    left: calc(50% - 3px);
+  }
+
+  .has-event-warning:after {
+    background: $warning;
+  }
+}
+

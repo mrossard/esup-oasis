@@ -1,0 +1,59 @@
+@import "../../styles/variables";
+@import "../../styles/helpers";
+
+.grid-admin {
+  max-width: 90%;
+  display: grid;
+  margin: 0;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-auto-rows: 1fr;
+  grid-auto-flow: row dense;
+  grid-gap: 10px;
+
+  .grid-admin-item {
+
+    .grid-admin-item-content-title {
+      font-size: 1.2rem;
+      margin: 10px 0;
+      font-weight: 500;
+    }
+
+    .ant-btn {
+      width: 100%;
+      height: 100%;
+      display: block;
+      white-space: break-spaces;
+
+      &:hover {
+        background-color: $app;
+        color: $text;
+        border-color: $app;
+        @extend .shadow-1;
+        transition: all .25s;
+
+        .grid-admin-item-content-desc {
+          color: $text;
+        }
+      }
+    }
+
+  }
+}
+
+.ref-inactif td:not(.commandes) {
+  background-color: $light-grey;
+  color: $light-color;
+  opacity: .5;
+}
+
+.administration {
+  h2 {
+    margin-top: 48px;
+  }
+
+  .small-calendar {
+    .Calendar__day.-ltr {
+      height: 25px;
+    }
+  }
+}

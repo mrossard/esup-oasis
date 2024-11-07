@@ -1,0 +1,25 @@
+App\Entity\Utilisateur:
+  mrossard:
+    uid: 'mrossard'
+    email: 'manuel.rossard@u-bordeaux.fr'
+    nom: 'ROSSARD'
+    prenom: 'Manuel'
+    admin: true
+  jlemon100p:
+    uid: 'jlemon100p'
+    email: 'julien.lemonnier@u-bordeaux.fr'
+    nom: 'LEMONNIER'
+    prenom: 'Julien'
+    admin: true
+  axdubroca:
+    uid: 'axdubroca'
+    email: 'axelle.dubroca@u-bordeaux.fr'
+    nom: 'DUBROCA'
+    prenom: 'Axelle'
+    admin: true
+  kverdeau:
+    uid: 'kverdeau'
+    email: 'karine.verdeau@u-bordeux.fr'
+    nom: 'VERDEAU'
+    prenom: 'Karine'
+    admin: true

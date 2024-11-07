@@ -1,0 +1,131 @@
+{% extends 'mail/base.html.twig' %}
+{% block body %}
+    <span class="preheader"> Évènements de la semaine du {{ date('+1 day')|date('d/m/Y') }} au {{ date('+1 day')|date_modify('+7 days')|date('d/m/Y') }}</span>
+    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+        <tr>
+            <td>&nbsp;</td>
+            <td class="container">
+                <div class="content">
+
+                    <table role="presentation" class="main">
+
+                        <tr>
+                            <td class="wrapper">
+                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td align="center">
+                                            <a href="{{ frontUrl }}" referrerpolicy="no-referrer"
+                                               target="_blank"
+                                               aria-label="Se rendre sur le site AppliPhase de l'université de Bordeaux">
+                                                <img border="0" class="img-responsive"
+                                                     src="{{ backUrl }}/images/logo-appliphase-email.png"
+                                                     alt="" aria-hidden="true" style="max-width: 300px"/></a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                                <tr>
+                                                    <td>
+                                                        <h1>
+                                                            Évènements de la semaine
+                                                            du {{ date('+1 day')|date('d/m/Y') }} au
+                                                            {{ date('+1 day')|date_modify('+7 days')|date('d/m/Y') }}
+                                                        </h1>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <p>Bonjour {{ intervenant.prenom }},</p>
+                                            <p>Les événements suivants sont prévus dans la semaine qui vient:</p>
+
+                                            <ul>
+                                                {% for evenement in evenements %}
+                                                    <li>
+                                                        {% if evenement.libelle is empty %}{{ evenement.type.libelle }}{% else %}{{ evenement.libelle }}{% endif %}
+                                                        <ul>
+                                                            <li>Le <strong>{{ evenement.debut|date("d/m/Y") }}</strong>
+                                                                de <strong>{{ evenement.debut|date("H:i") }}</strong>
+                                                                à <strong>{{ evenement.fin|date("H:i") }}</strong>
+                                                                {% if evenement.tempsPreparation > 0 %}
+                                                                    . Merci de vous présenter
+                                                                    <strong>{{ evenement.tempsPreparation }}
+                                                                        minutes en avance</strong>.
+                                                                {% endif %}
+                                                            </li>
+                                                            <li>Campus : {{ evenement.campus.libelle }}</li>
+                                                            {% if evenement.salle != null %}
+                                                                <li><strong>{{ evenement.salle }}</strong></li>
+                                                            {% endif %}
+                                                            <li>En accompagnement de :
+                                                                <ul>
+                                                                    {% for benef in evenement.beneficiaires %}
+                                                                        <li>
+                                                                            <strong>{{ benef.utilisateur.prenom|capitalize }} {{ benef.utilisateur.nom|capitalize }}</strong>
+                                                                        </li>
+                                                                    {% endfor %}
+                                                                </ul>
+                                                            </li>
+                                                            {% if evenement.equipements|length > 0 %}
+                                                                <li>Equipements nécessaires :
+                                                                    <ul>
+                                                                        {% for equipement in evenement.equipements %}
+                                                                            <li>{{ equipement.libelle }}</li>
+                                                                        {% endfor %}
+                                                                    </ul>
+                                                                </li>
+                                                            {% endif %}
+                                                        </ul>
+                                                    </li>
+                                                {% endfor %}
+                                            </ul>
+
+                                            <hr/>
+
+                                            <p class="last">Cordialement,<br/>
+                                                Le service PHASE</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+
+                    </table>
+
+                    <div class="footer">
+
+                        <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td>
+                                    <a
+                                            href="https://u-bordeaux.fr" referrerpolicy="no-referrer"
+                                            target="_blank">
+                                        <img border="0" width="50" style="width: 50px"
+                                             src="{{ backUrl }}/images/universite-bordeaux-medaillon.png"
+                                             alt="Logo Université de Bordeaux"/>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="content-block">
+                                <span class="apple-link"><a
+                                            href="https://u-bordeaux.fr" referrerpolicy="no-referrer"
+                                            target="_blank">Université de Bordeaux</a> • <a
+                                            href="{{ frontUrl }}" referrerpolicy="no-referrer"
+                                            target="_blank">AppliPhase</a></span>
+                                    <br><a href="{{ frontUrl }}/mon-compte">Réglez les paramètres de
+                                        notification</a> dans la section "Mon compte" d'AppliPhase.
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                </div>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+    </table>
+{% endblock %}

@@ -1,0 +1,49 @@
+App\Entity\Campus:
+  campus1:
+    libelle: 'Talence'
+    actif: true
+  campus2:
+    libelle: 'Pessac'
+    actif: true
+  campus3:
+    libelle: 'Bordeaux Victoire'
+    actif: true
+  campus4:
+    libelle: 'Bordeaux Carreire'
+    actif: true
+  campus5:
+    libelle: 'Bordeaux Pey Berland'
+    actif: true
+  campus6:
+    libelle: 'Bordeaux Bastide'
+    actif: true
+  campus7:
+    libelle: 'Gradignan'
+    actif: true
+  campus8:
+    libelle: 'Dax'
+    actif: true
+  campus9:
+    libelle: 'Bayonne'
+    actif: true
+  campus10:
+    libelle: 'Mont de Marsan'
+    actif: true
+  campus11:
+    libelle: "Villenave d'Ornon"
+    actif: true
+  campus12:
+    libelle: 'Agen'
+    actif: true
+  campus13:
+    libelle: 'Périgueux'
+    actif: true
+  campus14:
+    libelle: 'Mérignac'
+    actif: true
+  campus15:
+    libelle: 'Pau'
+    actif: true
+  campus99:
+    libelle: 'inactif'
+    actif: false

@@ -1,0 +1,71 @@
+App\Entity\Question:
+  #############################################################################
+  # Question "figée" besoin accompagnement
+  #############################################################################
+  question_besoin_accompagnement:
+    id: -1
+    libelle: "Souhaitez-vous un accompagnement par le service Phase?"
+    aide: ""
+    type_reponse: "select"
+    obligatoire: true
+    choix_multiple: false
+    reponse_conservable: true
+    optionsReponse:
+      - '@reponse_oui_question_besoin_accompagnement'
+      - '@reponse_non_question_besoin_accompagnement'
+  question_commune_1:
+    libelle: "Quelle est la couleur du cheval blanc d'Henri IV?"
+    aide: "La réponse est dans la question!"
+    type_reponse: "select"
+    obligatoire: true
+    optionsReponse:
+      - '@reponse_1_question_commune_1'
+      - '@reponse_2_question_commune_1'
+    reponse_conservable: true
+  question_commune_2:
+    libelle: "Comment avez-vous trouvé la question précédente?"
+    aide: ""
+    type_reponse: "text"
+    obligatoire: false
+    reponse_conservable: true
+  question_sportifs_1:
+    libelle: "Avez-vous un numéro machin bidule du ministère?"
+    aide: ""
+    type_reponse: "select"
+    obligatoire: true
+    optionsReponse:
+      - '@reponse_1_question_sportifs_1'
+      - '@reponse_2_question_sportifs_1'
+    reponse_conservable: false
+  question_sportifs_2:
+    libelle: "Votre numéro machin bidule du ministère :"
+    aide: "N lettres / chiffres, confirme votre statut 'haut niveau'"
+    type_reponse: "text"
+    obligatoire: true
+    reponse_conservable: false
+  question_sportifs_3:
+    libelle: "De quel club professionnel faites-vous partie ?"
+    type_reponse: "select"
+    aide: "Prendre dans la liste"
+    table_options: "clubs_professionnels"
+    obligatoire: false
+  question_sportifs_sans_numero:
+    libelle: "une question obligatoire derriere une reponse non choisie"
+    type_reponse: "text"
+    obligatoire: true
+    reponse_conservable: false
+  question_valider_demande:
+    libelle: "Valider"
+    type_reponse: "submit"
+    obligatoire: true
+    reponse_conservable: false
+    choix_multiple: false
+  question_pj_1:
+    libelle: "Vous pouvez déposer le justificatif machinbidule"
+    type_reponse: "file"
+    obligatoire: false
+    reponse_conservable: true
+  question_accompagnement:
+    libelle: "Avez-vous déjà été accompagné par PHASE?"
+    type_reponse: "text"
+    obligatoire: true

@@ -1,0 +1,8 @@
+App\Entity\InterventionForfait:
+  intervention1:
+    type: '@typeEvenement7'
+    intervenant: '@intervenant1'
+    periode: '@periode1'
+    heures: '2.5'
+    dateCreation: <date_create('2019-01-01 08:00')>
+    utilisateurCreation: '@admin'

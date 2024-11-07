@@ -1,0 +1,38 @@
+api_platform:
+  title: oasis
+  version: '%env(resolve:APP_VERSION)%'
+  openapi:
+    contact:
+      name: "Manuel Rossard"
+      email: "manuel.rossard@u-bordeaux.fr"
+  swagger:
+    api_keys:
+      JWT:
+        name: Authorization
+        type: header
+  defaults:
+    pagination_client_items_per_page: true
+    cache_headers:
+      max-age: 0
+      shared_max_age: 3600
+      vary: [ 'Content-Type', 'Authorization', 'Cookie', 'X-Switch-User' ]
+
+  formats:
+    jsonld: [ 'application/ld+json' ]
+    html: [ 'text/html' ]
+
+  keep_legacy_inflector: true
+
+  http_cache:
+    invalidation:
+      urls: [ '%env(SOUIN_API_URL)%' ]
+      purger: api_platform.http_cache.purger.souin
+
+  # The list of exceptions mapped to their HTTP status code.
+  exception_to_status:
+    Symfony\Component\Serializer\Exception\ExceptionInterface: 400
+    ApiPlatform\Exception\ItemNotFoundException: 404
+    ApiPlatform\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+    ApiPlatform\Exception\FilterValidationException: 400
+    Doctrine\ORM\OptimisticLockException: 409
+    App\State\PeriodeRH\ConfigurationIncompleteException: 422

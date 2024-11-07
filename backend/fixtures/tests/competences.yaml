@@ -1,0 +1,49 @@
+App\Entity\Competence:
+  competence1:
+    libelle: 'Droit'
+    actif: true
+  competence2:
+    libelle: 'Economie Gestion AES'
+    actif: true
+  competence3:
+    libelle: 'Mathématiques'
+    actif: true
+  competence4:
+    libelle: 'Informatique'
+    actif: true
+  competence5:
+    libelle: 'Physique'
+    actif: true
+  competence6:
+    libelle: 'Chimie'
+    actif: true
+  competence7:
+    libelle: 'Biologie'
+    actif: true
+  competence8:
+    libelle: 'Psychologie'
+    actif: true
+  competence9:
+    libelle: 'Sociologie'
+    actif: true
+  competence10:
+    libelle: 'Sciences de la terre'
+    actif: true
+  competence11:
+    libelle: 'Sciences de la vie'
+    actif: true
+  competence12:
+    libelle: 'Sciences de la santé'
+    actif: true
+  competence13:
+    libelle: 'Sciences de l’éducation'
+    actif: true
+  competence14:
+    libelle: 'Sciences de l’ingénieur'
+    actif: true
+  competence15:
+    libelle: 'Anthropologie'
+    actif: true
+  competence99:
+    libelle: 'inactif'
+    actif: false

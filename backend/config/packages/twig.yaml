@@ -1,0 +1,12 @@
+twig:
+  default_path: '%kernel.project_dir%/templates'
+  globals:
+    publicRootDir: '%kernel.project_dir%/public'
+    frontUrl: '%env(FRONT_URL)%'
+    backUrl: '%env(BACK_URL)%'
+  paths:
+    '%kernel.project_dir%/public/css': 'styles'
+
+when@test:
+  twig:
+    strict_variables: true

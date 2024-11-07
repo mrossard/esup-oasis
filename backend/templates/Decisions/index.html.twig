@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+    <title>Décision d'établissement</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <style>
+        html {
+        {% if app.environment != 'prod' %} background: url('{{ backUrl }}/images/filigrane_test.png') repeat;
+        {% else %} background-color: #FFFFFF;
+        {% endif %} -webkit-print-color-adjust: exact;
+        }
+
+        .content {
+        {% if app.environment != 'prod' %} background: url('{{ backUrl }}/images/filigrane_test.png') repeat;
+        {% endif %}
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 14px;
+            color: #333333;
+            line-height: 1.4em;
+            width: 92%;
+            margin: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: -20px auto 30px auto;
+            width: 100%;
+        }
+
+        .expediteur {
+            width: 40%;
+        }
+
+        .destinataire {
+            width: 50%;
+            text-align: left;
+        }
+
+        main {
+            width: 92%;
+            margin: auto;
+        }
+
+        .gestionnaire {
+            padding-left: 2%;
+            font-size: 11px;
+        }
+
+        .exergue {
+            font-weight: bold;
+        }
+
+        .date-lieu {
+            margin-top: 20px;
+        }
+
+        .page-break-avoid {
+            page-break-inside: avoid;
+        }
+
+        footer {
+            width: 100%;
+            height: 80px;
+            margin-top: 30px;
+            position: fixed;
+            bottom: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: end;
+            background: url('{{ backUrl }}/images/triangle-ub.svg') bottom right no-repeat;
+            background-size: contain;
+        }
+
+        .footer-adresse {
+            margin-bottom: 10px;
+            font-size: 11px;
+        }
+
+        @page {
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="content">
+    <header>
+        <div class="expediteur">
+            <img src="{{ backUrl }}/images/logo_ub.svg" style="height: 125px" alt="logo"/>
+            {% set premierAmenagement = data.amenagements|first %}
+            {% set premierBeneficiaire = premierAmenagement.beneficiaires|first %}
+            <div class="gestionnaire">
+                Université de Bordeaux<br/>
+                Dossier suivi par :<br/>
+                Service PHASE<br/>
+                {{ premierBeneficiaire.gestionnaire.prenom }} {{ premierBeneficiaire.gestionnaire.nom }}
+                <br/>
+                {{ premierBeneficiaire.gestionnaire.email }}
+            </div>
+        </div>
+        <div class="destinataire">
+            <b>{{ premierBeneficiaire.utilisateur.nom|upper }} {{ premierBeneficiaire.utilisateur.prenom }}</b>
+            <br/>
+            {{ premierBeneficiaire.utilisateur.email }}
+            <div class="date-lieu">
+                Talence, le {{ "now"|date("d/m/Y") }}
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!--<div class="exergue">
+            Les décisions d'établissement seront envoyées par courriel à l'adresse institutionnelle des étudiants contre
+            accusé de réception.
+        </div>-->
+
+        <p class="intro">
+            Vous avez sollicité, dans les conditions prévues aux articles D613-26 à D613-28 du code de l'éducation
+            auprès du médecin désigné par la commission des droits et de l'autonomie des personnnes handicapées
+            plusieurs aménagements d'épreuves au titre de l'année universitaire {{ data.annee }}/{{ data.annee + 1 }}.
+        </p>
+
+        <div class="amenagements">
+            Je vous informe que j'ai pris la décision de vous accorder le bénéfice
+            {{ data.amenagements|length > 1 ? "des aménagements suivants" : "de l'aménagement suivant" }}&nbsp;:
+            <ul>
+                {% for amenagement in data.amenagements %}
+                    <li class="page-break-avoid">{{ amenagement.type.libelleLong|default(amenagement.type.libelle) }}
+                        {% if amenagement.commentaire != null %}
+                            <br/> {{ amenagement.commentaire|nl2br }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="page-break-avoid">
+            <p>Le bénéfice {{ data.amenagements|length > 1 ? "des aménagements" : "de l'aménagement" }}
+                vous est accordé sous réserve des évolutions matérielles ou techniques ou de la
+                particularité de certains examens.</p>
+            <p>La reconduction de cette décision au-delà de l'année universitaire {{ data.annee }}/{{ data.annee + 1 }}
+                est soumise à la condition que vous subissiez un entretien avec le service PHASE dont vous dépendez
+                géographiquement au début de chaque année universitaire.</p>
+            <p>Je vous prie de croire à l'expression de ma considération toute particulière.</p>
+            <p>{{ data.president.qualite }}, {{ data.president.nom }},<br>
+                Et par délégation, {{ data.responsable_phase.qualite }}, {{ data.responsable_phase.nom }}<br/>
+                {% if data.responsable_phase.signature.contents != null %}
+                    <img src="data:{{ data.responsable_phase.signature.mimeType }};base64, {{ data.responsable_phase.signature.contents }}"
+                         style="height: 100px"
+                         alt="signature"/>
+                {% endif %}
+            </p>
+        </div>
+    </main>
+</div>
+</body>
+</html>
