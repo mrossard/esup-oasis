@@ -39,9 +39,9 @@ class IntervenantBilanFinancier
             $this->activitesParPeriode[$key]->coeffCharges = $coeffCharge;
         }
         $this->activitesParPeriode[$key]->nbHeures = bcadd(
-            $this->activitesParMois[$key]->nbHeures ?? 0,
+            $this->activitesParPeriode[$key]?->nbHeures ?? 0,
             $nbHeures
         );
-
+        return;
     }
 }
