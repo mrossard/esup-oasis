@@ -42,6 +42,5 @@ class IntervenantBilanFinancier
             $this->activitesParPeriode[$key]?->nbHeures ?? 0,
             $nbHeures
         );
-        return;
     }
 }
