@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+/** @noinspection PhpMultipleClassDeclarationsInspection */
 
 /*
  * Copyright (c) 2024. Esup - Université de Bordeaux.

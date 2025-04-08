@@ -24,11 +24,11 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 class DomaineAmenagementEnCoursFilter extends AbstractFilter
 {
 
-    public function __construct(private UtilisateurAmenagementEnCoursFilterHelper $helper,
-                                ManagerRegistry                                   $managerRegistry,
-                                ?LoggerInterface                                  $logger = null,
-                                ?array                                            $properties = null,
-                                ?NameConverterInterface                           $nameConverter = null)
+    public function __construct(private readonly UtilisateurAmenagementEnCoursFilterHelper $helper,
+                                ManagerRegistry                                            $managerRegistry,
+                                ?LoggerInterface                                           $logger = null,
+                                ?array                                                     $properties = null,
+                                ?NameConverterInterface                                    $nameConverter = null)
     {
         parent::__construct($managerRegistry, $logger, ['examens', 'pedagogique', 'aideHumaine'], $nameConverter);
     }
@@ -43,7 +43,6 @@ class DomaineAmenagementEnCoursFilter extends AbstractFilter
 
         $this->helper->ajouterJointuresDomaine($queryBuilder, $queryNameGenerator, $value, $property);
 
-        return;
     }
 
     public function getDescription(string $resourceClass): array

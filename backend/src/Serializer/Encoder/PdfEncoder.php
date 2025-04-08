@@ -20,11 +20,10 @@ use RuntimeException;
 use Sensiolabs\GotenbergBundle\GotenbergPdfInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Serializer\Encoder\EncoderInterface;
-use Twig\Environment;
 
 class PdfEncoder implements EncoderInterface
 {
-    private $projectRoot;
+    private string $projectRoot;
 
     public function __construct(private readonly GotenbergPdfInterface $pdf,
                                 private readonly LoggerInterface       $logger,

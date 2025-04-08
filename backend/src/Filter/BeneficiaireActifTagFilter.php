@@ -60,8 +60,6 @@ class BeneficiaireActifTagFilter extends AbstractFilter
             ->andWhere($queryBuilder->expr()->in(sprintf('%s.id', $tagAlias), ':' . $tagIdsParameter))
             ->setParameter($tagIdsParameter, array_map(fn(Tag $tag) => $tag->getId(), $values));
 
-        return;
-
     }
 
     //pas un champ ni une association...wtf?

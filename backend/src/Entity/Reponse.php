@@ -480,7 +480,7 @@ class Reponse
      * @param CategorieAmenagement[] $options
      * @return $this
      */
-    public function majCategoriesAmenagement(array $options)
+    public function majCategoriesAmenagement(array $options): static
     {
         foreach ($this->getCategoriesAmenagement() as $categorie) {
             if (!in_array($categorie, $options)) {
@@ -509,7 +509,7 @@ class Reponse
      * @param int $id
      * @return void
      */
-    public function setId(int $id)
+    public function setId(int $id): void
     {
         $this->id = $id;
     }
@@ -583,7 +583,7 @@ class Reponse
      * @param EtablissementEnseignementArtistique[] $etablissements
      * @return Reponse
      */
-    public function majEtablissementsEnseignementArtistique(array $etablissements)
+    public function majEtablissementsEnseignementArtistique(array $etablissements): static
     {
         foreach ($this->getEtablissementsEnseignementArtistique() as $etab) {
             if (!in_array($etab, $etablissements)) {

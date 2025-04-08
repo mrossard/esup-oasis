@@ -261,7 +261,7 @@ class DemandeProvider extends AbstractEntityProvider implements ResetInterface
     }
 
 
-    public function reset()
+    public function reset(): void
     {
         $this->currentContext = [];
     }

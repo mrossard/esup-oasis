@@ -39,9 +39,9 @@ class ComposanteFormationFilter extends AbstractFilter
     use ClockAwareTrait;
 
     public function __construct(private readonly Security              $security,
-                                private FormationRepository            $formationRepository,
+                                private readonly FormationRepository   $formationRepository,
                                 private readonly IriConverterInterface $iriConverter,
-                                protected ManagerRegistry              $managerRegistry,
+                                protected ?ManagerRegistry             $managerRegistry,
                                 ?LoggerInterface                       $logger = null,
                                 protected ?array                       $properties = null,
                                 protected ?NameConverterInterface      $nameConverter = null,)
@@ -91,7 +91,7 @@ class ComposanteFormationFilter extends AbstractFilter
         foreach ($values as $value) {
             try {
                 $entity = $this->iriConverter->getResourceFromIri($value);
-            } catch (NotFoundHttpException $e) {
+            } catch (NotFoundHttpException) {
                 throw new NotFoundHttpException(
                     sprintf('Valeur inconnue pour %s ("%s")', $property, $value)
                 );
@@ -119,7 +119,6 @@ class ComposanteFormationFilter extends AbstractFilter
         $queryBuilder->andWhere($orX)
             ->setParameter($nowParam, $this->now());
 
-        return;
     }
 
 
@@ -129,7 +128,7 @@ class ComposanteFormationFilter extends AbstractFilter
      * @param $values
      * @return array
      */
-    private function cleanValues($values, $property)
+    private function cleanValues($values, $property): array
     {
         $values = is_array($values) ? $values : [$values];
 
@@ -169,12 +168,12 @@ class ComposanteFormationFilter extends AbstractFilter
         return $values;
     }
 
-    private function getComposanteIri(\App\Entity\Composante $composante)
+    private function getComposanteIri(\App\Entity\Composante $composante): string
     {
         return Composante::COLLECTION_URI . '/' . $composante->getId();
     }
 
-    private function getFormationIri(\App\Entity\Formation $formation)
+    private function getFormationIri(\App\Entity\Formation $formation): string
     {
         return Formation::COLLECTION_URI . '/' . $formation->getId();
     }
