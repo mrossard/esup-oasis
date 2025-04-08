@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 readonly class FileSystemStorageProvider implements StorageProviderInterface
 {
 
-    function __construct(private string $basePath)
+    function __construct(private readonly string $basePath)
     {
 
     }
