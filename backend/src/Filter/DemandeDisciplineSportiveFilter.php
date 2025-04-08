@@ -16,9 +16,7 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
-use App\ApiResource\DisciplineSportive;
 use App\ApiResource\Tag;
-use App\Entity\Reponse;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -70,8 +68,6 @@ class DemandeDisciplineSportiveFilter extends AbstractFilter
             ->andWhere(sprintf('%1$s.demandeur = %2$s.repondant and %1$s.campagne = %2$s.campagne', $alias, $reponseAlias))
             ->andWhere($queryBuilder->expr()->in(sprintf('%s.id', $disciplineAlias), ':' . $disciplineIdsParameter))
             ->setParameter($disciplineIdsParameter, $values);
-
-        return;
 
     }
 

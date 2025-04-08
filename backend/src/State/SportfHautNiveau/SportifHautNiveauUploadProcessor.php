@@ -34,13 +34,13 @@ class SportifHautNiveauUploadProcessor implements ProcessorInterface
 
     /**
      * @param SportifHautNiveau $data
-     * @param Operation         $operation
-     * @param array             $uriVariables
-     * @param array             $context
+     * @param Operation $operation
+     * @param array $uriVariables
+     * @param array $context
      * @return ListeSportifsHautNiveau
      * @throws Exception
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ListeSportifsHautNiveau
     {
         $fichier = $this->fichierRepository->find($data->telechargement->id);
         $contenu = $this->storageProvider->get($fichier->getMetadata());

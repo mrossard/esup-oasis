@@ -38,15 +38,15 @@ final class BeneficiaireProfilProcessor implements ProcessorInterface
                                 private readonly TypologieHandicapRepository  $typologieHandicapRepository,
                                 private readonly TransformerService           $transformerService,
                                 private readonly MessageBusInterface          $messageBus,
-                                private ValidatorInterface                    $validator,)
+                                private readonly ValidatorInterface           $validator,)
     {
     }
 
     /**
      * @param BeneficiaireProfil $data
-     * @param Operation          $operation
-     * @param array              $uriVariables
-     * @param array              $context
+     * @param Operation $operation
+     * @param array $uriVariables
+     * @param array $context
      * @return BeneficiaireProfil|null
      * @throws Exception
      */

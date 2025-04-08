@@ -159,7 +159,7 @@ class NestedFieldSearchFilter extends AbstractFilter
                 } else {
                     $exprs[] = $queryBuilder->expr()->eq($val->id, $alias . '.' . $targetField);
                 }
-            } catch (Exception $e) {
+            } catch (Exception) {
                 $exprs[] = $queryBuilder->expr()->eq($alias . '.' . $targetField, $val);
             }
         }

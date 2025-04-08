@@ -33,29 +33,28 @@ readonly class BilanActiviteProcessor implements ProcessorInterface
 {
     use ClockAwareTrait;
 
-    public function __construct(private BilanRepository              $bilanRepository,
-                                private Security                     $security,
-                                private IriConverterInterface        $iriConverter,
-                                private TransformerService           $transformerService,
-                                private readonly MessageBusInterface $messageBus)
+    public function __construct(private BilanRepository       $bilanRepository,
+                                private Security              $security,
+                                private IriConverterInterface $iriConverter,
+                                private TransformerService    $transformerService,
+                                private MessageBusInterface   $messageBus)
     {
 
     }
 
     /**
      * @param BilanActivite $data
-     * @param Operation     $operation
-     * @param array         $uriVariables
-     * @param array         $context
-     * @return void
+     * @param Operation $operation
+     * @param array $uriVariables
+     * @param array $context
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?BilanActivite
     {
         //Support de POST et DELETE uniquement
         if ($operation instanceof Delete) {
             $existant = $this->bilanRepository->find($data->id);
             $this->bilanRepository->remove($existant, true);
-            return;
+            return null;
         }
 
         $bilan = new Bilan();

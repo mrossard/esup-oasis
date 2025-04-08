@@ -61,7 +61,6 @@ class EtatAvisEseUtilisateurFilter extends AbstractFilter
 
         $addFilters($queryBuilder, $queryNameGenerator, $alias, $avisAlias, $fichierAlias, $nowParam);
 
-        return;
     }
 
     protected function addFilterAucun(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator,

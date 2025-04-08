@@ -25,7 +25,7 @@ class ErreurTechniqueMessageHandler
 
     }
 
-    public function __invoke(ErreurTechniqueMessage $message)
+    public function __invoke(ErreurTechniqueMessage $message): void
     {
         $this->mailService->envoyerMailErreurTechnique($message);
     }

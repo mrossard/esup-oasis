@@ -40,9 +40,8 @@ class ParametreUIProcessor implements ProcessorInterface
      * @param Operation $operation
      * @param array $uriVariables
      * @param array $context
-     * @return void
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?ParametreUI
     {
         $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']);
         $param = $this->parametreUIRepository->findOneBy([
@@ -59,7 +58,7 @@ class ParametreUIProcessor implements ProcessorInterface
         if ($operation instanceof Delete) {
             $this->parametreUIRepository->remove($param, true);
             $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
-            return;
+            return null;
         }
 
         //PUT

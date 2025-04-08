@@ -12,7 +12,7 @@
 
 namespace App\State\PeriodeRH;
 
-use ApiPlatform\Exception\ItemNotFoundException;
+use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\LigneServiceFait;

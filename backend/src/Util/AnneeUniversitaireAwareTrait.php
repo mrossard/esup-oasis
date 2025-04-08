@@ -13,7 +13,6 @@
 namespace App\Util;
 
 use App\Entity\Beneficiaire;
-use App\Message\AmenagementModifieMessage;
 use DateTime;
 use DateTimeImmutable;
 use DateTimeInterface;

@@ -15,12 +15,10 @@ namespace App\State\Commission;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Commission;
-use App\Entity\Utilisateur;
 use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
 use App\Repository\CommissionRepository;
 use App\State\TransformerService;
-use App\State\Utilisateur\UtilisateurManager;
 use Override;
 use ReflectionException;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -37,13 +35,12 @@ readonly class CommissionProcessor implements ProcessorInterface
 
     /**
      * @param Commission $data
-     * @param Operation  $operation
-     * @param array      $uriVariables
-     * @param array      $context
-     * @return void
+     * @param Operation $operation
+     * @param array $uriVariables
+     * @param array $context
      * @throws ReflectionException
      */
-    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Commission
     {
         if (null == $data->id) {
             $entity = new \App\Entity\Commission();

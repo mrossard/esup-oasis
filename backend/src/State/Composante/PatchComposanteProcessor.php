@@ -37,13 +37,12 @@ class PatchComposanteProcessor implements ProcessorInterface
 
     /**
      * @param Composante $data
-     * @param Operation  $operation
-     * @param array      $uriVariables
-     * @param array      $context
-     * @return void
+     * @param Operation $operation
+     * @param array $uriVariables
+     * @param array $context
      * @throws ErreurLdapException
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Composante
     {
         $entity = $this->composanteRepository->find($data->id);
 

@@ -295,7 +295,7 @@ class Beneficiaire
         return $this;
     }
 
-    public function getAmenagementsActifs()
+    public function getAmenagementsActifs(): array
     {
         return array_filter(
             $this->getAmenagements()->toArray(),
