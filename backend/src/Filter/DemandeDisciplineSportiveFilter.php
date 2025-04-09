@@ -16,6 +16,7 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use App\ApiResource\Tag;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
@@ -92,22 +93,22 @@ class DemandeDisciplineSportiveFilter extends AbstractFilter
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => [
-                    'description' => 'discipline sportive',
-                    'name' => self::PROPERTY,
-                    'type' => 'string',
-                ],
+                'openapi' => new Parameter(
+                    name: self::PROPERTY,
+                    in: 'query',
+                    description: 'discipline sportive',
+                ),
             ],
             self::PROPERTY . '[]' => [
                 'property' => self::PROPERTY,
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
                 'is_collection' => true,
-                'openapi' => [
-                    'description' => 'discipline sportive',
-                    'name' => self::PROPERTY,
-                    'type' => 'string',
-                ],
+                'openapi' => new Parameter(
+                    name: self::PROPERTY,
+                    in: 'query',
+                    description: 'discipline sportive',
+                ),
             ],
 
         ];

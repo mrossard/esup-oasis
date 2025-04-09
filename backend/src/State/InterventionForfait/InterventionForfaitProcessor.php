@@ -28,6 +28,7 @@ use App\State\TransformerService;
 use App\State\Utilisateur\UtilisateurManager;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Clock\ClockAwareTrait;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 class InterventionForfaitProcessor implements ProcessorInterface
@@ -51,7 +52,9 @@ class InterventionForfaitProcessor implements ProcessorInterface
      * @param Operation $operation
      * @param array $uriVariables
      * @param array $context
+     * @return InterventionForfait|null
      * @throws ErreurLdapException
+     * @throws ExceptionInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?InterventionForfait
     {

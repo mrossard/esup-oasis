@@ -16,6 +16,7 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use App\ApiResource\Utilisateur;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -69,11 +70,11 @@ class ProfilBeneficiaireFilter extends AbstractFilter
                 'property' => 'profil',
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
-                'openapi' => [
-                    'description' => 'Recherche sur le profil bénéficiaire',
-                    'name' => 'profil',
-                    'type' => 'string',
-                ],
+                'openapi' => new Parameter(
+                    name: 'profil',
+                    in: 'query',
+                    description: 'Recherche sur le profil bénéficiaire',
+                ),
             ],
         ];
     }

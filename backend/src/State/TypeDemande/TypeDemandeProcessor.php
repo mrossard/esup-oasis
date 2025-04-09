@@ -25,12 +25,12 @@ use Exception;
 use Override;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class TypeDemandeProcessor implements ProcessorInterface
+readonly class TypeDemandeProcessor implements ProcessorInterface
 {
-    function __construct(private readonly TypeDemandeRepository        $typeDemandeRepository,
-                         private readonly ProfilBeneficiaireRepository $profilBeneficiaireRepository,
-                         private readonly TransformerService           $transformerService,
-                         private readonly MessageBusInterface          $messageBus)
+    function __construct(private TypeDemandeRepository        $typeDemandeRepository,
+                         private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
+                         private TransformerService           $transformerService,
+                         private MessageBusInterface          $messageBus)
     {
     }
 

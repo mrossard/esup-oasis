@@ -20,7 +20,7 @@ use App\Message\RessourceModifieeMessage;
 use App\Repository\CommissionRepository;
 use App\State\TransformerService;
 use Override;
-use ReflectionException;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class CommissionProcessor implements ProcessorInterface
@@ -38,7 +38,8 @@ readonly class CommissionProcessor implements ProcessorInterface
      * @param Operation $operation
      * @param array $uriVariables
      * @param array $context
-     * @throws ReflectionException
+     * @return Commission
+     * @throws ExceptionInterface
      */
     #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Commission
     {

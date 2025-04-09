@@ -13,6 +13,7 @@
 namespace App\Entity;
 
 use App\Repository\PeriodeRHRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -66,7 +67,7 @@ class PeriodeRH
 
     public function setDebut(DateTimeInterface $debut): self
     {
-        $this->debut = $debut;
+        $this->debut = DateTime::createFromInterface($debut);
 
         return $this;
     }
@@ -78,7 +79,7 @@ class PeriodeRH
 
     public function setFin(DateTimeInterface $fin): self
     {
-        $this->fin = $fin;
+        $this->fin = DateTime::createFromInterface($fin);
 
         return $this;
     }
@@ -90,7 +91,7 @@ class PeriodeRH
 
     public function setButoir(DateTimeInterface $butoir): self
     {
-        $this->butoir = $butoir;
+        $this->butoir = DateTime::createFromInterface($butoir);
 
         return $this;
     }
@@ -132,7 +133,10 @@ class PeriodeRH
 
     public function setDateEnvoi(?DateTimeInterface $dateEnvoi): self
     {
-        $this->dateEnvoi = $dateEnvoi;
+        $this->dateEnvoi = match ($dateEnvoi) {
+            null => null,
+            default => DateTime::createFromInterface($dateEnvoi)
+        };
 
         return $this;
     }

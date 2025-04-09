@@ -13,6 +13,7 @@
 namespace App\Entity;
 
 use App\Repository\BeneficiaireRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -100,7 +101,7 @@ class Beneficiaire
 
     public function setDebut(DateTimeInterface $debut): self
     {
-        $this->debut = $debut;
+        $this->debut = DateTime::createFromInterface($debut);
 
         return $this;
     }
@@ -112,7 +113,10 @@ class Beneficiaire
 
     public function setFin(?DateTimeInterface $fin): self
     {
-        $this->fin = $fin;
+        $this->fin = match ($fin) {
+            null => null,
+            default => DateTime::createFromInterface($fin)
+        };
 
         return $this;
     }

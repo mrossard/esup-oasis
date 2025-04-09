@@ -17,10 +17,10 @@ use App\Service\MailService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler(handles: ErreurTechniqueMessage::class)]
-class ErreurTechniqueMessageHandler
+readonly class ErreurTechniqueMessageHandler
 {
 
-    public function __construct(private readonly MailService $mailService)
+    public function __construct(private MailService $mailService)
     {
 
     }

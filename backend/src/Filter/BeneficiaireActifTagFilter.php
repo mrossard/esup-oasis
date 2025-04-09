@@ -16,6 +16,7 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use App\Entity\Tag;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
@@ -72,22 +73,22 @@ class BeneficiaireActifTagFilter extends AbstractFilter
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => [
-                    'description' => $value['description'] ?? $property,
-                    'name' => $property,
-                    'type' => 'string',
-                ],
+                'openapi' => new Parameter(
+                    name: $property,
+                    in: 'query',
+                    description: $value['description'] ?? $property,
+                ),
             ];
             $description[$property . '[]'] = [
                 'property' => $property,
                 'type' => Type::BUILTIN_TYPE_STRING,
                 'required' => false,
                 'is_collection' => true,
-                'openapi' => [
-                    'description' => $value['description'] ?? $property,
-                    'name' => $property,
-                    'type' => 'string',
-                ],
+                'openapi' => new Parameter(
+                    name: $property,
+                    in: 'query',
+                    description: $value['description'] ?? $property,
+                ),
             ];
         }
         return $description;

@@ -42,7 +42,6 @@ class EvenementProvider extends AbstractEntityProvider
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $utilisateur = $this->security->getUser();
-        assert($utilisateur instanceof \App\Entity\Utilisateur);
 
         if ($operation instanceof GetCollection) {
             //calcul de la clé pour mise en cache
@@ -52,6 +51,7 @@ class EvenementProvider extends AbstractEntityProvider
             };
             //Evenements à valider : différences en fonction du service de l'utilisateur!
             if (array_key_exists('filters', $context) && array_key_exists('aValider', $context['filters'])) {
+                assert($utilisateur instanceof \App\Entity\Utilisateur);
                 $cacheKey .= array_reduce(
                     array: $utilisateur->getServices()->toArray(),
                     callback: function ($carry, Service $item) {

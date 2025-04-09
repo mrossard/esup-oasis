@@ -123,6 +123,7 @@ readonly class UtilisateurManager
 
     /**
      * @param string $term
+     * @param bool $etudiantsSeulement
      * @return Utilisateur[]|Generator
      */
     public function search(string $term, bool $etudiantsSeulement = false): array|Generator
@@ -407,6 +408,7 @@ readonly class UtilisateurManager
      * @param int|null $id
      * @param Utilisateur|null $gestionnaire
      * @param TypologieHandicap[] $typologies
+     * @param bool $avecAccompagnement
      * @return Beneficiaire
      * @throws BeneficiaireInconnuException
      */

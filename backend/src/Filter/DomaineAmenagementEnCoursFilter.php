@@ -15,6 +15,7 @@ namespace App\Filter;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
@@ -54,11 +55,11 @@ class DomaineAmenagementEnCoursFilter extends AbstractFilter
                 'type' => Type::BUILTIN_TYPE_BOOL,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => [
-                    'description' => $property,
-                    'name' => $property,
-                    'type' => 'bool',
-                ],
+                'openapi' => new Parameter(
+                    name: $property,
+                    in: 'query',
+                    description: $property,
+                ),
             ];
         }
         return $description;

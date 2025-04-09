@@ -41,7 +41,7 @@ readonly class TypeAmenagementProcessor implements ProcessorInterface
      * @return array|mixed|object|null
      * @throws Exception
      */
-    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TypeAmenagement
+    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): \App\ApiResource\TypeAmenagement
     {
         /**
          * Uniquement POST et PATCH

@@ -18,10 +18,10 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileSystemStorageProvider implements StorageProviderInterface
+readonly class FileSystemStorageProvider implements StorageProviderInterface
 {
 
-    function __construct(private readonly string $basePath)
+    function __construct(private string $basePath)
     {
 
     }
