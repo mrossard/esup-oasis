@@ -19,18 +19,20 @@ use App\ApiResource\ParametreUI;
 use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
 use App\Repository\ParametreUIRepository;
+use App\Service\ErreurLdapException;
 use App\State\TransformerService;
 use App\State\Utilisateur\UtilisateurManager;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class ParametreUIProcessor implements ProcessorInterface
+readonly class ParametreUIProcessor implements ProcessorInterface
 {
 
     public function __construct(
-        private readonly ParametreUIRepository $parametreUIRepository,
-        private readonly UtilisateurManager    $utilisateurManager,
-        private readonly TransformerService    $transformerService,
-        private readonly MessageBusInterface   $messageBus)
+        private ParametreUIRepository $parametreUIRepository,
+        private UtilisateurManager    $utilisateurManager,
+        private TransformerService    $transformerService,
+        private MessageBusInterface   $messageBus)
     {
 
     }
@@ -40,6 +42,9 @@ class ParametreUIProcessor implements ProcessorInterface
      * @param Operation $operation
      * @param array $uriVariables
      * @param array $context
+     * @return ParametreUI|null
+     * @throws ErreurLdapException
+     * @throws ExceptionInterface
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?ParametreUI
     {

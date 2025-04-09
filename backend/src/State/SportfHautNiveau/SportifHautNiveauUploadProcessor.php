@@ -23,12 +23,12 @@ use App\State\TransformerService;
 use Exception;
 use Symfony\Component\HttpFoundation\File\File;
 
-class SportifHautNiveauUploadProcessor implements ProcessorInterface
+readonly class SportifHautNiveauUploadProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly StorageProviderInterface    $storageProvider,
-                                private readonly FichierRepository           $fichierRepository,
-                                private readonly SportifHautNiveauRepository $sportifHautNiveauRepository,
-                                private readonly TransformerService          $transformerService)
+    public function __construct(private StorageProviderInterface    $storageProvider,
+                                private FichierRepository           $fichierRepository,
+                                private SportifHautNiveauRepository $sportifHautNiveauRepository,
+                                private TransformerService          $transformerService)
     {
     }
 

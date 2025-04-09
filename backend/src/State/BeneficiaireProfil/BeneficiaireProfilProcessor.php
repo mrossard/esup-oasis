@@ -31,14 +31,14 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-final class BeneficiaireProfilProcessor implements ProcessorInterface
+final readonly class BeneficiaireProfilProcessor implements ProcessorInterface
 {
-    public function __construct(private readonly UtilisateurManager           $utilisateurManager,
-                                private readonly ProfilBeneficiaireRepository $profilBeneficiaireRepository,
-                                private readonly TypologieHandicapRepository  $typologieHandicapRepository,
-                                private readonly TransformerService           $transformerService,
-                                private readonly MessageBusInterface          $messageBus,
-                                private readonly ValidatorInterface           $validator,)
+    public function __construct(private UtilisateurManager           $utilisateurManager,
+                                private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
+                                private TypologieHandicapRepository  $typologieHandicapRepository,
+                                private TransformerService           $transformerService,
+                                private MessageBusInterface          $messageBus,
+                                private ValidatorInterface           $validator,)
     {
     }
 

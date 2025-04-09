@@ -150,8 +150,9 @@ class ServicesFaitsProvider implements ProviderInterface
     /**
      * @param LigneServiceFait|null $ligne
      * @param Evenement|InterventionForfait $evenement
+     * @param TauxHoraire $tauxHoraire
      * @return LigneServiceFait
-     * @throws ConfigurationIncompleteException
+     * @throws Exception
      */
     protected function append(?LigneServiceFait $ligne, Evenement|InterventionForfait $evenement, TauxHoraire $tauxHoraire): LigneServiceFait
     {

@@ -14,6 +14,7 @@
 namespace App\Entity;
 
 use App\Repository\AmenagementRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -110,7 +111,10 @@ class Amenagement implements BeneficiairesManagerInterface
 
     public function setDebut(?DateTimeInterface $debut): static
     {
-        $this->debut = $debut;
+        $this->debut = match ($debut) {
+            null => null,
+            default => DateTime::createFromInterface($debut)
+        };
 
         return $this;
     }
@@ -122,7 +126,11 @@ class Amenagement implements BeneficiairesManagerInterface
 
     public function setFin(?DateTimeInterface $fin): static
     {
-        $this->fin = $fin;
+        $this->debut = match ($fin) {
+            null => null,
+            default => DateTime::createFromInterface($fin)
+        };
+
 
         return $this;
     }

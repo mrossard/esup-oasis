@@ -16,6 +16,7 @@ use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use App\ApiResource\Composante;
 use App\ApiResource\Formation;
 use App\Entity\Amenagement;
@@ -126,6 +127,7 @@ class ComposanteFormationFilter extends AbstractFilter
      * Vérifie que les composantes demandées sont bien accessibles à l'utilisateur, sinon les retire
      *
      * @param $values
+     * @param $property
      * @return array
      */
     private function cleanValues($values, $property): array
@@ -187,22 +189,22 @@ class ComposanteFormationFilter extends AbstractFilter
             'type' => Type::BUILTIN_TYPE_STRING,
             'required' => false,
             'is_collection' => false,
-            'openapi' => [
-                'description' => "composante d'inscription du bénéficiaire",
-                'name' => 'composante',
-                'type' => 'string',
-            ],
+            'openapi' => new Parameter(
+                name: 'composante',
+                in: 'query',
+                description: "composante d'inscription du bénéficiaire",
+            ),
         ];
         $description['composante[]'] = [
             'property' => 'composante',
             'type' => Type::BUILTIN_TYPE_STRING,
             'required' => false,
             'is_collection' => true,
-            'openapi' => [
-                'description' => "composante d'inscription du bénéficiaire",
-                'name' => 'composante',
-                'type' => 'string',
-            ],
+            'openapi' => new Parameter(
+                name: 'composante',
+                in: 'query',
+                description: "composante d'inscription du bénéficiaire",
+            ),
         ];
 
         $description['formation'] = [
@@ -210,22 +212,22 @@ class ComposanteFormationFilter extends AbstractFilter
             'type' => Type::BUILTIN_TYPE_STRING,
             'required' => false,
             'is_collection' => false,
-            'openapi' => [
-                'description' => "formation d'inscription du bénéficiaire",
-                'name' => 'composante',
-                'type' => 'string',
-            ],
+            'openapi' => new Parameter(
+                name: 'formation',
+                in: 'query',
+                description: "formation d'inscription du bénéficiaire",
+            ),
         ];
         $description['formation[]'] = [
             'property' => 'formation',
             'type' => Type::BUILTIN_TYPE_STRING,
             'required' => false,
             'is_collection' => true,
-            'openapi' => [
-                'description' => "formation d'inscription du bénéficiaire",
-                'name' => 'composante',
-                'type' => 'string',
-            ],
+            'openapi' => new Parameter(
+                name: 'formation',
+                in: 'query',
+                description: "formation d'inscription du bénéficiaire",
+            ),
         ];
 
         return $description;

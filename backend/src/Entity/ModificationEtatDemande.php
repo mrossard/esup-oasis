@@ -13,6 +13,7 @@
 namespace App\Entity;
 
 use App\Repository\ModificationEtatDemandeRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -133,7 +134,7 @@ class ModificationEtatDemande
 
     public function setDateModification(DateTimeInterface $dateModification): static
     {
-        $this->dateModification = $dateModification;
+        $this->dateModification = DateTime::createFromInterface($dateModification);
 
         return $this;
     }

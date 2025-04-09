@@ -21,7 +21,7 @@ Oasis est disponible sous la forme de deux applications frontend et backend sép
 suivantes :
 
 * Frontend : Javascript, React 18
-* Backend : PHP, Symfony 7.1 / Api Platform 3.2
+* Backend : PHP 8.3, Symfony 7.2 / Api Platform 4
 
 Des Dockerfile sont fournis pour le déploiement des deux applications, plus de détails dans la documentation de
 chacune.

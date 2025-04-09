@@ -12,8 +12,8 @@
 
 namespace App\State\BilanActivite;
 
-use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\BilanActivite;
@@ -44,9 +44,6 @@ readonly class BilanActiviteProcessor implements ProcessorInterface
 
     /**
      * @param BilanActivite $data
-     * @param Operation $operation
-     * @param array $uriVariables
-     * @param array $context
      */
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?BilanActivite
     {

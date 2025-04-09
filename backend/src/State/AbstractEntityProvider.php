@@ -16,6 +16,7 @@ use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\PeriodeRH;
@@ -77,7 +78,7 @@ abstract class AbstractEntityProvider extends AbstractTransformer implements Pro
 
             //On (re-)pagine si nécessaire!
             if ($pagination && !($postfiltrage ?? false)) {
-                assert($data instanceof TraversablePaginator);
+                assert($data instanceof PaginatorInterface);
                 return new TraversablePaginator(new ArrayIterator($processed), $data->getCurrentPage(), $data->getItemsPerPage(), $data->getTotalItems());
             }
             return $processed;
