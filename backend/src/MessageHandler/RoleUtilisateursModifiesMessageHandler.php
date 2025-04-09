@@ -19,7 +19,7 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 #[AsMessageHandler(handles: RoleUtilisateursModifiesMessage::class)]
 readonly class RoleUtilisateursModifiesMessageHandler
 {
-    public function __construct(private readonly TagAwareCacheInterface $cache)
+    public function __construct(private TagAwareCacheInterface $cache)
     {
 
     }
