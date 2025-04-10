@@ -26,13 +26,15 @@ readonly class AmenagementModifieMessageHandler
 
     }
 
-    public function __invoke(AmenagementModifieMessage $message)
+    public function __invoke(AmenagementModifieMessage $message): void
     {
         $bornesAnneeConcernee = $message->getBornesAnnee();
         $this->logger->info('Aménagement modifié pour  : ' . $message->getBeneficiaire()->getUid() . ', année : ' . json_encode($bornesAnneeConcernee));
         $beneficiaire = $message->getBeneficiaire();
 
-        $this->decisionAmenagementManager->majEtatDecision($beneficiaire, $bornesAnneeConcernee['debut'], $bornesAnneeConcernee['fin']);
+        if ($message->isExamens()) {
+            $this->decisionAmenagementManager->majEtatDecision($beneficiaire, $bornesAnneeConcernee['debut'], $bornesAnneeConcernee['fin']);
+        }
     }
 
 }
