@@ -67,7 +67,7 @@ class Evenement implements BeneficiairesManagerInterface
     private ?Intervenant $intervenant = null;
 
     #[ORM\ManyToMany(targetEntity: Intervenant::class, inversedBy: 'suppleances')]
-    #[ORM\JoinTable(name: 'evenement_suppleant')]
+    #[ORM\JoinTable(name: 'evenement_intervenant')]
     private Collection $suppleants;
 
     #[ORM\ManyToOne(inversedBy: 'evenements')]
