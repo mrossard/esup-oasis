@@ -126,7 +126,7 @@ class Amenagement implements BeneficiairesManagerInterface
 
     public function setFin(?DateTimeInterface $fin): static
     {
-        $this->debut = match ($fin) {
+        $this->fin = match ($fin) {
             null => null,
             default => DateTime::createFromInterface($fin)
         };
