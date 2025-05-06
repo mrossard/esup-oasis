@@ -32,7 +32,7 @@ readonly class AmenagementModifieMessageHandler
         $this->logger->info('Aménagement modifié pour  : ' . $message->getBeneficiaire()->getUid() . ', année : ' . json_encode($bornesAnneeConcernee));
         $beneficiaire = $message->getBeneficiaire();
 
-        if ($message->isExamens()) {
+        if ($message->isExamens() && $message->impacteDecision) {
             $this->decisionAmenagementManager->majEtatDecision($beneficiaire, $bornesAnneeConcernee['debut'], $bornesAnneeConcernee['fin']);
         }
     }

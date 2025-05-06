@@ -90,6 +90,14 @@ class AmenagementProcessor implements ProcessorInterface
             $fin = $this->getFinSemestre2();
         }
 
+        //On vérifie si un champ important a été changé pour déclencher la maj de la décision
+        $modificationDecision = false;
+        if ($entity->getDebut() !== $debut || $entity->getFin() !== $fin ||
+            $entity->getCommentaire() !== $data->commentaire ||
+            $entity->getType()->getId() !== $data->typeAmenagement->id) {
+            $modificationDecision = true;
+        }
+
         $entity->setDebut($debut);
         $entity->setFin($fin);
         $entity->setCommentaire($data->commentaire);
@@ -102,9 +110,9 @@ class AmenagementProcessor implements ProcessorInterface
         });
 
         /**
-         * Ajout/modification des bénéficiaires actifs pour l'utilisateur!
+         * Ajout/modification des bénéficiaires actifs pour l'utilisateur !
          */
-        $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']);//sur POST c'est pas rempli...
+        $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']);//sur POST ce n'est pas rempli...
         foreach ($utilisateur->getBeneficiaires() as $beneficiaire) {
             if ($entity->canHaveBeneficiaire($beneficiaire)) {
                 $entity->addBeneficiaire($beneficiaire);
@@ -112,7 +120,7 @@ class AmenagementProcessor implements ProcessorInterface
         }
 
         $this->amenagementRepository->save($entity, true);
-        $this->messageBus->dispatch(new AmenagementModifieMessage($entity));
+        $this->messageBus->dispatch(new AmenagementModifieMessage($entity, $modificationDecision));
 
         $resource = $this->transformerService->transform($entity, Amenagement::class);
         if (null !== $data->id) {
