@@ -53,10 +53,15 @@ readonly class PatchDemandeProcessor implements ProcessorInterface
             //si nouvel état = validé, on veut refresh le cache!
             if ($data->etat->id === EtatDemande::VALIDEE) {
                 $beneficiaire = $this->transformerService->transform($demande->getDemandeur()->getBeneficiairesActifs()[0], BeneficiaireProfil::class);
+                $demandeur = $data->demandeur;
+                $demandeur->roleId = 'ROLE_DEMANDEUR';
                 $this->messageBus->dispatch(new RessourceModifieeMessage($beneficiaire));
-                $this->messageBus->dispatch(new RessourceModifieeMessage($data->demandeur));
+                $this->messageBus->dispatch(new RessourceModifieeMessage($demandeur));
                 $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($beneficiaire));
-                $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data->demandeur));
+                $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($demandeur));
+                $demandeur->roleId = 'ROLE_BENEFICIAIRE';
+                $this->messageBus->dispatch(new RessourceModifieeMessage($demandeur));
+                $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($demandeur));
             }
 
         } else {
