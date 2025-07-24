@@ -76,7 +76,7 @@ readonly class UtilisateurManager
                                 private TagAwareCacheInterface                                   $cache, private ReponseRepository $reponseRepository,
                                 #[Autowire('%env(json:LDAP_CHAMPS_RECHERCHE)%')] private array   $ldapChampsRecherche,
                                 #[Autowire('%env(LDAP_CRITERES_RECHERCHE_SUP)%')] private string $ldapCriteresRecherche,
-                                #[Autowire('%env(LDAP_CHAMP_ETU_ID%')] private string            $ldapChampEtuId)
+                                #[Autowire('%env(LDAP_CHAMP_ETU_ID)%')] private string           $ldapChampEtuId)
     {
 
     }
