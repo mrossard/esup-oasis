@@ -13,6 +13,7 @@
 namespace App\State\PeriodeRH;
 
 use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\PeriodeRH;
@@ -23,12 +24,11 @@ use Exception;
 readonly class IntervenantServicesFaitsProvider implements ProviderInterface
 {
 
-    function __construct(private ServicesFaitsProvider $servicesFaitsProvider,
-                         private PeriodeProvider       $periodeProvider,
-                         private PeriodeRHRepository   $periodeRHRepository)
-    {
-
-    }
+    function __construct(
+        private ServicesFaitsProvider $servicesFaitsProvider,
+        private PeriodeProvider $periodeProvider,
+        private PeriodeRHRepository $periodeRHRepository,
+    ) {}
 
     /**
      * @throws Exception
@@ -46,10 +46,15 @@ readonly class IntervenantServicesFaitsProvider implements ProviderInterface
             $periodeContext['filters']['order'] = $context['filters']['order'];
         }
 
+        $periodeRhOperation = new GetCollection()
+            ->withClass(PeriodeRH::class)
+            ->withFilters(['annotated_app_api_resource_periode_rh_api_platform_doctrine_orm_filter_order_filter']);
+
         $periodes = $this->periodeProvider->provide(
-            operation: $operation->withClass(PeriodeRH::class),
+            operation: $periodeRhOperation,
             uriVariables: [],
-            context: $periodeContext);
+            context: $periodeContext,
+        );
 
         //on a les périodes filtrées...
         $result = [];
@@ -61,7 +66,7 @@ readonly class IntervenantServicesFaitsProvider implements ProviderInterface
             $servicesFaits = $this->servicesFaitsProvider->init($periodeEntity, $uriVariables['uid']);
             $result[] = $this->servicesFaitsProvider->traiterEvenements(
                 evenements: $this->servicesFaitsProvider->getEvenements($periodeEntity, $uriVariables['uid']),
-                servicesFaits: $servicesFaits
+                servicesFaits: $servicesFaits,
             );
         }
 
