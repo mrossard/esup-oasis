@@ -22,6 +22,7 @@ use App\ApiResource\TypeEvenement;
 use App\ApiResource\Utilisateur;
 use App\Entity\ApplicationCliente;
 use App\Entity\Service;
+use App\Filter\PreloadAssociationsFilter;
 use App\State\AbstractEntityProvider;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -76,6 +77,36 @@ class EvenementProvider extends AbstractEntityProvider
         return $this->cache->get(
             key: $cacheKey,
             callback: function (ItemInterface $item) use ($operation, $uriVariables, $context) {
+                $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+                    'intervenant' => [
+                        'sourceEntity' => 'root',
+                        'relationName' => 'intervenant'
+                    ],
+                    'utilisateur' => [
+                        'sourceEntity' => 'intervenant',
+                        'relationName' => 'utilisateur'
+                    ],
+                    'beneficiaires' => [
+                        'sourceEntity' => 'root',
+                        'relationName' => 'beneficiaires'
+                    ],
+                    'utilisateurBenef' => [
+                        'sourceEntity' => 'beneficiaires',
+                        'relationName' => 'utilisateur'
+                    ],
+                    'utilisateurCreation' => [
+                        'sourceEntity' => 'root',
+                        'relationName' => 'utilisateurCreation'
+                    ],
+                    'intervenantUtilisateurCreation' => [
+                        'sourceEntity' => 'utilisateurCreation',
+                        'relationName' => 'intervenant'
+                    ],
+                    'profil' => [
+                        'sourceEntity' => 'beneficiaires',
+                        'relationName' => 'profil'
+                    ]
+                ];
                 $result = parent::provide($operation, $uriVariables, $context);
                 $item->expiresAfter(7200);
                 if ($result instanceof Evenement) {
