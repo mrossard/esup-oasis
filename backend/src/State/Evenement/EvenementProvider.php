@@ -86,6 +86,14 @@ class EvenementProvider extends AbstractEntityProvider
                         'sourceEntity' => 'intervenant',
                         'relationName' => 'utilisateur'
                     ],
+                    'campus' => [
+                        'sourceEntity' => 'root',
+                        'relationName' => 'campus'
+                    ],
+                    'intervenantCampus' => [
+                        'sourceEntity' => 'intervenant',
+                        'relationName' => 'campuses'
+                    ],
                     'beneficiaires' => [
                         'sourceEntity' => 'root',
                         'relationName' => 'beneficiaires'
@@ -93,6 +101,10 @@ class EvenementProvider extends AbstractEntityProvider
                     'utilisateurBenef' => [
                         'sourceEntity' => 'beneficiaires',
                         'relationName' => 'utilisateur'
+                    ],
+                    'intervenantBenef' => [
+                        'sourceEntity' => 'utilisateurBenef',
+                        'relationName' => 'intervenant',
                     ],
                     'utilisateurCreation' => [
                         'sourceEntity' => 'root',
@@ -102,9 +114,29 @@ class EvenementProvider extends AbstractEntityProvider
                         'sourceEntity' => 'utilisateurCreation',
                         'relationName' => 'intervenant'
                     ],
+                    'servicesUtilisateurCreation' => [
+                        'sourceEntity' => 'utilisateurCreation',
+                        'relationName' => 'services'
+                    ],
                     'profil' => [
                         'sourceEntity' => 'beneficiaires',
                         'relationName' => 'profil'
+                    ],
+                    'enseignants' => [
+                        'sourceEntity' => 'root',
+                        'relationName' => 'enseignants'
+                    ],
+                    'intervenantEnseignant' => [
+                        'sourceEntity' => 'enseignants',
+                        'relationName' => 'intervenant'
+                    ],
+                    'equipements' => [
+                        'sourceEntity' => 'root',
+                        'relationName' => 'equipements'
+                    ],
+                    'suppleants' => [
+                        'sourceEntity' => 'root',
+                        'relationName' => 'suppleants'
                     ]
                 ];
                 $result = parent::provide($operation, $uriVariables, $context);
