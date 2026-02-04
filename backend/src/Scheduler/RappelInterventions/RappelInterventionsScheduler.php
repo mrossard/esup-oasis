@@ -19,6 +19,7 @@ use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 #[AsSchedule('rappelHebdo')]
 class RappelInterventionsScheduler implements ScheduleProviderInterface
@@ -27,12 +28,12 @@ class RappelInterventionsScheduler implements ScheduleProviderInterface
 
     public const string INTERVALLE = '7 days';
 
-    public function __construct(private readonly ParametreRepository $parametreRepository,
-                                private readonly string              $heurePassage,
-                                private readonly string              $startScheduleNow)
-    {
-
-    }
+    public function __construct(
+        private readonly ParametreRepository $parametreRepository,
+        private readonly string $heurePassage,
+        private readonly string $startScheduleNow,
+        private readonly CacheInterface $cache,
+    ) {}
 
     public function getSchedule(): Schedule
     {
@@ -45,10 +46,13 @@ class RappelInterventionsScheduler implements ScheduleProviderInterface
 
         $from = $this->startScheduleNow == 'true' ? $this->now() : 'sunday 23:45';
 
-        return (new Schedule())->add(
-            RecurringMessage::every(frequency: $frequency?->getValeurCourante()->getValeur() ?? self::INTERVALLE,
-                                    message  : new RappelInterventionsMessage($debut, $fin),
-                                    from     : $from)
-        );
+        return new Schedule()
+            ->stateful($this->cache) // ensure missed tasks are executed
+            ->processOnlyLastMissedRun(true) // ensure only last missed task is run
+            ->add(RecurringMessage::every(
+                frequency: $frequency?->getValeurCourante()->getValeur() ?? self::INTERVALLE,
+                message: new RappelInterventionsMessage($debut, $fin),
+                from: $from,
+            ));
     }
 }

@@ -19,17 +19,19 @@ use Symfony\Component\Scheduler\Attribute\AsSchedule;
 use Symfony\Component\Scheduler\RecurringMessage;
 use Symfony\Component\Scheduler\Schedule;
 use Symfony\Component\Scheduler\ScheduleProviderInterface;
+use Symfony\Contracts\Cache\CacheInterface;
 
 #[AsSchedule('rappelEnvoiRH')]
 class RappelEnvoiRHScheduler implements ScheduleProviderInterface
 {
     use ClockAwareTrait;
 
-    public function __construct(private readonly ParametreRepository $parametreRepository,
-                                private readonly string              $heurePassage,
-                                private readonly string              $startScheduleNow)
-    {
-    }
+    public function __construct(
+        private readonly ParametreRepository $parametreRepository,
+        private readonly string $heurePassage,
+        private readonly string $startScheduleNow,
+        private readonly CacheInterface $cache,
+    ) {}
 
     public function getSchedule(): Schedule
     {
@@ -39,11 +41,13 @@ class RappelEnvoiRHScheduler implements ScheduleProviderInterface
 
         $from = $this->startScheduleNow == 'true' ? $this->now() : $this->heurePassage;
 
-        return (new Schedule())->add(
-            RecurringMessage::every(frequency: $frequency?->getValeurCourante()->getValeur() ?? '1 day',
-                                    message  : new RappelEnvoiRHMessage(),
-                                    from     : $from
-            )
-        );
+        return new Schedule()
+            ->stateful($this->cache) // ensure missed tasks are executed
+            ->processOnlyLastMissedRun(true) // ensure only last missed task is run
+            ->add(RecurringMessage::every(
+                frequency: $frequency?->getValeurCourante()->getValeur() ?? '1 day',
+                message: new RappelEnvoiRHMessage(),
+                from: $from,
+            ));
     }
 }
