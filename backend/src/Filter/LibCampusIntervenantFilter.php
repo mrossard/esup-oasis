@@ -18,17 +18,19 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class LibCampusIntervenantFilter extends AbstractFilter
 {
-
-    protected function filterProperty(string                      $property, $value,
-                                      QueryBuilder                $queryBuilder,
-                                      QueryNameGeneratorInterface $queryNameGenerator,
-                                      string                      $resourceClass,
-                                      ?Operation                  $operation = null,
-                                      array                       $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== 'libelleCampus') {
             return;
         }
@@ -37,13 +39,13 @@ class LibCampusIntervenantFilter extends AbstractFilter
         $joinAlias = $queryNameGenerator->generateJoinAlias('intervenant');
         $campusAlias = $queryNameGenerator->generateJoinAlias('campus');
 
-        $condition = $queryBuilder->expr()->like("lower(unaccent(" . $campusAlias . '.libelle' . '))', 'unaccent(?1)');
+        $condition = $queryBuilder->expr()->like('lower(unaccent(' . $campusAlias . '.libelle' . '))', 'unaccent(?1)');
 
         $queryBuilder
             ->join($alias . '.intervenant', $joinAlias)
             ->join($joinAlias . '.campuses', $campusAlias)
             ->andWhere($condition)
-            ->setParameter('1', "%" . strtolower($value) . "%");
+            ->setParameter('1', '%' . strtolower($value) . '%');
     }
 
     public function getDescription(string $resourceClass): array
@@ -51,7 +53,7 @@ class LibCampusIntervenantFilter extends AbstractFilter
         return [
             'libelleCampus' => [
                 'property' => 'libelleCampus',
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'openapi' => new Parameter(
                     name: 'libelleCampus',

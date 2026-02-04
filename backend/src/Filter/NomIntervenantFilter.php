@@ -18,14 +18,19 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class NomIntervenantFilter extends AbstractFilter
 {
-
-    protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                      QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                      ?Operation                  $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== 'nomIntervenant') {
             return;
         }
@@ -34,14 +39,13 @@ class NomIntervenantFilter extends AbstractFilter
         $joinAlias = $queryNameGenerator->generateJoinAlias('intervenant');
         $utilisateurAlias = $queryNameGenerator->generateJoinAlias('utilisateur');
 
-        $condition = $queryBuilder->expr()->like("lower(unaccent(" . $utilisateurAlias . '.nom' . '))', 'unaccent(?1)');
+        $condition = $queryBuilder->expr()->like('lower(unaccent(' . $utilisateurAlias . '.nom' . '))', 'unaccent(?1)');
 
         $queryBuilder
             ->join($alias . '.intervenant', $joinAlias)
             ->join($joinAlias . '.utilisateur', $utilisateurAlias)
             ->andWhere($condition)
-            ->setParameter('1', "%" . strtolower($value) . "%");
-
+            ->setParameter('1', '%' . strtolower($value) . '%');
     }
 
     public function getDescription(string $resourceClass): array
@@ -49,7 +53,7 @@ class NomIntervenantFilter extends AbstractFilter
         return [
             'nomIntervenant' => [
                 'property' => 'nomIntervenant',
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'openapi' => new Parameter(
                     name: 'nomIntervenant',

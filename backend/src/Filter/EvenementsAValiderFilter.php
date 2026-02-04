@@ -24,14 +24,17 @@ use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class EvenementsAValiderFilter extends AbstractFilter
 {
-
-    public function __construct(ManagerRegistry         $managerRegistry, private readonly Security $security,
-                                ?LoggerInterface        $logger = null, ?array $properties = null,
-                                ?NameConverterInterface $nameConverter = null,)
-    {
+    public function __construct(
+        ManagerRegistry $managerRegistry,
+        private readonly Security $security,
+        ?LoggerInterface $logger = null,
+        ?array $properties = null,
+        ?NameConverterInterface $nameConverter = null,
+    ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
     }
 
@@ -40,7 +43,7 @@ class EvenementsAValiderFilter extends AbstractFilter
         return [
             'aValider' => [
                 'property' => 'aValider',
-                'type' => Type::BUILTIN_TYPE_BOOL,
+                'type' => TypeIdentifier::BOOL,
                 'required' => false,
                 'openapi' => new Parameter(
                     name: 'aValider',
@@ -51,10 +54,15 @@ class EvenementsAValiderFilter extends AbstractFilter
         ];
     }
 
-    protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                      QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                      ?Operation                  $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== 'aValider') {
             return;
         }
@@ -63,18 +71,23 @@ class EvenementsAValiderFilter extends AbstractFilter
         $alias = $queryBuilder->getRootAliases()[0];
         $typeAlias = $queryNameGenerator->generateJoinAlias('type');
 
-
-        $queryBuilder->join($alias . '.type', $typeAlias, Join::WITH, $typeAlias . '.id=:typeRenfort')
-            ->andWhere($alias . ('.dateValidation is null'))
+        $queryBuilder
+            ->join($alias . '.type', $typeAlias, Join::WITH, $typeAlias . '.id=:typeRenfort')
+            ->andWhere($alias . '.dateValidation is null')
             ->setParameter('typeRenfort', TypeEvenement::TYPE_RENFORT);
         if (!$this->security->isGranted('ROLE_ADMIN')) {
             //il faut regarder les événements des renforts qui sont sur le même service que l'utilisateur connecté
             $renfortAlias = $queryNameGenerator->generateJoinAlias('utilisateurCreation');
             $renfortServiceAlias = $queryNameGenerator->generateJoinAlias('services');
 
-            $queryBuilder->join($alias . '.utilisateurCreation', $renfortAlias)
-                ->join($renfortAlias . '.services', $renfortServiceAlias, Join::WITH,
-                    ':user MEMBER OF ' . $renfortServiceAlias . '.utilisateurs')
+            $queryBuilder
+                ->join($alias . '.utilisateurCreation', $renfortAlias)
+                ->join(
+                    $renfortAlias . '.services',
+                    $renfortServiceAlias,
+                    Join::WITH,
+                    ':user MEMBER OF ' . $renfortServiceAlias . '.utilisateurs',
+                )
                 ->setParameter('user', $user);
         }
     }

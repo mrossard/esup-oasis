@@ -23,22 +23,31 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class BeneficiaireActifTagFilter extends AbstractFilter
 {
     use BeneficiaireActifAwareFilterTrait;
 
-    public function __construct(private readonly IriConverterInterface $iriConverter,
-                                ManagerRegistry                        $managerRegistry, ?LoggerInterface $logger = null,
-                                ?array                                 $properties = null, ?NameConverterInterface $nameConverter = null)
-    {
+    public function __construct(
+        private readonly IriConverterInterface $iriConverter,
+        ManagerRegistry $managerRegistry,
+        ?LoggerInterface $logger = null,
+        ?array $properties = null,
+        ?NameConverterInterface $nameConverter = null,
+    ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
     }
 
-
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator,
-                                      string $resourceClass, ?Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if (!in_array($property, array_keys($this->getProperties()))) {
             return;
         }
@@ -47,20 +56,17 @@ class BeneficiaireActifTagFilter extends AbstractFilter
         $beneficiaireAlias = $this->filterBeneficiairesActifs($queryBuilder, $queryNameGenerator, $alias);
 
         $values = match (is_array($value)) {
-            true => array_map(
-                fn($val) => $this->getTagEntityFromIriOrId($val),
-                $value
-            ),
-            default => [$this->getTagEntityFromIriOrId($value)]
+            true => array_map(fn($val) => $this->getTagEntityFromIriOrId($val), $value),
+            default => [$this->getTagEntityFromIriOrId($value)],
         };
 
         $tagAlias = $queryNameGenerator->generateJoinAlias('tags');
         $tagIdsParameter = $queryNameGenerator->generateParameterName('tagIds');
 
-        $queryBuilder->join(sprintf('%s.tags', $beneficiaireAlias), $tagAlias)
+        $queryBuilder
+            ->join(sprintf('%s.tags', $beneficiaireAlias), $tagAlias)
             ->andWhere($queryBuilder->expr()->in(sprintf('%s.id', $tagAlias), ':' . $tagIdsParameter))
             ->setParameter($tagIdsParameter, array_map(fn(Tag $tag) => $tag->getId(), $values));
-
     }
 
     //pas un champ ni une association...wtf?
@@ -70,7 +76,7 @@ class BeneficiaireActifTagFilter extends AbstractFilter
         foreach ($this->getProperties() as $property => $value) {
             $description[$property] = [
                 'property' => $property,
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'is_collection' => false,
                 'openapi' => new Parameter(
@@ -81,7 +87,7 @@ class BeneficiaireActifTagFilter extends AbstractFilter
             ];
             $description[$property . '[]'] = [
                 'property' => $property,
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'is_collection' => true,
                 'openapi' => new Parameter(
@@ -102,8 +108,9 @@ class BeneficiaireActifTagFilter extends AbstractFilter
 
         $resource = $this->iriConverter->getResourceFromIri($val);
 
-        return $this->managerRegistry->getManagerForClass(Tag::class)->getRepository(Tag::class)->find($resource->id);
+        return $this->managerRegistry
+            ->getManagerForClass(Tag::class)
+            ->getRepository(Tag::class)
+            ->find($resource->id);
     }
-
-
 }

@@ -19,16 +19,27 @@ use App\Entity\DecisionAmenagementExamens;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class EtatDecisionAmenagementFilter extends AbstractFilter
 {
     protected const string PROPERTY = 'etatDecisionAmenagement';
 
-
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
-    {
-        $etats = [DecisionAmenagementExamens::ETAT_EDITE, DecisionAmenagementExamens::ETAT_EDITION_DEMANDEE,
-            DecisionAmenagementExamens::ETAT_VALIDE, DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS];
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
+        $etats = [
+            DecisionAmenagementExamens::ETAT_EDITE,
+            DecisionAmenagementExamens::ETAT_EDITION_DEMANDEE,
+            DecisionAmenagementExamens::ETAT_VALIDE,
+            DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS,
+        ];
 
         if ($property !== self::PROPERTY) {
             return;
@@ -43,10 +54,14 @@ class EtatDecisionAmenagementFilter extends AbstractFilter
         $decisionPlusRecenteAlias = $queryNameGenerator->generateJoinAlias('decision');
         $etatParam = $queryNameGenerator->generateParameterName('etat');
 
-
-        $queryBuilder->join(sprintf('%s.decisionsAmenagementExamens', $rootAlias), $decisionAlias)
-            ->leftJoin(sprintf('%s.decisionsAmenagementExamens', $rootAlias), $decisionPlusRecenteAlias,
-                Join::WITH, sprintf('%s.debut > %s.debut', $decisionPlusRecenteAlias, $decisionAlias))
+        $queryBuilder
+            ->join(sprintf('%s.decisionsAmenagementExamens', $rootAlias), $decisionAlias)
+            ->leftJoin(
+                sprintf('%s.decisionsAmenagementExamens', $rootAlias),
+                $decisionPlusRecenteAlias,
+                Join::WITH,
+                sprintf('%s.debut > %s.debut', $decisionPlusRecenteAlias, $decisionAlias),
+            )
             ->andWhere(sprintf('%s.id is null', $decisionPlusRecenteAlias))
             ->andWhere(sprintf('%s.etat = :%s', $decisionAlias, $etatParam))
             ->setParameter($etatParam, $value);
@@ -57,7 +72,7 @@ class EtatDecisionAmenagementFilter extends AbstractFilter
         return [
             self::PROPERTY => [
                 'property' => self::PROPERTY,
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'openapi' => [
                     'description' => 'Etat avis ESE',

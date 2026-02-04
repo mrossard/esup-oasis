@@ -13,10 +13,10 @@
 namespace App\Filter;
 
 use ApiPlatform\Metadata\FilterInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class LdapSearchFilter implements FilterInterface
 {
-
     /**
      * @inheritDoc
      */
@@ -25,7 +25,7 @@ class LdapSearchFilter implements FilterInterface
         return [
             'term' => [
                 'property' => 'uid',
-                'type' => 'string',
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'strategy' => 'partial',
                 'is_collection' => false,

@@ -15,22 +15,26 @@ namespace App\Security\Voter;
 use App\ApiResource\Utilisateur;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class VoirInfosPersoVoter extends Voter
 {
-
-    public function __construct(private readonly Security $security)
-    {
-    }
+    public function __construct(
+        private readonly Security $security,
+    ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         return Utilisateur::VOIR_INFOS_PERSO === $attribute;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
-    {
+    protected function voteOnAttribute(
+        string $attribute,
+        mixed $subject,
+        TokenInterface $token,
+        ?Vote $vote = null,
+    ): bool {
         if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_PLANIFICATEUR)) {
             return true;
         }

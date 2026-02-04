@@ -21,29 +21,34 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class DomaineAmenagementEnCoursFilter extends AbstractFilter
 {
-
-    public function __construct(private readonly UtilisateurAmenagementEnCoursFilterHelper $helper,
-                                ManagerRegistry                                            $managerRegistry,
-                                ?LoggerInterface                                           $logger = null,
-                                ?array                                                     $properties = null,
-                                ?NameConverterInterface                                    $nameConverter = null)
-    {
+    public function __construct(
+        private readonly UtilisateurAmenagementEnCoursFilterHelper $helper,
+        ManagerRegistry $managerRegistry,
+        ?LoggerInterface $logger = null,
+        ?array $properties = null,
+        ?NameConverterInterface $nameConverter = null,
+    ) {
         parent::__construct($managerRegistry, $logger, ['examens', 'pedagogique', 'aideHumaine'], $nameConverter);
     }
 
-    protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                      QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                      ?Operation                  $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if (!in_array($property, $this->getProperties())) {
             return;
         }
 
         $this->helper->ajouterJointuresDomaine($queryBuilder, $queryNameGenerator, $value, $property);
-
     }
 
     public function getDescription(string $resourceClass): array
@@ -52,14 +57,10 @@ class DomaineAmenagementEnCoursFilter extends AbstractFilter
         foreach ($this->getProperties() as $property) {
             $description[$property] = [
                 'property' => $property,
-                'type' => Type::BUILTIN_TYPE_BOOL,
+                'type' => TypeIdentifier::BOOL,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => new Parameter(
-                    name: $property,
-                    in: 'query',
-                    description: $property,
-                ),
+                'openapi' => new Parameter(name: $property, in: 'query', description: $property),
             ];
         }
         return $description;

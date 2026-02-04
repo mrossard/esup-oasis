@@ -18,10 +18,10 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class UtilisateurExistantSearchFilter extends AbstractFilter
 {
-
     protected const string PROPERTY = 'recherche';
 
     /**
@@ -34,10 +34,15 @@ class UtilisateurExistantSearchFilter extends AbstractFilter
      * @param array $context
      * @return void
      */
-    protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                      QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                      ?Operation                  $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if (static::PROPERTY !== $property) {
             return;
         }
@@ -47,7 +52,10 @@ class UtilisateurExistantSearchFilter extends AbstractFilter
 
         foreach ($this->properties as $property => $type) {
             if (($type ?? 'string') === 'string') {
-                $strExprs[] = $queryBuilder->expr()->like("lower(unaccent(" . $alias . '.' . $property . '))', 'unaccent(:strValue)');
+                $strExprs[] = $queryBuilder->expr()->like(
+                    'lower(unaccent(' . $alias . '.' . $property . '))',
+                    'unaccent(:strValue)',
+                );
             } else {
                 if (is_numeric($value)) {
                     $intExprs[] = sprintf('%s.%s = :intValue', $alias, $property);
@@ -59,7 +67,7 @@ class UtilisateurExistantSearchFilter extends AbstractFilter
 
         $queryBuilder->andWhere($orX);
         if (count($strExprs) > 0) {
-            $queryBuilder->setParameter('strValue', "%" . strtolower(trim($value)) . "%");
+            $queryBuilder->setParameter('strValue', '%' . strtolower(trim($value)) . '%');
         }
         if (count($intExprs) > 0) {
             $queryBuilder->setParameter('intValue', $value);
@@ -71,7 +79,7 @@ class UtilisateurExistantSearchFilter extends AbstractFilter
         return [
             'recherche' => [
                 'property' => static::PROPERTY,
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'openapi' => new Parameter(
                     name: static::PROPERTY,

@@ -16,22 +16,26 @@ use App\ApiResource\Amenagement;
 use App\Entity\Utilisateur;
 use App\State\Utilisateur\UtilisateurManager;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class VoirAmenagementsUtilisateurVoter extends Voter
 {
-    public function __construct(private readonly UtilisateurManager $utilisateurManager)
-    {
-
-    }
+    public function __construct(
+        private readonly UtilisateurManager $utilisateurManager,
+    ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         return $attribute === Amenagement::VOIR_AMENAGEMENTS_UTILISATEUR;
     }
 
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
-    {
+    protected function voteOnAttribute(
+        string $attribute,
+        mixed $subject,
+        TokenInterface $token,
+        ?Vote $vote = null,
+    ): bool {
         if (in_array(Utilisateur::ROLE_PLANIFICATEUR, $token->getRoleNames())) {
             return true;
         }
@@ -50,7 +54,6 @@ class VoirAmenagementsUtilisateurVoter extends Voter
                     return true;
                 }
             }
-
         }
         return false;
     }

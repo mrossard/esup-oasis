@@ -18,14 +18,19 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class NomGestionnaireFilter extends AbstractFilter
 {
-
-    protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                      QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                      ?Operation                  $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== 'nomGestionnaire') {
             return;
         }
@@ -34,13 +39,16 @@ class NomGestionnaireFilter extends AbstractFilter
         $beneficiaireAlias = $queryNameGenerator->generateJoinAlias('beneficiaires');
         $gestionnaireAlias = $queryNameGenerator->generateJoinAlias('gestionnaire');
 
-        $condition = $queryBuilder->expr()->like("lower(unaccent(" . $gestionnaireAlias . '.nom' . '))', 'unaccent(?1)');
+        $condition = $queryBuilder->expr()->like(
+            'lower(unaccent(' . $gestionnaireAlias . '.nom' . '))',
+            'unaccent(?1)',
+        );
 
         $queryBuilder
             ->join($alias . '.beneficiaires', $beneficiaireAlias)
             ->join($beneficiaireAlias . '.gestionnaire', $gestionnaireAlias)
             ->andWhere($condition)
-            ->setParameter('1', "%" . strtolower($value) . "%");
+            ->setParameter('1', '%' . strtolower($value) . '%');
     }
 
     public function getDescription(string $resourceClass): array
@@ -48,7 +56,7 @@ class NomGestionnaireFilter extends AbstractFilter
         return [
             'nomGestionnaire' => [
                 'property' => 'nomGestionnaire',
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'openapi' => new Parameter(
                     name: 'nomGestionnaire',

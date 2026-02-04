@@ -20,6 +20,7 @@ use App\Entity\Formation;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class InscriptionEnCoursFilter extends AbstractFilter
 {
@@ -27,8 +28,15 @@ class InscriptionEnCoursFilter extends AbstractFilter
 
     public const string PROPERTY = 'avecInscriptions';
 
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== self::PROPERTY || $value !== 'true' || $resourceClass !== Formation::class) {
             return;
         }
@@ -38,7 +46,8 @@ class InscriptionEnCoursFilter extends AbstractFilter
         $nowParam = $queryNameGenerator->generateParameterName('now');
         $now = $this->now();
 
-        $queryBuilder->join(sprintf('%s.inscriptions', $alias), $inscriptionsAlias)
+        $queryBuilder
+            ->join(sprintf('%s.inscriptions', $alias), $inscriptionsAlias)
             ->andWhere(sprintf('%1$s.fin > :%2$s', $inscriptionsAlias, $nowParam))
             ->setParameter($nowParam, $now);
     }
@@ -48,7 +57,7 @@ class InscriptionEnCoursFilter extends AbstractFilter
         return [
             self::PROPERTY => [
                 'property' => self::PROPERTY,
-                'type' => Type::BUILTIN_TYPE_BOOL,
+                'type' => TypeIdentifier::BOOL,
                 'required' => false,
                 'openapi' => new Parameter(
                     name: 'aValider',

@@ -17,15 +17,16 @@ use App\Entity\Utilisateur;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class AjouterInterventionForfaitVoter extends Voter
 {
     use ClockAwareTrait;
 
-    public function __construct(private readonly Security $security)
-    {
-    }
+    public function __construct(
+        private readonly Security $security,
+    ) {}
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -33,13 +34,17 @@ class AjouterInterventionForfaitVoter extends Voter
     }
 
     /**
-     * @param string              $attribute
-     * @param InterventionForfait $subject
-     * @param TokenInterface      $token
-     * @return bool
+     * @param string $attribute
+     * @param mixed $subject
+     * @param TokenInterface $token
+     * @param Vote|null $vote* @return bool
      */
-    protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
-    {
+    protected function voteOnAttribute(
+        string $attribute,
+        mixed $subject,
+        TokenInterface $token,
+        ?Vote $vote = null,
+    ): bool {
         if (!$this->security->isGranted(Utilisateur::ROLE_PLANIFICATEUR)) {
             return false;
         }

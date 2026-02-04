@@ -12,7 +12,6 @@
 
 namespace App\ApiResource;
 
-
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
@@ -70,17 +69,17 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: self::BENEFICIAIRE_COLLECTION_URI,
             name: self::BENEFICIAIRE_COLLECTION_URI,
-            provider: BeneficiaireProvider::class
+            provider: BeneficiaireProvider::class,
         ),
         new GetCollection(
             uriTemplate: self::INTERVENANT_COLLECTION_URI,
             name: self::INTERVENANT_COLLECTION_URI,
-            provider: IntervenantProvider::class
+            provider: IntervenantProvider::class,
         ),
         new GetCollection(
             uriTemplate: self::RENFORT_COLLECTION_URI,
             name: self::RENFORT_COLLECTION_URI,
-            provider: RenfortProvider::class
+            provider: RenfortProvider::class,
         ),
         new GetCollection(
             uriTemplate: '/roles/{roleId}/utilisateurs',
@@ -98,17 +97,13 @@ use Symfony\Component\Validator\Constraints as Assert;
                 TypeAmenagementEnCoursFilter::class,
                 DomaineAmenagementEnCoursFilter::class,
             ],
-            provider: AmenagementsParUtilisateurProvider::class
+            provider: AmenagementsParUtilisateurProvider::class,
         ),
-        new Get(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: ['uid'],
-            provider: UtilisateurProvider::class,
-        ),
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['uid'], provider: UtilisateurProvider::class),
         new Patch(
             uriTemplate: self::ITEM_URI,
             securityPostDenormalize: "is_granted('" . self::CAN_PATCH_USER . "', [previous_object, object])",
-            provider: UtilisateurProvider::class
+            provider: UtilisateurProvider::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
@@ -116,7 +111,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     openapi: new Operation(tags: ['Utilisateurs']),
     exceptionToStatus: [ErreurLdapException::class => 400],
     processor: UtilisateurProcessor::class,
-    stateOptions: new Options(entityClass: \App\Entity\Utilisateur::class)
+    stateOptions: new Options(entityClass: \App\Entity\Utilisateur::class),
 )]
 #[ApiFilter(LdapSearchFilter::class)]
 #[ApiFilter(RenfortFilter::class)]
@@ -145,7 +140,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         'type' => 'string',
         'mapping' => 'beneficiaires.gestionnaire',
         'desc' => 'gestionnaire du bénéficiaire',
-    ]])]
+    ],
+])]
 #[ApiFilter(ExistsFilter::class, properties: ['numeroEtudiant'])]
 #[ApiFilter(ComposanteFormationFilter::class, properties: ['composante', 'formation'])]
 #[ApiFilter(EtatAvisEseUtilisateurFilter::class)]
@@ -236,27 +232,29 @@ final class Utilisateur
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\Email]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
-        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)"
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)",
     )]
     public ?string $emailPerso;
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\Length(max: 20)]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
-        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)"
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)",
     )]
     public ?string $telPerso;
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
-        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)"
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)",
     )]
     public ?string $contactUrgence;
 
-
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    #[Assert\Choice(self::TOUS_ROLES, multiple: true)]
+    #[Assert\Choice(choices: self::TOUS_ROLES, multiple: true)]
     public array $roles;
 
     /**
@@ -331,34 +329,42 @@ final class Utilisateur
     public array $inscriptions;
 
     #[Groups([self::GROUP_OUT])]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')")]
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+    )]
     public ?bool $boursier;
 
     #[Groups([self::GROUP_OUT])]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')")]
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+    )]
     public ?string $statutEtudiant = null;
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
-        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)"
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)",
     )]
     public bool $abonneImmediat;
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
-        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)"
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)",
     )]
     public bool $abonneVeille;
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
-        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)"
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)",
     )]
     public bool $abonneAvantVeille;
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    #[ApiProperty(security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
-        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)"
+    #[ApiProperty(
+        security: "object == null or object.uid == user.getUserIdentifier() or is_granted('ROLE_PLANIFICATEUR')",
+        securityPostDenormalize: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)",
     )]
     public bool $abonneRecapHebdo;
 
@@ -374,5 +380,4 @@ final class Utilisateur
     {
         return ucfirst($this->prenom) . ' ' . ucfirst($this->nom);
     }
-
 }

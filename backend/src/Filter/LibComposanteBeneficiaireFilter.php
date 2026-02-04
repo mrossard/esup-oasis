@@ -19,16 +19,21 @@ use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class LibComposanteBeneficiaireFilter extends AbstractFilter
 {
-
     use ClockAwareTrait;
 
-    protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                      QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                      ?Operation                  $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== 'libelleComposante') {
             return;
         }
@@ -38,7 +43,10 @@ class LibComposanteBeneficiaireFilter extends AbstractFilter
         $formationAlias = $queryNameGenerator->generateJoinAlias('formation');
         $composanteALias = $queryNameGenerator->generateJoinAlias('composante');
 
-        $condition = $queryBuilder->expr()->like("lower(unaccent(" . $composanteALias . '.libelle' . '))', 'unaccent(?1)');
+        $condition = $queryBuilder->expr()->like(
+            'lower(unaccent(' . $composanteALias . '.libelle' . '))',
+            'unaccent(?1)',
+        );
 
         $queryBuilder
             ->join($alias . '.inscriptions', $inscriptionAlias)
@@ -46,7 +54,7 @@ class LibComposanteBeneficiaireFilter extends AbstractFilter
             ->join($formationAlias . '.composante', $composanteALias)
             ->andWhere($condition)
             ->andWhere()
-            ->setParameter('1', "%" . strtolower($value) . "%");
+            ->setParameter('1', '%' . strtolower($value) . '%');
     }
 
     public function getDescription(string $resourceClass): array
@@ -54,7 +62,7 @@ class LibComposanteBeneficiaireFilter extends AbstractFilter
         return [
             'libelleComposante' => [
                 'property' => 'libelleComposante',
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'openapi' => new Parameter(
                     name: 'libelleComposante',

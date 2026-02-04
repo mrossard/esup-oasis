@@ -11,12 +11,19 @@ use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\PropertyInfo\Type;
+use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TauxHoraireDateFilter extends AbstractFilter
 {
-
-    protected function filterProperty(string $property, $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== 'date') {
             return;
         }
@@ -26,13 +33,13 @@ class TauxHoraireDateFilter extends AbstractFilter
         try {
             $date = new DateTime($value);
         } catch (Exception) {
-            throw new HttpException(400, "date mal formée");
+            throw new HttpException(400, 'date mal formée');
         }
 
-        $queryBuilder
-            ->andWhere(sprintf('%1$s.debut <= :date AND (%1$s.fin >= :date or %1$s.fin is null)', $rootAlias))
-            ->setParameter('date', $date);
-
+        $queryBuilder->andWhere(sprintf(
+            '%1$s.debut <= :date AND (%1$s.fin >= :date or %1$s.fin is null)',
+            $rootAlias,
+        ))->setParameter('date', $date);
     }
 
     public function getDescription(string $resourceClass): array
@@ -40,7 +47,7 @@ class TauxHoraireDateFilter extends AbstractFilter
         return [
             'date' => [
                 'property' => 'date',
-                'type' => Type::BUILTIN_TYPE_STRING,
+                'type' => TypeIdentifier::STRING,
                 'required' => false,
                 'openapi' => new Parameter(
                     name: 'taux',
