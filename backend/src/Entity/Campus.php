@@ -13,30 +13,36 @@
 namespace App\Entity;
 
 use App\Repository\CampusRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: CampusRepository::class)]
-#[Map(target: \App\ApiResource\Campus::class)]
+#[Map(target: \App\ApiResource\Campus::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class Campus
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column(options: ['default' => true])]
+    #[Map(if: false)]
     private ?bool $actif = null;
 
-    #[ORM\OneToMany(mappedBy: 'campus', targetEntity: Evenement::class)]
+    #[ORM\OneToMany(targetEntity: Evenement::class, mappedBy: 'campus')]
+    #[Map(if: false)]
     private Collection $evenements;
 
     #[ORM\ManyToMany(targetEntity: Intervenant::class, mappedBy: 'campuses')]
+    #[Map(if: false)]
     private Collection $intervenants;
 
     public function __construct()

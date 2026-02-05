@@ -13,33 +13,42 @@
 namespace App\Entity;
 
 use App\Repository\CategorieAmenagementRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: CategorieAmenagementRepository::class)]
-#[Map(target: \App\ApiResource\CategorieAmenagement::class)]
+#[Map(target: \App\ApiResource\CategorieAmenagement::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class CategorieAmenagement
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column]
+    #[Map(if: false)]
     private ?bool $actif = null;
 
-    #[ORM\OneToMany(mappedBy: 'categorie', targetEntity: TypeAmenagement::class)]
+    #[ORM\OneToMany(targetEntity: TypeAmenagement::class, mappedBy: 'categorie')]
+    #[Map(if: false)]
     private Collection $typesAmenagement;
 
     /**
      * @var Collection<int, Reponse>
      */
     #[ORM\ManyToMany(targetEntity: Reponse::class, mappedBy: 'categoriesAmenagement')]
+    #[Map(if: false)]
     private Collection $reponses;
 
     public function __construct()

@@ -49,10 +49,24 @@ final class Composante
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT])]
-    public int $id;
+    public int $id {
+        get {
+            if (!isset($this->id) && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id;
+        }
+    }
 
     #[Groups([Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT, Amenagement::GROUP_OUT, self::GROUP_OUT])]
-    public string $libelle;
+    public string $libelle {
+        get {
+            if (!isset($this->libelle) && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
 
     /***
      * TODO: à revoir plus tard - pb des collections
@@ -63,5 +77,20 @@ final class Composante
      */
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Map(transform: new MapCollection())]
-    public array $referents;
+    public array $referents {
+        get {
+            if (!isset($this->referents) && $this->entity !== null) {
+                $this->referents = array_map(
+                    fn($u) => new Utilisateur($u),
+                    $this->entity->getReferents()->toArray()
+                );
+            }
+            return $this->referents ?? [];
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\Composante $entity = null,
+    ) {
+    }
 }

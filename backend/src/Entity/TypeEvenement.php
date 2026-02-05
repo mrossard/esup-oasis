@@ -12,13 +12,16 @@
 
 namespace App\Entity;
 
+use App\State\EntityToResourceTransformer;
 use App\Repository\TypeEvenementRepository;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TypeEvenementRepository::class)]
+#[Map(target: \App\ApiResource\TypeEvenement::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class TypeEvenement
 {
     public const int TYPE_RENFORT = -1;
@@ -26,33 +29,43 @@ class TypeEvenement
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column(options: ['default' => true])]
+    #[Map(if: false)]
     private ?bool $actif = true;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Map(if: false)]
     private ?string $couleur = null;
 
     #[ORM\Column(options: ['default' => true])]
+    #[Map(if: false)]
     private ?bool $visibleParDefaut = true;
 
     #[ORM\OneToMany(mappedBy: 'type', targetEntity: Evenement::class, orphanRemoval: true)]
+    #[Map(if: false)]
     private Collection $evenements;
 
     #[ORM\ManyToMany(targetEntity: Intervenant::class, mappedBy: 'typesEvenements')]
+    #[Map(if: false)]
     private Collection $intervenants;
 
     #[ORM\Column]
+    #[Map(if: false)]
     private ?bool $avecValidation = null;
 
     #[ORM\OneToMany(mappedBy: 'typeEvenement', targetEntity: TauxHoraire::class)]
+    #[Map(if: false)]
     private Collection $tauxHoraires;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private bool $forfait = false;
 
     public function __construct()

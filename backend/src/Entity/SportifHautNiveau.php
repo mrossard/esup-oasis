@@ -12,6 +12,7 @@
 
 namespace App\Entity;
 
+use App\State\EntityToResourceTransformer;
 use App\Repository\SportifHautNiveauRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -19,24 +20,29 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: SportifHautNiveauRepository::class)]
 #[UniqueEntity('identifiantExterne')]
-#[Map(target: \App\ApiResource\SportifHautNiveau::class)]
+#[Map(target: \App\ApiResource\SportifHautNiveau::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class SportifHautNiveau
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $identifiantExterne = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Map(if: false)]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Map(if: false)]
     private ?string $prenom = null;
 
     #[ORM\Column(nullable: true)]
+    #[Map(if: false)]
     private ?int $anneeNaissance = null;
 
     public function getId(): ?int

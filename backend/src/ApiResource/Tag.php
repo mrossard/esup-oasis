@@ -53,13 +53,46 @@ class Tag
     public const string GROUP_OUT = 'tag:out';
 
     #[Groups([self::GROUP_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank]
-    public string $libelle;
+    public string $libelle {
+        get {
+            if (!isset($this->libelle) && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $actif = true;
+    public bool $actif = true {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isActif() ?? true;
+            }
+            return $this->actif;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public CategorieTag $categorie;
+    public CategorieTag $categorie {
+        get {
+            if (!isset($this->categorie) && $this->entity !== null && $this->entity->getCategorie()) {
+                $this->categorie = new CategorieTag($this->entity->getCategorie());
+            }
+            return $this->categorie;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\Tag $entity = null,
+    ) {
+    }
 }

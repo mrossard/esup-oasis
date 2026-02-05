@@ -53,28 +53,89 @@ class TypeAmenagement
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
     #[Assert\NotBlank]
-    public string $libelle;
+    public string $libelle {
+        get {
+            if (!isset($this->libelle) && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
-    public ?string $libelleLong = null;
+    public ?string $libelleLong = null {
+        get {
+            if ($this->libelleLong === null && $this->entity !== null) {
+                $this->libelleLong = $this->entity->getLibelleLong();
+            }
+            return $this->libelleLong ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
-    public bool $actif = true;
+    public bool $actif = true {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isActif() ?? true;
+            }
+            return $this->actif;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
     #[Assert\NotNull]
-    public CategorieAmenagement $categorie;
+    public CategorieAmenagement $categorie {
+        get {
+            if (!isset($this->categorie) && $this->entity !== null && $this->entity->getCategorie()) {
+                $this->categorie = new CategorieAmenagement($this->entity->getCategorie());
+            }
+            return $this->categorie;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
-    public ?bool $pedagogique = null;
+    public ?bool $pedagogique = null {
+        get {
+            if ($this->pedagogique === null && $this->entity !== null) {
+                $this->pedagogique = $this->entity->isPedagogique();
+            }
+            return $this->pedagogique ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
-    public ?bool $examens = null;
+    public ?bool $examens = null {
+        get {
+            if ($this->examens === null && $this->entity !== null) {
+                $this->examens = $this->entity->isExamens();
+            }
+            return $this->examens ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
-    public ?bool $aideHumaine = null;
+    public ?bool $aideHumaine = null {
+        get {
+            if ($this->aideHumaine === null && $this->entity !== null) {
+                $this->aideHumaine = $this->entity->isAideHumaine();
+            }
+            return $this->aideHumaine ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\TypeAmenagement $entity = null,
+    ) {
+    }
 }

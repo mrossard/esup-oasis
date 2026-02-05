@@ -68,16 +68,56 @@ class SportifHautNiveau
     public const string GROUP_PATCH = 'sportif_haut_niveau:patch';
 
     #[Ignore]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT, self::GROUP_POST])]
-    public string $identifiantExterne;
+    public string $identifiantExterne {
+        get {
+            if (!isset($this->identifiantExterne) && $this->entity !== null) {
+                $this->identifiantExterne = $this->entity->getIdentifiantExterne() ?? '';
+            }
+            return $this->identifiantExterne;
+        }
+    }
 
     #[Groups([self::GROUP_PATCH, self::GROUP_POST, self::GROUP_OUT])]
-    public ?string $nom = null;
+    public ?string $nom = null {
+        get {
+            if ($this->nom === null && $this->entity !== null) {
+                $this->nom = $this->entity->getNom();
+            }
+            return $this->nom ?? null;
+        }
+    }
     #[Groups([self::GROUP_PATCH, self::GROUP_POST, self::GROUP_OUT])]
-    public ?string $prenom = null;
+    public ?string $prenom = null {
+        get {
+            if ($this->prenom === null && $this->entity !== null) {
+                $this->prenom = $this->entity->getPrenom();
+            }
+            return $this->prenom ?? null;
+        }
+    }
     #[Groups([self::GROUP_PATCH, self::GROUP_POST, self::GROUP_OUT])]
-    public ?int $anneeNaissance = null;
+    public ?int $anneeNaissance = null {
+        get {
+            if ($this->anneeNaissance === null && $this->entity !== null) {
+                $this->anneeNaissance = $this->entity->getAnneeNaissance();
+            }
+            return $this->anneeNaissance ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\SportifHautNiveau $entity = null,
+    ) {
+    }
 }

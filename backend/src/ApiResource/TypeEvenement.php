@@ -67,29 +67,101 @@ final class TypeEvenement
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
     #[Assert\NotBlank]
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public string $libelle;
+    public string $libelle {
+        get {
+            if (!isset($this->libelle) && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $actif = true;
+    public bool $actif = true {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isActif() ?? true;
+            }
+            return $this->actif;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public ?string $couleur;
+    public ?string $couleur = null {
+        get {
+            if ($this->couleur === null && $this->entity !== null) {
+                $this->couleur = $this->entity->getCouleur();
+            }
+            return $this->couleur ?? null;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $visibleParDefaut = true;
+    public bool $visibleParDefaut = true {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isVisibleParDefaut() ?? true;
+            }
+            return $this->visibleParDefaut;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $avecValidation = false;
+    public bool $avecValidation = false {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isAvecValidation() ?? false;
+            }
+            return $this->avecValidation;
+        }
+    }
 
     /**
      * @var TauxHoraire[]
      */
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\All([new Assert\Type(TauxHoraire::class)])]
-    public array $tauxHoraires = [];
+    public array $tauxHoraires = [] {
+        get {
+            if (empty($this->tauxHoraires) && $this->entity !== null) {
+                $this->tauxHoraires = array_map(
+                    fn($entity) => new TauxHoraire($entity),
+                    $this->entity->getTauxHoraires()->toArray()
+                );
+            }
+            return $this->tauxHoraires;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
-    public ?TauxHoraire $tauxActif = null;
+    public ?TauxHoraire $tauxActif = null {
+        get {
+            if ($this->tauxActif === null && $this->entity !== null) {
+                $actif = $this->entity->getTauxHoraireActif();
+                $this->tauxActif = $actif ? new TauxHoraire($actif) : null;
+            }
+            return $this->tauxActif;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $forfait = false;
+    public bool $forfait = false {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isForfait();
+            }
+            return $this->forfait;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\TypeEvenement $entity = null,
+    ) {
+    }
 }

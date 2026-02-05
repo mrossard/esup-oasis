@@ -20,19 +20,17 @@ use App\Filter\IntervenantFilter;
 
 readonly class IntervenantProvider implements ProviderInterface
 {
-    public function __construct(private UtilisateurProvider $utilisateurProvider)
-    {
+    public function __construct(
+        private UtilisateurProvider $utilisateurProvider,
+    ) {}
 
-    }
-
-    public function provide(Operation $operation, array $uriVariables = [], array $context = []): Utilisateur|array|PaginatorInterface
-    {
+    public function provide(
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): Utilisateur|array|PaginatorInterface {
         $context['filters'][IntervenantFilter::PROPERTY] = true;
 
-        return $this->utilisateurProvider->provide(
-            $operation,
-            $uriVariables,
-            $context
-        );
+        return $this->utilisateurProvider->provide($operation, $uriVariables, $context);
     }
 }

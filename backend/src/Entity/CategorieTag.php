@@ -13,27 +13,35 @@
 namespace App\Entity;
 
 use App\Repository\CategorieTagRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: CategorieTagRepository::class)]
-#[Map(target: \App\ApiResource\CategorieTag::class)]
+#[Map(target: \App\ApiResource\CategorieTag::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class CategorieTag
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column]
+    #[Map(if: false)]
     private ?bool $actif = null;
 
     #[ORM\OneToMany(targetEntity: Tag::class, mappedBy: 'categorie')]
+    #[Map(if: false)]
     private Collection $tags;
 
     public function __construct()

@@ -12,12 +12,13 @@
 
 namespace App\Entity;
 
+use App\State\EntityToResourceTransformer;
 use App\Repository\EtatDemandeRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: EtatDemandeRepository::class)]
-#[Map(target: 'App\ApiResource\EtatDemande')]
+#[Map(target: 'App\ApiResource\EtatDemande', transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class EtatDemande
 {
     public const int EN_COURS = 1;
@@ -33,12 +34,15 @@ class EtatDemande
 
     #[ORM\Id]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column(options: ['default' => true])]
+    #[Map(if: false)]
     private ?bool $actif = null;
 
     public function getId(): ?int

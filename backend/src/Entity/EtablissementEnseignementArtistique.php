@@ -12,6 +12,7 @@
 
 namespace App\Entity;
 
+use App\State\EntityToResourceTransformer;
 use App\Repository\EtablissementEnseignementArtistiqueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,24 +20,28 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: EtablissementEnseignementArtistiqueRepository::class)]
-#[Map(target: \App\ApiResource\EtablissementEnseignementArtistique::class)]
+#[Map(target: \App\ApiResource\EtablissementEnseignementArtistique::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class EtablissementEnseignementArtistique
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column(options: ['default' => true])]
+    #[Map(if: false)]
     private ?bool $actif = null;
 
     /**
      * @var Collection<int, Reponse>
      */
     #[ORM\ManyToMany(targetEntity: Reponse::class, mappedBy: 'etablissementsEnseignementArtistique')]
+    #[Map(if: false)]
     private Collection $reponses;
 
     public function __construct()

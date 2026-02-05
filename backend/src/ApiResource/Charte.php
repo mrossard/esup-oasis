@@ -46,11 +46,32 @@ class Charte
 
     #[ApiProperty(identifier: true)]
     #[Ignore]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
-    public string $libelle;
+    public string $libelle {
+        get {
+            if (!isset($this->libelle) && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
 
-    public string $contenu;
+    public string $contenu {
+        get {
+            if (!isset($this->contenu) && $this->entity !== null) {
+                $this->contenu = $this->entity->getContenu() ?? '';
+            }
+            return $this->contenu;
+        }
+    }
 
     /***
      * TODO: revoir ça pour mapping collections!
@@ -60,5 +81,20 @@ class Charte
      * @var ProfilBeneficiaire[]
      */
     #[Map(transform: new MapCollection())]
-    public array $profilsAssocies;
+    public array $profilsAssocies {
+        get {
+            if (!isset($this->profilsAssocies) && $this->entity !== null) {
+                $this->profilsAssocies = array_map(
+                    fn($p) => new ProfilBeneficiaire($p),
+                    $this->entity->getProfilsAssocies()->toArray()
+                );
+            }
+            return $this->profilsAssocies ?? [];
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\Charte $entity = null,
+    ) {
+    }
 }

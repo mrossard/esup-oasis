@@ -12,6 +12,7 @@
 
 namespace App\Entity;
 
+use App\State\EntityToResourceTransformer;
 use App\Repository\TypeAmenagementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -20,39 +21,49 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TypeAmenagementRepository::class)]
-#[Map(target: \App\ApiResource\TypeAmenagement::class)]
+#[Map(target: \App\ApiResource\TypeAmenagement::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class TypeAmenagement
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Map(if: false)]
     private ?string $libelleLong = null;
 
     #[ORM\Column(options: ['default' => true])]
+    #[Map(if: false)]
     private ?bool $actif = true;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private ?bool $pedagogique = false;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private ?bool $examens = false;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private ?bool $aideHumaine = false;
 
     #[ORM\ManyToMany(targetEntity: Reponse::class, mappedBy: 'typesAmenagement')]
+    #[Map(if: false)]
     private Collection $reponses;
 
     #[ORM\OneToMany(mappedBy: 'type', targetEntity: Amenagement::class, orphanRemoval: true)]
+    #[Map(if: false)]
     private Collection $amenagements;
 
     #[ORM\ManyToOne(inversedBy: 'typesAmenagement')]
+    #[Map(if: false)]
     private ?CategorieAmenagement $categorie = null;
 
     public function __construct()

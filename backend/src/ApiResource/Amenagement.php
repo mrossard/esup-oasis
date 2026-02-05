@@ -123,32 +123,128 @@ class Amenagement
 
     //pour uriVariables uniquement
     #[Groups([Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Ignore]
-    public ?string $uid = null;
+    public ?string $uid = null {
+        get {
+            if (!isset($this->uid) && $this->entity !== null) {
+                // Logic from Provider
+                $beneficiaires = $this->entity->getBeneficiaires();
+                if ($beneficiaires->count() > 0) {
+                     $firstBenef = $beneficiaires->current();
+                     if ($firstBenef) {
+                         $this->uid = $firstBenef->getUtilisateur()->getUid();
+                     }
+                }
+            }
+            return $this->uid ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
-    public Utilisateur $beneficiaire;
+    public Utilisateur $beneficiaire {
+        get {
+            if (!isset($this->beneficiaire) && $this->entity !== null) {
+                $beneficiaires = $this->entity->getBeneficiaires();
+                if ($beneficiaires->count() > 0) {
+                     $firstBenef = $beneficiaires->current();
+                     if ($firstBenef) {
+                         $user = $firstBenef->getUtilisateur();
+                         $this->beneficiaire = new Utilisateur($user);
+                         
+                         $derniereInscription = $user->getDerniereInscription();
+                         if ($derniereInscription) {
+                             $this->beneficiaire->inscriptions = [new Inscription($derniereInscription)];
+                         } else {
+                             $this->beneficiaire->inscriptions = [];
+                         }
+                     }
+                }
+            }
+            return $this->beneficiaire;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
     #[Assert\NotNull]
-    public TypeAmenagement $typeAmenagement;
+    public TypeAmenagement $typeAmenagement {
+        get {
+            if (!isset($this->typeAmenagement) && $this->entity !== null && $this->entity->getType()) {
+                $this->typeAmenagement = new TypeAmenagement($this->entity->getType());
+            }
+            return $this->typeAmenagement;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $semestre1 = false;
+    public bool $semestre1 = false {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isSemestre1() ?? false;
+            }
+            return $this->semestre1;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $semestre2 = false;
+    public bool $semestre2 = false {
+        get {
+             if ($this->entity !== null) {
+                return $this->entity->isSemestre2() ?? false;
+            }
+            return $this->semestre2;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public ?DateTimeInterface $debut = null;
+    public ?DateTimeInterface $debut = null {
+        get {
+             if (!isset($this->debut) && $this->entity !== null) {
+                $this->debut = $this->entity->getDebut();
+            }
+            return $this->debut ?? null;
+        }
+    }
     #[Assert\GreaterThan(propertyPath: 'debut', message: 'fin doit être postérieur à debut')]
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public ?DateTimeInterface $fin = null;
+    public ?DateTimeInterface $fin = null {
+        get {
+             if (!isset($this->fin) && $this->entity !== null) {
+                $this->fin = $this->entity->getFin();
+            }
+            return $this->fin ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
-    public ?string $commentaire = null;
+    public ?string $commentaire = null {
+        get {
+             if (!isset($this->commentaire) && $this->entity !== null) {
+                $this->commentaire = $this->entity->getCommentaire();
+            }
+            return $this->commentaire ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public ?TypeSuiviAmenagement $suivi = null;
+    public ?TypeSuiviAmenagement $suivi = null {
+        get {
+            if (!isset($this->suivi) && $this->entity !== null && $this->entity->getSuivi()) {
+                $this->suivi = new TypeSuiviAmenagement($this->entity->getSuivi());
+            }
+            return $this->suivi ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\Amenagement $entity = null,
+    ) {
+    }
 }

@@ -25,18 +25,22 @@ class IntervenantFilter extends AbstractFilter
 
     public const string PROPERTY = 'intervenantfilter';
 
-    protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                      QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                      ?Operation                  $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if (!$operation->getClass() == Utilisateur::class || $property !== self::PROPERTY) {
             return;
         }
         $alias = $queryBuilder->getRootAliases()[0];
 
         //on allège au maximum pour ne pas être bloqué sur des opérations décalées dans le temps
-        $queryBuilder->join($alias . '.intervenant', 'i')
-            ->innerJoin('i.typesEvenements', 'type');
+        $queryBuilder->join($alias . '.intervenant', 'i')->innerJoin('i.typesEvenements', 'type');
     }
 
     public function getDescription(string $resourceClass): array

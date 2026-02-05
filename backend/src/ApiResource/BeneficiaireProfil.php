@@ -81,25 +81,67 @@ final class BeneficiaireProfil
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     //Copie de l'UID utilisateur. Non présenté à l'extérieur, juste utile pour uriVariables
-    public ?string $uid;
+    public ?string $uid {
+        get {
+            if (!isset($this->uid) && $this->entity !== null && $this->entity->getUtilisateur()) {
+                $this->uid = $this->entity->getUtilisateur()->getUid();
+            }
+            return $this->uid ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[ApiProperty(security: "is_granted('" . self::VOIR_PROFILS . "')")]
-    public ?ProfilBeneficiaire $profil = null;
+    public ?ProfilBeneficiaire $profil = null {
+        get {
+            if ($this->profil === null && $this->entity !== null && $this->entity->getProfil()) {
+                $this->profil = new ProfilBeneficiaire($this->entity->getProfil());
+            }
+            return $this->profil;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank(groups: [self::GROUP_VALIDATION_IN])]
-    public DateTimeInterface $debut;
+    public DateTimeInterface $debut {
+        get {
+            if (!isset($this->debut) && $this->entity !== null) {
+                $this->debut = $this->entity->getDebut();
+            }
+            return $this->debut;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public ?DateTimeInterface $fin = null;
+    public ?DateTimeInterface $fin = null {
+        get {
+            if ($this->fin === null && $this->entity !== null) {
+                $this->fin = $this->entity->getFin();
+            }
+            return $this->fin ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank(groups: [self::GROUP_VALIDATION_IN])]
-    public Utilisateur $gestionnaire;
+    public Utilisateur $gestionnaire {
+        get {
+            if (!isset($this->gestionnaire) && $this->entity !== null && $this->entity->getGestionnaire()) {
+                $this->gestionnaire = new Utilisateur($this->entity->getGestionnaire());
+            }
+            return $this->gestionnaire;
+        }
+    }
 
     /**
      * @var TypologieHandicap[]
@@ -107,8 +149,30 @@ final class BeneficiaireProfil
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\All([new Assert\Type(TypologieHandicap::class)], groups: [self::GROUP_VALIDATION_IN])]
     #[ApiProperty(security: "is_granted('" . self::VOIR_PROFILS . "')")]
-    public array $typologies;
+    public array $typologies {
+        get {
+            if (!isset($this->typologies) && $this->entity !== null) {
+                $this->typologies = array_map(
+                    fn($t) => new TypologieHandicap($t),
+                    $this->entity->getTypologies()->toArray()
+                );
+            }
+            return $this->typologies ?? [];
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $avecAccompagnement = true;
+    public bool $avecAccompagnement = true {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isAvecAccompagnement() ?? true;
+            }
+            return $this->avecAccompagnement;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\Beneficiaire $entity = null,
+    ) {
+    }
 }

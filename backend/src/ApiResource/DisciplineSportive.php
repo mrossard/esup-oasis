@@ -49,12 +49,37 @@ class DisciplineSportive
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
     #[Assert\NotBlank]
-    public string $libelle;
+    public ?string $libelle = null {
+        get {
+            if (null === $this->libelle && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
-    public bool $actif = true;
+    public ?bool $actif = null {
+        get {
+            if (null === $this->actif && $this->entity !== null) {
+                return $this->entity->isActif() ?? true;
+            }
+            return $this->actif;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\DisciplineSportive $entity = null,
+    ) {}
 }

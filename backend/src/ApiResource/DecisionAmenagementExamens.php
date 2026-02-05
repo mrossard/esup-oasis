@@ -50,14 +50,54 @@ class DecisionAmenagementExamens
     public const string GROUP_IN = 'decision:in';
     public const string GROUP_OUT = 'decision:out';
 
-    #[Ignore] public ?int $id = null;
-    #[Ignore] public string $uid;
-    #[Ignore] public int $annee;
+    #[Ignore] public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
+    #[Ignore] public string $uid {
+        get {
+            if (!isset($this->uid) && $this->entity !== null && $this->entity->getBeneficiaire()) {
+                $this->uid = $this->entity->getBeneficiaire()->getUid();
+            }
+            return $this->uid;
+        }
+    }
+    #[Ignore] public int $annee {
+        get {
+            if (!isset($this->annee) && $this->entity !== null && $this->entity->getDebut()) {
+                $this->annee = (int)$this->entity->getDebut()->format('Y');
+            }
+            return $this->annee;
+        }
+    }
 
     #[Groups([Utilisateur::GROUP_OUT, self::GROUP_OUT, self::GROUP_IN])]
     #[EtatDecisionValideConstraint]
-    public string $etat;
+    public string $etat {
+        get {
+            if (!isset($this->etat) && $this->entity !== null) {
+                $this->etat = $this->entity->getEtat() ?? '';
+            }
+            return $this->etat;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
-    public ?string $urlContenu = null;
+    public ?string $urlContenu = null {
+        get {
+            if ($this->urlContenu === null && $this->entity !== null && $this->entity->getFichier()) {
+                $this->urlContenu = '/fichiers/' . $this->entity->getFichier()->getId();
+            }
+            return $this->urlContenu ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\DecisionAmenagementExamens $entity = null,
+    ) {
+    }
 }

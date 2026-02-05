@@ -40,54 +40,54 @@ use Symfony\Component\Security\Core\Exception\UserNotFoundException;
 use Symfony\Contracts\Cache\ItemInterface;
 use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
-
-class UtilisateurProvider extends AbstractEntityProvider
+class UtilisateurProvider implements ProviderInterface
 {
     use ClockAwareTrait;
 
-    public function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')] ProviderInterface       $itemProvider,
-                                #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')] ProviderInterface $collectionProvider,
-                                private readonly UtilisateurManager                                                           $utilisateurManager,
-                                private readonly DecisionAmenagementManager                                                   $decisionAmenagementManager,
-                                private readonly TagAwareCacheInterface                                                       $cache)
-    {
-        parent::__construct($itemProvider, $collectionProvider);
-    }
-
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private readonly ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private readonly ProviderInterface $collectionProvider,
+        private readonly UtilisateurManager $utilisateurManager,
+        private readonly DecisionAmenagementManager $decisionAmenagementManager,
+        private readonly TagAwareCacheInterface $cache,
+    ) {}
 
     /**
      * @param Operation $operation
      * @param array $uriVariables
      * @param array $context
      * @return Utilisateur|array|PaginatorInterface
-     * @throws ErreurLdapException
      */
-    #[Override] public function provide(Operation $operation, array $uriVariables = [], array $context = []): Utilisateur|array|PaginatorInterface
-    {
+    #[Override]
+    public function provide(
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): Utilisateur|array|PaginatorInterface {
         //recherche dans le ldap
-        if (!($operation instanceof GetCollection)) {
+        if (!$operation instanceof GetCollection) {
             //mise en cache des résultats pour un utilisateur donné
-            return $this->cache->get(
-                key: 'utilisateur_' . $uriVariables['uid'],
-                callback: function (ItemInterface $item) use ($operation, $uriVariables, $context) {
-                    //todo: si pas en base, cache à durée très courte!
-                    $item->expiresAfter(7200);
-                    $utilisateur = $this->ldapProvide($operation, $uriVariables, $context);
-                    $item->tag('utilisateur_' . $utilisateur->uid);
-                    return $utilisateur;
-                }
-            );
+            return $this->cache->get(key: 'utilisateur_'
+            . $uriVariables['uid'], callback: function (ItemInterface $item) use ($operation, $uriVariables, $context) {
+                //todo: si pas en base, cache à durée très courte!
+                $item->expiresAfter(7200);
+                $utilisateur = $this->ldapProvide($operation, $uriVariables, $context);
+                $item->tag('utilisateur_' . $utilisateur->uid);
+                return $utilisateur;
+            });
         }
         if ($operation->getName() === Utilisateur::COLLECTION_URI) {
             return $this->ldapProvide($operation, $uriVariables, $context);
         }
 
-        //GetCollection sur /beneficiaires, /intervenants ou /renforts
+        //GetCollection sur /beneficiaires
         if ($operation->getName() === Utilisateur::BENEFICIAIRE_COLLECTION_URI) {
             $context['filters']['beneficiairefilter'] = true;
         }
 
-        return parent::provide($operation, $uriVariables, $context);
+        return $this->collectionProvider->provide($operation, $uriVariables, $context);
     }
 
     /**
@@ -97,33 +97,35 @@ class UtilisateurProvider extends AbstractEntityProvider
      * @return Utilisateur|Utilisateur[]|PaginatorInterface
      * @throws ErreurLdapException
      */
-    public function ldapProvide(Operation $operation, array $uriVariables = [], array $context = []): Utilisateur|array|PaginatorInterface
-    {
+    public function ldapProvide(
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): Utilisateur|array|PaginatorInterface {
         // GetCollection => en mode search only
         if ($operation instanceof CollectionOperationInterface) {
             if (!isset($context['filters']['term'])) {
                 if (isset($context['filters']['recherche'])) {
-                    return parent::provide($operation, $uriVariables, $context);
+                    return $this->collectionProvider->provide($operation, $uriVariables, $context);
                 }
                 throw new RuntimeException('Paramètre "term" ou "recherche" manquant.');
             }
 
-            $etudiantsSeulement = (($context['filters']['exists']['numeroEtudiant'] ?? "false") == "true");
+            $etudiantsSeulement = ($context['filters']['exists']['numeroEtudiant'] ?? 'false') == 'true';
 
             $users = [];
             foreach ($this->utilisateurManager->search($context['filters']['term'], $etudiantsSeulement) as $user) {
-                $users[] = $this->transform($user);
+                $users[] = new Utilisateur($user);
             }
             return $users;
         }
         //Get simple
         try {
-            return $this->transform($this->utilisateurManager->parUid($uriVariables['uid']));
+            return new Utilisateur($this->utilisateurManager->parUid($uriVariables['uid']));
         } catch (UserNotFoundException) {
             throw new ItemNotFoundException('Utilisateur inconnu');
         }
     }
-
 
     /**
      * @param \App\Entity\Utilisateur $entity
@@ -148,47 +150,66 @@ class UtilisateurProvider extends AbstractEntityProvider
 
         //gestionnaires/renforts/admin
         //$user->admin = $entity->isAdmin();
-        $user->services = array_map(fn($service) => $this->transformerService->transform($service, Service::class),
-            $entity->getServices()->toArray());
+        $user->services = array_map(fn($service) => $this->transformerService->transform(
+            $service,
+            Service::class,
+        ), $entity->getServices()->toArray());
 
         //intervenant/renfort
-        $user->competences = array_map(fn($competence) => $this->transformerService->transform($competence, Competence::class),
-            $entity->getIntervenant()?->getCompetences()->toArray() ?? []);
-        $user->campus = array_map(fn($campus) => $this->transformerService->transform($campus, Campus::class),
-            $entity->getIntervenant()?->getCampuses()->toArray() ?? []);
-        $user->typesEvenements = array_map(fn($type) => $this->transformerService->transform($type, TypeEvenement::class),
-            $entity->getIntervenant()?->getTypesEvenements()->toArray() ?? []);
+        $user->competences = array_map(fn($competence) => $this->transformerService->transform(
+            $competence,
+            Competence::class,
+        ), $entity->getIntervenant()?->getCompetences()->toArray() ?? []);
+        $user->campus = array_map(fn($campus) => $this->transformerService->transform(
+            $campus,
+            Campus::class,
+        ), $entity->getIntervenant()?->getCampuses()->toArray() ?? []);
+        $user->typesEvenements = array_map(fn($type) => $this->transformerService->transform(
+            $type,
+            TypeEvenement::class,
+        ), $entity->getIntervenant()?->getTypesEvenements()->toArray() ?? []);
         $user->intervenantDebut = $entity->getIntervenant()?->getDebut();
         $user->intervenantFin = $entity->getIntervenant()?->getFin();
 
         //Beneficiaires
-        $user->profils = array_map(fn($beneficiaire) => $this->transformerService->transform($beneficiaire, BeneficiaireProfil::class),
-            $entity->getBeneficiaires()->toArray() ?? []);
+        $user->profils = array_map(fn($beneficiaire) => $this->transformerService->transform(
+            $beneficiaire,
+            BeneficiaireProfil::class,
+        ), $entity->getBeneficiaires()->toArray() ?? []);
 
-        $user->gestionnairesActifs = array_unique(array_reduce($entity->getBeneficiaires()->toArray(),
-            fn($carry, Beneficiaire $benef) => match (true) {
-                $this->now() < $benef->getDebut() || (null !== $benef->getFin() && $this->now() > $benef->getFin()) => $carry,
-                default => [...($carry ?? []), $this->transformerService->transform($benef->getGestionnaire(), Utilisateur::class)]
-            }
-        ) ?? [], SORT_REGULAR);
+        $user->gestionnairesActifs = array_unique(array_reduce($entity->getBeneficiaires()->toArray(), fn(
+            $carry,
+            Beneficiaire $benef,
+        ) => match (true) {
+            $this->now() < $benef->getDebut() || null !== $benef->getFin() && $this->now() > $benef->getFin() => $carry,
+            default => [
+                ...($carry ?? []),
+                $this->transformerService->transform($benef->getGestionnaire(), Utilisateur::class),
+            ],
+        }) ?? [], SORT_REGULAR);
 
         $user->gestionnairesActifs = array_values($user->gestionnairesActifs);
 
         //Tags
-        $user->tags = array_values(array_unique(array_map(
-            fn($tag) => $this->transformerService->transform($tag, Tag::class),
-            array_reduce(
-                $entity->getBeneficiairesActifs(),
-                fn(array $carry, Beneficiaire $beneficiaire) => [...$carry, ...$beneficiaire->getTags()],
-                []
-            )
-        ), SORT_REGULAR));
+        $user->tags = array_values(array_unique(
+            array_map(
+                fn($tag) => $this->transformerService->transform($tag, Tag::class),
+                array_reduce(
+                    $entity->getBeneficiairesActifs(),
+                    fn(array $carry, Beneficiaire $beneficiaire) => [...$carry, ...$beneficiaire->getTags()],
+                    [],
+                ),
+            ),
+            SORT_REGULAR,
+        ));
 
         $user->etatAvisEse = $entity->getEtatAvisEse();
 
         //inscriptions
-        $user->inscriptions = array_map(fn($inscription) => $this->transformerService->transform($inscription, Inscription::class),
-            $entity->getInscriptions()->toArray() ?? []);
+        $user->inscriptions = array_map(fn($inscription) => $this->transformerService->transform(
+            $inscription,
+            Inscription::class,
+        ), $entity->getInscriptions()->toArray() ?? []);
 
         $user->boursier = $entity->isBoursier();
         $user->statutEtudiant = $entity->getStatutEtudiant();
@@ -204,7 +225,7 @@ class UtilisateurProvider extends AbstractEntityProvider
         $decisionEnCours = $this->decisionAmenagementManager->getDecisionCourante($entity);
         $user->decisionAmenagementAnneeEnCours = match ($decisionEnCours) {
             null => null,
-            default => $this->transformerService->transform($decisionEnCours, DecisionAmenagementExamens::class)
+            default => $this->transformerService->transform($decisionEnCours, DecisionAmenagementExamens::class),
         };
 
         $user->numeroAnonyme = $entity->getNumeroAnonyme();

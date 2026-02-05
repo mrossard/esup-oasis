@@ -60,29 +60,83 @@ final class PeriodeRH
     public const string GROUP_OUT = 'periode:out';
 
     #[Groups([self::GROUP_OUT, ServicesFaits::GROUP_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT, ServicesFaits::GROUP_OUT])]
     #[Assert\NotBlank]
-    public ?DateTimeInterface $debut;
+    public ?DateTimeInterface $debut = null {
+        get {
+            if ($this->debut === null && $this->entity !== null) {
+                $this->debut = $this->entity->getDebut();
+            }
+            return $this->debut ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT, ServicesFaits::GROUP_OUT])]
     #[Assert\NotBlank]
     #[Assert\GreaterThan(propertyPath: 'debut')]
-    public ?DateTimeInterface $fin;
+    public ?DateTimeInterface $fin = null {
+        get {
+            if ($this->fin === null && $this->entity !== null) {
+                $this->fin = $this->entity->getFin();
+            }
+            return $this->fin ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
     #[Assert\NotBlank]
     #[Assert\GreaterThan(propertyPath: 'debut')]
     #[Assert\LessThanOrEqual(propertyPath: 'fin')]
-    public ?DateTimeInterface $butoir;
+    public ?DateTimeInterface $butoir = null {
+        get {
+            if ($this->butoir === null && $this->entity !== null) {
+                $this->butoir = $this->entity->getButoir();
+            }
+            return $this->butoir ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
-    public bool $envoyee = false;
+    public ?bool $envoyee = null {
+        get {
+            if ($this->envoyee === null && $this->entity !== null) {
+                $this->envoyee = $this->entity->getDateEnvoi() !== null;
+            }
+            return $this->envoyee ?? false;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, ServicesFaits::GROUP_OUT])]
-    public ?DateTimeInterface $dateEnvoi;
+    public ?DateTimeInterface $dateEnvoi = null {
+        get {
+            if ($this->dateEnvoi === null && $this->entity !== null) {
+                $this->dateEnvoi = $this->entity->getDateEnvoi();
+            }
+            return $this->dateEnvoi ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, ServicesFaits::GROUP_OUT])]
-    public ?Utilisateur $utilisateurEnvoi;
+    public ?Utilisateur $utilisateurEnvoi = null {
+        get {
+            if ($this->utilisateurEnvoi === null && $this->entity !== null && $this->entity->getUtilisateurEnvoi()) {
+                $this->utilisateurEnvoi = new Utilisateur($this->entity->getUtilisateurEnvoi());
+            }
+            return $this->utilisateurEnvoi ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\PeriodeRH $entity = null,
+    ) {
+    }
 }

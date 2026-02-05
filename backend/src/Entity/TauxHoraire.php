@@ -12,14 +12,17 @@
 
 namespace App\Entity;
 
+use App\State\EntityToResourceTransformer;
 use App\Repository\TauxHoraireRepository;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Clock\ClockAwareTrait;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TauxHoraireRepository::class)]
+#[Map(target: \App\ApiResource\TauxHoraire::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class TauxHoraire
 {
     use ClockAwareTrait;
@@ -27,19 +30,24 @@ class TauxHoraire
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 5, scale: 2)]
+    #[Map(if: false)]
     private ?string $montant = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Map(if: false)]
     private ?DateTimeInterface $debut = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+    #[Map(if: false)]
     private ?DateTimeInterface $fin = null;
 
     #[ORM\ManyToOne(inversedBy: 'tauxHoraires')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?TypeEvenement $typeEvenement = null;
 
     public function getId(): ?int

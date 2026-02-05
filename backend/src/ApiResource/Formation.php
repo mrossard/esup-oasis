@@ -41,7 +41,14 @@ final class Formation
     public const string ITEM_URI = self::COLLECTION_URI . '/{id}';
 
     #[ApiProperty(identifier: true)]
-    public int $id;
+    public int $id {
+        get {
+            if (!isset($this->id) && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id;
+        }
+    }
 
     #[Groups([
         Utilisateur::GROUP_OUT,
@@ -49,7 +56,14 @@ final class Formation
         Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT,
         Amenagement::GROUP_OUT,
     ])]
-    public Composante $composante;
+    public Composante $composante {
+        get {
+            if (!isset($this->composante) && $this->entity !== null && $this->entity->getComposante()) {
+                $this->composante = new Composante($this->entity->getComposante());
+            }
+            return $this->composante;
+        }
+    }
 
     #[Groups([
         Utilisateur::GROUP_OUT,
@@ -57,17 +71,57 @@ final class Formation
         Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT,
         Amenagement::GROUP_OUT,
     ])]
-    public string $libelle;
+    public string $libelle {
+        get {
+            if (!isset($this->libelle) && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
 
     #[Groups([Utilisateur::GROUP_OUT])]
-    public string $codeExterne;
+    public string $codeExterne {
+        get {
+            if (!isset($this->codeExterne) && $this->entity !== null) {
+                $this->codeExterne = $this->entity->getCodeExterne() ?? '';
+            }
+            return $this->codeExterne;
+        }
+    }
 
     #[Groups([Utilisateur::GROUP_OUT])]
-    public ?string $niveau = null;
+    public ?string $niveau = null {
+        get {
+            if ($this->niveau === null && $this->entity !== null) {
+                $this->niveau = $this->entity->getNiveau();
+            }
+            return $this->niveau ?? null;
+        }
+    }
 
     #[Groups([Utilisateur::GROUP_OUT])]
-    public ?string $discipline = null;
+    public ?string $discipline = null {
+        get {
+            if ($this->discipline === null && $this->entity !== null) {
+                $this->discipline = $this->entity->getDiscipline();
+            }
+            return $this->discipline ?? null;
+        }
+    }
 
     #[Groups([Utilisateur::GROUP_OUT])]
-    public ?string $diplome = null;
+    public ?string $diplome = null {
+        get {
+            if ($this->diplome === null && $this->entity !== null) {
+                $this->diplome = $this->entity->getDiplome();
+            }
+            return $this->diplome ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\Formation $entity = null,
+    ) {
+    }
 }

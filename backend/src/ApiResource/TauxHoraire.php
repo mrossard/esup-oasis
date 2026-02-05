@@ -89,11 +89,32 @@ class TauxHoraire
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT, ServicesFaits::GROUP_OUT, ActiviteBeneficiaire::OUT, ActiviteIntervenant::OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     //copie juste pour gérer facilement les IRI
-    public int $typeId;
-    public TypeEvenement $typeEvenement;
+    public int $typeId {
+        get {
+            if (!isset($this->typeId) && $this->entity !== null && $this->entity->getTypeEvenement()) {
+                $this->typeId = $this->entity->getTypeEvenement()->getId();
+            }
+            return $this->typeId;
+        }
+    }
+    public TypeEvenement $typeEvenement {
+        get {
+            if (!isset($this->typeEvenement) && $this->entity !== null && $this->entity->getTypeEvenement()) {
+                $this->typeEvenement = new TypeEvenement($this->entity->getTypeEvenement());
+            }
+            return $this->typeEvenement;
+        }
+    }
 
     #[Assert\NotBlank]
     #[Assert\Length(max: 5)]
@@ -107,11 +128,37 @@ class TauxHoraire
         ActiviteBeneficiaire::OUT,
         ActiviteIntervenant::OUT,
     ])]
-    public string $montant;
+    public string $montant {
+        get {
+            if (!isset($this->montant) && $this->entity !== null) {
+                $this->montant = $this->entity->getMontant() ?? '';
+            }
+            return $this->montant;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public DateTimeInterface $debut;
+    public DateTimeInterface $debut {
+        get {
+            if (!isset($this->debut) && $this->entity !== null) {
+                $this->debut = $this->entity->getDebut();
+            }
+            return $this->debut;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\GreaterThan(propertyPath: 'debut')]
-    public ?DateTimeInterface $fin = null;
+    public ?DateTimeInterface $fin = null {
+        get {
+            if ($this->fin === null && $this->entity !== null) {
+                $this->fin = $this->entity->getFin();
+            }
+            return $this->fin ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\TauxHoraire $entity = null,
+    ) {
+    }
 }

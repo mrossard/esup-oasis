@@ -49,13 +49,46 @@ final class ProfilBeneficiaire
 
     #[Groups([self::GROUP_OUT])]
     #[ApiProperty(identifier: true)]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank]
-    public string $libelle;
+    public string $libelle {
+        get {
+            if (!isset($this->libelle) && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $actif = true;
+    public bool $actif = true {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isActif() ?? true;
+            }
+            return $this->actif;
+        }
+    }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $avecTypologie = false;
+    public bool $avecTypologie = false {
+        get {
+            if ($this->entity !== null) {
+                return $this->entity->isAvecTypologie() ?? false;
+            }
+            return $this->avecTypologie;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\ProfilBeneficiaire $entity = null,
+    ) {
+    }
 }

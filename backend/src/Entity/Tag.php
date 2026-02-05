@@ -12,6 +12,7 @@
 
 namespace App\Entity;
 
+use App\State\EntityToResourceTransformer;
 use App\Repository\TagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -19,25 +20,30 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TagRepository::class)]
-#[Map(target: \App\ApiResource\Tag::class)]
+#[Map(target: \App\ApiResource\Tag::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class Tag
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column]
+    #[Map(if: false)]
     private ?bool $actif = null;
 
     #[ORM\ManyToOne(inversedBy: 'tags')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?CategorieTag $categorie = null;
 
     #[ORM\ManyToMany(targetEntity: Beneficiaire::class, mappedBy: 'tags')]
+    #[Map(if: false)]
     private Collection $beneficiaires;
 
     public function __construct()

@@ -12,6 +12,7 @@
 
 namespace App\Entity;
 
+use App\State\EntityToResourceTransformer;
 use App\Repository\CharteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,22 +22,25 @@ use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\ObjectMapper\Transform\MapCollection;
 
 #[ORM\Entity(repositoryClass: CharteRepository::class)]
-#[Map(target: \App\ApiResource\Charte::class)]
+#[Map(target: \App\ApiResource\Charte::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class Charte
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Map(if: false)]
     private ?string $contenu = null;
 
     #[ORM\ManyToMany(targetEntity: ProfilBeneficiaire::class, inversedBy: 'chartes')]
-    #[Map(transform: new MapCollection())]
+    #[Map(if: false)]
     private Collection $profilsAssocies;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     public function __construct()

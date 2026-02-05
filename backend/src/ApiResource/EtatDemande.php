@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation;
-use App\State\Demande\EtatDemandeProvider;
 
 #[ApiResource(
     operations: [
@@ -27,13 +26,30 @@ use App\State\Demande\EtatDemandeProvider;
     openapi: new Operation(tags: ['Referentiel']),
     stateOptions: new Options(entityClass: \App\Entity\EtatDemande::class),
 )]
-readonly class EtatDemande
+final class EtatDemande
 {
     public const string COLLECTION_URI = '/etats_demandes';
     public const string ITEM_URI = self::COLLECTION_URI . '/{id}';
 
+    public ?int $id {
+        get {
+            if (!isset($this->id) && $this->entity !== null) {
+                return $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
+
+    public string $libelle {
+        get {
+            if (!isset($this->libelle) && $this->entity !== null) {
+                return $this->entity->getLibelle() ?? '';
+            }
+            return $this->libelle;
+        }
+    }
+
     public function __construct(
-        public int $id,
-        public string $libelle,
+        private ?\App\Entity\EtatDemande $entity = null,
     ) {}
 }
