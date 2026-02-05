@@ -22,32 +22,22 @@ use ApiPlatform\OpenApi\Model\Operation;
 use App\State\Parametre\ValeurParametreProcessor;
 use App\State\Parametre\ValeurParametreProvider;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    operations            : [
-        new Get(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['cle', 'id']
-        ),
-        new Post(
-            uriTemplate : self::COLLECTION_URI,
-            uriVariables: ['cle'],
-            read        : false
-        ),
-        new Patch(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['cle', 'id']
-        ),
+    operations: [
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['cle', 'id']),
+        new Post(uriTemplate: self::COLLECTION_URI, uriVariables: ['cle'], read: false),
+        new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['cle', 'id']),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    openapi               : new Operation(tags: ['Referentiel']),
-    order                 : ['debut' => 'DESC '],
-    provider              : ValeurParametreProvider::class,
-    processor             : ValeurParametreProcessor::class,
-    stateOptions          : new Options(entityClass: \App\Entity\ValeurParametre::class)
+    openapi: new Operation(tags: ['Referentiel']),
+    order: ['debut' => 'DESC '],
+    provider: ValeurParametreProvider::class,
+    processor: ValeurParametreProcessor::class,
+    stateOptions: new Options(entityClass: \App\Entity\ValeurParametre::class),
 )]
 #[Assert\Expression('this.fichier != null or this.valeur != null')]
 class ValeurParametre
@@ -77,5 +67,4 @@ class ValeurParametre
     #[Groups([self::GROUP_OUT, self::GROUP_IN, Parametre::GROUP_OUT])]
     #[Assert\GreaterThan(propertyPath: 'debut')]
     public ?DateTimeInterface $fin = null;
-
 }

@@ -16,8 +16,10 @@ use App\Repository\TypeSuiviAmenagementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TypeSuiviAmenagementRepository::class)]
+#[Map(target: \App\ApiResource\TypeSuiviAmenagement::class)]
 class TypeSuiviAmenagement
 {
     #[ORM\Id]
@@ -31,7 +33,7 @@ class TypeSuiviAmenagement
     #[ORM\Column(options: ['default' => true])]
     private ?bool $actif = true;
 
-    #[ORM\OneToMany(mappedBy: 'suivi', targetEntity: Amenagement::class)]
+    #[ORM\OneToMany(targetEntity: Amenagement::class, mappedBy: 'suivi')]
     private Collection $amenagements;
 
     public function __construct()

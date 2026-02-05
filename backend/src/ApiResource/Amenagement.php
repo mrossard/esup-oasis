@@ -25,10 +25,10 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\AmenagementBeneficiaireActifFilter;
+use App\Filter\AmenagementUtilisateurFilter;
 use App\Filter\BeneficiaireActifTagFilter;
 use App\Filter\CaseInsensitiveSearchFilter;
 use App\Filter\ComposanteFormationFilter;
-use App\Filter\AmenagementUtilisateurFilter;
 use App\Filter\NestedFieldSearchFilter;
 use App\State\Amenagement\AmenagementProcessor;
 use App\State\Amenagement\AmenagementProvider;
@@ -36,49 +36,45 @@ use App\State\Amenagement\AmenagementSansFiltreProvider;
 use App\Validator\AmenagementDatesConstraint;
 use App\Validator\UtilisateurBeneficiaireAmenagementConstraint;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    operations            : [
+    operations: [
         new GetCollection(
-            uriTemplate : self::COLLECTION_URI,
+            uriTemplate: self::COLLECTION_URI,
             uriVariables: ['uid'],
-            security    : "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))"
+            security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))",
         ),
         new GetCollection(
             uriTemplate: '/amenagements',
-            security   : "is_granted('" . self::VOIR_AMENAGEMENTS . "')",
-            provider   : AmenagementSansFiltreProvider::class
+            security: "is_granted('" . self::VOIR_AMENAGEMENTS . "')",
+            provider: AmenagementSansFiltreProvider::class,
         ),
-        new Post(
-            uriTemplate : self::COLLECTION_URI,
-            uriVariables: ['uid'],
-            read        : false
-        ),
+        new Post(uriTemplate: self::COLLECTION_URI, uriVariables: ['uid'], read: false),
         new Get(
-            uriTemplate : self::ITEM_URI,
+            uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
-            security    : "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))"
+            security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))",
         ),
         new Patch(
-            uriTemplate : self::ITEM_URI,
+            uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
-            security    : "is_granted('" . self::MODIFIER_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))"
+            security: "is_granted('" . self::MODIFIER_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))",
         ),
         new Delete(
-            uriTemplate : self::ITEM_URI,
+            uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
-            security    : "is_granted('" . self::MODIFIER_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))"
+            security: "is_granted('" . self::MODIFIER_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))",
         ),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    openapi               : new Operation(tags: ['Utilisateurs']),
-    provider              : AmenagementProvider::class,
-    processor             : AmenagementProcessor::class,
-    stateOptions          : new Options(entityClass: \App\Entity\Amenagement::class)
+    openapi: new Operation(tags: ['Utilisateurs']),
+    provider: AmenagementProvider::class,
+    processor: AmenagementProcessor::class,
+    stateOptions: new Options(entityClass: \App\Entity\Amenagement::class),
 )]
 #[UtilisateurBeneficiaireAmenagementConstraint]
 #[ApiFilter(AmenagementUtilisateurFilter::class)]
@@ -93,7 +89,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         'type' => 'string',
         'mapping' => 'beneficiaires.utilisateur.nom',
         'desc' => 'Nom du bénéficiaire',
-    ]])]
+    ],
+])]
 #[ApiFilter(BooleanFilter::class, properties: [
     'type.pedagogique',
     'type.examens',
@@ -101,13 +98,18 @@ use Symfony\Component\Validator\Constraints as Assert;
 ])]
 #[ApiFilter(ComposanteFormationFilter::class, properties: ['composante', 'formation'])]
 #[ApiFilter(BeneficiaireActifTagFilter::class, properties: ['tags'])]
-#[ApiFilter(OrderFilter::class, properties: ['beneficiaires.utilisateur.nom'], arguments: ['orderParameterName' => 'order'])]
+#[ApiFilter(
+    OrderFilter::class,
+    properties: ['beneficiaires.utilisateur.nom'],
+    arguments: ['orderParameterName' => 'order'],
+)]
 #[ApiFilter(NestedFieldSearchFilter::class, properties: [
     'gestionnaire' => [
         'type' => 'string',
         'mapping' => 'beneficiaires.gestionnaire',
         'desc' => "gestionnaire du bénéficiaire de l'aménagement",
-    ]])]
+    ],
+])]
 #[AmenagementDatesConstraint]
 class Amenagement
 {
@@ -123,7 +125,8 @@ class Amenagement
     #[Groups([Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
     public ?int $id = null;
 
-    #[Ignore] public ?string $uid = null;
+    #[Ignore]
+    public ?string $uid = null;
 
     #[Groups([self::GROUP_OUT])]
     public Utilisateur $beneficiaire;

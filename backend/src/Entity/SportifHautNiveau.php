@@ -15,9 +15,11 @@ namespace App\Entity;
 use App\Repository\SportifHautNiveauRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: SportifHautNiveauRepository::class)]
 #[UniqueEntity('identifiantExterne')]
+#[Map(target: \App\ApiResource\SportifHautNiveau::class)]
 class SportifHautNiveau
 {
     #[ORM\Id]

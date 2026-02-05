@@ -16,8 +16,10 @@ use App\Repository\TagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TagRepository::class)]
+#[Map(target: \App\ApiResource\Tag::class)]
 class Tag
 {
     #[ORM\Id]

@@ -29,39 +29,34 @@ use App\Filter\NomIntervenantFilter;
 use App\State\InterventionForfait\InterventionForfaitProcessor;
 use App\State\InterventionForfait\InterventionForfaitProvider;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    operations            : [
-        new Get(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id']
-        ),
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI,
-        ),
+    operations: [
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
+        new GetCollection(uriTemplate: self::COLLECTION_URI),
         new Post(
-            uriTemplate            : self::COLLECTION_URI,
-            securityPostDenormalize: "is_granted('" . self::AJOUTER_INTERVENTION . "', object)"
+            uriTemplate: self::COLLECTION_URI,
+            securityPostDenormalize: "is_granted('" . self::AJOUTER_INTERVENTION . "', object)",
         ),
         new Patch(
-            uriTemplate : self::ITEM_URI,
+            uriTemplate: self::ITEM_URI,
             uriVariables: ['id'],
-            security    : "is_granted('" . self::MODIFIER_INTERVENTION . "', [previous_object, object])"
+            security: "is_granted('" . self::MODIFIER_INTERVENTION . "', [previous_object, object])",
         ),
         new Delete(
-            uriTemplate : self::ITEM_URI,
+            uriTemplate: self::ITEM_URI,
             uriVariables: ['id'],
-            security    : "is_granted('" . self::SUPPRIMER_INTERVENTION . "', object)"
+            security: "is_granted('" . self::SUPPRIMER_INTERVENTION . "', object)",
         ),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    order                 : ['periode.debut' => 'ASC'],
-    provider              : InterventionForfaitProvider::class,
-    processor             : InterventionForfaitProcessor::class,
-    stateOptions          : new Options(entityClass: \App\Entity\InterventionForfait::class)
+    order: ['periode.debut' => 'ASC'],
+    provider: InterventionForfaitProvider::class,
+    processor: InterventionForfaitProcessor::class,
+    stateOptions: new Options(entityClass: \App\Entity\InterventionForfait::class),
 )]
 #[ApiFilter(SearchFilter::class, properties: ['periode', 'type'])]
 #[ApiFilter(NestedUtilisateurFilter::class, properties: [
@@ -71,16 +66,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(NomIntervenantFilter::class)]
 #[ApiFilter(InterventionForfaitNomIntervenantOrderFilter::class, properties: ['intervenant.utilisateur.nom'])]
 #[ApiFilter(DateFilter::class, properties: ['periode.debut', 'periode.fin'])]
-#[Assert\Expression(expression: "this.type.forfait == true", message: "Type d'événement incompatible")]
+#[Assert\Expression(expression: 'this.type.forfait == true', message: "Type d'événement incompatible")]
 class InterventionForfait
 {
     public const string COLLECTION_URI = '/interventions_forfait';
     public const string ITEM_URI = self::COLLECTION_URI . '/{id}';
     public const string GROUP_IN = 'forfait:in';
     public const string GROUP_OUT = 'forfait:out';
-    public const string MODIFIER_INTERVENTION = "MODIFIER_INTERVENTION";
-    public const string SUPPRIMER_INTERVENTION = "SUPPRIMER_INTERVENTION";
-    public const string AJOUTER_INTERVENTION = "AJOUTER_INTERVENTION";
+    public const string MODIFIER_INTERVENTION = 'MODIFIER_INTERVENTION';
+    public const string SUPPRIMER_INTERVENTION = 'SUPPRIMER_INTERVENTION';
+    public const string AJOUTER_INTERVENTION = 'AJOUTER_INTERVENTION';
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT])]

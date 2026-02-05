@@ -40,6 +40,7 @@
     "symfony/maker-bundle": "^1.48",
     "symfony/messenger": "8.0.*",
     "symfony/monolog-bundle": "^4.0",
+    "symfony/object-mapper": "^8.0",
     "symfony/property-access": "8.0.*",
     "symfony/property-info": "8.0.*",
     "symfony/runtime": "8.0.*",

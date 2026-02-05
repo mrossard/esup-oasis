@@ -23,49 +23,42 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\State\Charte\CharteProcessor;
 use App\State\Charte\CharteProvider;
+use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\ObjectMapper\Transform\MapCollection;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
-    operations  : [
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI
-        ),
-        new Get(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id']
-        ),
-        new Post(
-            uriTemplate: self::COLLECTION_URI
-        ),
-        new Patch(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id']
-        ),
-        new Delete(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id']
-        ),
+    operations: [
+        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
+        new Post(uriTemplate: self::COLLECTION_URI),
+        new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
+        new Delete(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
     ],
-    openapi     : new Operation(tags: ['Referentiel']),
-    provider    : CharteProvider::class,
-    processor   : CharteProcessor::class,
-    stateOptions: new Options(entityClass: \App\Entity\Charte::class)
+    openapi: new Operation(tags: ['Referentiel']),
+    stateOptions: new Options(entityClass: \App\Entity\Charte::class),
 )]
+#[Map(target: \App\Entity\Charte::class)]
 class Charte
 {
     public const string COLLECTION_URI = '/chartes';
     public const string ITEM_URI = '/chartes/{id}';
 
     #[ApiProperty(identifier: true)]
-    #[Ignore] public ?int $id = null;
+    #[Ignore]
+    public ?int $id = null;
 
     public string $libelle;
 
     public string $contenu;
 
+    /***
+     * TODO: revoir ça pour mapping collections!
+     */
+
     /**
      * @var ProfilBeneficiaire[]
      */
+    #[Map(transform: new MapCollection())]
     public array $profilsAssocies;
-
 }

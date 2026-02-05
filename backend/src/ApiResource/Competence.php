@@ -24,35 +24,24 @@ use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\Competence\CompetenceProcessor;
 use App\State\Competence\CompetenceProvider;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    operations            : [
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI
-        ),
-        new Get(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id' => 'id'],
-        ),
-        new Post(
-            uriTemplate: self::COLLECTION_URI,
-            security   : "is_granted('ROLE_ADMIN')",
-        ),
-        new Patch(
-            uriTemplate: self::ITEM_URI,
-            security   : "is_granted('ROLE_ADMIN')",
-        ),
+    operations: [
+        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id' => 'id']),
+        new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_ADMIN')"),
+        new Patch(uriTemplate: self::ITEM_URI, security: "is_granted('ROLE_ADMIN')"),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    openapi               : new Operation(tags: ['Referentiel']),
-    provider              : CompetenceProvider::class,
-    processor             : CompetenceProcessor::class,
-    stateOptions          : new Options(entityClass: \App\Entity\Competence::class)
+    openapi: new Operation(tags: ['Referentiel']),
+    stateOptions: new Options(entityClass: \App\Entity\Competence::class),
 )]
 #[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
+#[Map(target: \App\Entity\Competence::class)]
 final class Competence
 {
     public const string COLLECTION_URI = '/competences';

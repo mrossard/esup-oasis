@@ -16,8 +16,10 @@ use App\Repository\CategorieTagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: CategorieTagRepository::class)]
+#[Map(target: \App\ApiResource\CategorieTag::class)]
 class CategorieTag
 {
     #[ORM\Id]
@@ -31,7 +33,7 @@ class CategorieTag
     #[ORM\Column]
     private ?bool $actif = null;
 
-    #[ORM\OneToMany(mappedBy: 'categorie', targetEntity: Tag::class)]
+    #[ORM\OneToMany(targetEntity: Tag::class, mappedBy: 'categorie')]
     private Collection $tags;
 
     public function __construct()

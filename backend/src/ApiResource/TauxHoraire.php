@@ -28,7 +28,7 @@ use App\State\TauxHoraire\TauxHoraireCollectionProvider;
 use App\State\TauxHoraire\TauxHoraireProcessor;
 use App\State\TauxHoraire\TauxHoraireProvider;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
@@ -36,16 +36,14 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: [
-                'typeId' => new Link(fromProperty: 'id', toProperty: 'typeEvenement', fromClass: TypeEvenement::class,),
+                'typeId' => new Link(fromProperty: 'id', toProperty: 'typeEvenement', fromClass: TypeEvenement::class),
             ],
             provider: TauxHoraireCollectionProvider::class,
         ),
-        new Get(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: [
-                'typeId', 'id',
-            ],
-        ),
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: [
+            'typeId',
+            'id',
+        ]),
         new Post(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: [
@@ -57,14 +55,16 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(
             uriTemplate: self::ITEM_URI,
             uriVariables: [
-                'typeId', 'id',
+                'typeId',
+                'id',
             ],
             security: "is_granted('ROLE_ADMIN')",
         ),
         new Delete(
             uriTemplate: self::ITEM_URI,
             uriVariables: [
-                'typeId', 'id',
+                'typeId',
+                'id',
             ],
             security: "is_granted('ROLE_ADMIN')",
         ),
@@ -77,7 +77,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     security: "is_granted('ROLE_PLANIFICATEUR') or is_granted('ROLE_INTERVENANT')",
     provider: TauxHoraireProvider::class,
     processor: TauxHoraireProcessor::class,
-    stateOptions: new Options(entityClass: \App\Entity\TauxHoraire::class)
+    stateOptions: new Options(entityClass: \App\Entity\TauxHoraire::class),
 )]
 #[ApiFilter(TauxHoraireDateFilter::class)]
 class TauxHoraire
@@ -100,7 +100,13 @@ class TauxHoraire
     #[Assert\Type('numeric')]
     #[Assert\LessThan(1000)] //decimal(5,2)
     #[Assert\Positive]
-    #[Groups([self::GROUP_OUT, self::GROUP_IN, ServicesFaits::GROUP_OUT, ActiviteBeneficiaire::OUT, ActiviteIntervenant::OUT])]
+    #[Groups([
+        self::GROUP_OUT,
+        self::GROUP_IN,
+        ServicesFaits::GROUP_OUT,
+        ActiviteBeneficiaire::OUT,
+        ActiviteIntervenant::OUT,
+    ])]
     public string $montant;
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]

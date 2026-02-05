@@ -29,44 +29,40 @@ use App\Validator\BeneficiaireDifferentGestionnaireContraint;
 use App\Validator\BeneficiaireSupprimableConstraint;
 use App\Validator\ProfilAvecTypologieConstraint;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
-
 #[ApiResource(
-    operations            : [
-        new Get(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['uid', 'id']
-        ),
+    operations: [
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['uid', 'id']),
         new Patch(
-            uriTemplate      : self::ITEM_URI,
-            uriVariables     : ['uid', 'id'],
-            security         : "is_granted('" . self::VOIR_PROFILS . "')",
+            uriTemplate: self::ITEM_URI,
+            uriVariables: ['uid', 'id'],
+            security: "is_granted('" . self::VOIR_PROFILS . "')",
             validationContext: ['groups' => [self::GROUP_VALIDATION_IN]],
         ),
         new Post(
-            uriTemplate      : self::COLLECTION_URI,
-            uriVariables     : ['uid'],
-            security         : "is_granted('" . self::VOIR_PROFILS . "')",
+            uriTemplate: self::COLLECTION_URI,
+            uriVariables: ['uid'],
+            security: "is_granted('" . self::VOIR_PROFILS . "')",
             validationContext: ['groups' => [self::GROUP_VALIDATION_IN]],
-            read             : false
+            read: false,
         ),
         new Delete(
-            uriTemplate      : self::ITEM_URI,
-            uriVariables     : ['uid', 'id'],
-            security         : "is_granted('" . self::VOIR_PROFILS . "')",
-            validationContext: ['groups' => [self::GROUP_VALIDATION_DELETE]]
+            uriTemplate: self::ITEM_URI,
+            uriVariables: ['uid', 'id'],
+            security: "is_granted('" . self::VOIR_PROFILS . "')",
+            validationContext: ['groups' => [self::GROUP_VALIDATION_DELETE]],
         ),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    openapi               : new Operation(tags: ['Utilisateurs']),
-    order                 : ['debut' => 'DESC '],
-    security              : "is_granted('ROLE_PLANIFICATEUR')",
-    provider              : BeneficiaireProfilProvider::class,
-    processor             : BeneficiaireProfilProcessor::class,
-    stateOptions          : new Options(entityClass: Beneficiaire::class)
+    openapi: new Operation(tags: ['Utilisateurs']),
+    order: ['debut' => 'DESC '],
+    security: "is_granted('ROLE_PLANIFICATEUR')",
+    provider: BeneficiaireProfilProvider::class,
+    processor: BeneficiaireProfilProcessor::class,
+    stateOptions: new Options(entityClass: Beneficiaire::class),
 )]
 #[ApiFilter(SearchFilter::class, properties: ['profil'])]
 #[ProfilAvecTypologieConstraint(groups: [self::GROUP_VALIDATION_IN])]

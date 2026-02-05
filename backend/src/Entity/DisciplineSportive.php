@@ -16,8 +16,10 @@ use App\Repository\DisciplineSportiveRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: DisciplineSportiveRepository::class)]
+#[Map(target: \App\ApiResource\DisciplineSportive::class)]
 class DisciplineSportive
 {
     #[ORM\Id]

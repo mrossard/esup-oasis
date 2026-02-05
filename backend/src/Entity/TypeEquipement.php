@@ -16,8 +16,10 @@ use App\Repository\TypeEquipementRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TypeEquipementRepository::class)]
+#[Map(target: \App\ApiResource\TypeEquipement::class)]
 class TypeEquipement
 {
     #[ORM\Id]

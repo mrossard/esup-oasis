@@ -17,18 +17,11 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use App\State\Inscription\InscriptionProvider;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource(
-    operations: [
-        new Get(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: ['id'],
-            openapi: false,
-            provider: InscriptionProvider::class
-        ),
-    ],
-)]
+#[ApiResource(operations: [
+    new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id'], openapi: false, provider: InscriptionProvider::class),
+])]
 final class Inscription
 {
     public const string COLLECTION_URI = '/inscriptions';
@@ -37,12 +30,16 @@ final class Inscription
     #[ApiProperty(identifier: true)]
     public int $id;
 
-    #[Groups([Utilisateur::GROUP_OUT, Demande::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT, Amenagement::GROUP_OUT])]
+    #[Groups([
+        Utilisateur::GROUP_OUT,
+        Demande::GROUP_OUT,
+        Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT,
+        Amenagement::GROUP_OUT,
+    ])]
     public Formation $formation;
 
     #[Groups([Utilisateur::GROUP_OUT, Demande::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
     public DateTimeInterface $debut;
     #[Groups([Utilisateur::GROUP_OUT, Demande::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
     public DateTimeInterface $fin;
-
 }

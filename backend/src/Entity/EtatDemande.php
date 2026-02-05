@@ -14,8 +14,10 @@ namespace App\Entity;
 
 use App\Repository\EtatDemandeRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: EtatDemandeRepository::class)]
+#[Map(target: 'App\ApiResource\EtatDemande')]
 class EtatDemande
 {
     public const int EN_COURS = 1;

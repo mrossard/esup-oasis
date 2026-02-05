@@ -23,30 +23,20 @@ use ApiPlatform\OpenApi\Model\Operation;
 use App\State\CampagneDemande\CampagneDemandeProcessor;
 use App\State\CampagneDemande\CampagneDemandeProvider;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
     operations: [
-        new Get(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: ['id', 'typeId']
-        ),
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI,
-            uriVariables: ['typeId']
-        ),
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id', 'typeId']),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, uriVariables: ['typeId']),
         new Post(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: ['typeId'],
             security: "is_granted('ROLE_ADMIN')",
-            read: false
+            read: false,
         ),
-        new Patch(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: ['id', 'typeId'],
-            security: "is_granted('ROLE_ADMIN')"
-        ),
+        new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id', 'typeId'], security: "is_granted('ROLE_ADMIN')"),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],

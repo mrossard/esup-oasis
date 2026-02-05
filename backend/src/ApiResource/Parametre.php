@@ -12,7 +12,6 @@
 
 namespace App\ApiResource;
 
-
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
@@ -20,25 +19,20 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\State\Parametre\ParametreProvider;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
-    operations            : [
-        new Get(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['cle']
-        ),
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI
-        ),
+    operations: [
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['cle']),
+        new GetCollection(uriTemplate: self::COLLECTION_URI),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    openapi               : new Operation(tags: ['Referentiel']),
-    order                 : ['cle' => 'ASC '],
-    security              : 'is_granted("' . \App\Entity\Utilisateur::ROLE_GESTIONNAIRE . '")',
-    provider              : ParametreProvider::class,
-    stateOptions          : new Options(entityClass: \App\Entity\Parametre::class)
+    openapi: new Operation(tags: ['Referentiel']),
+    order: ['cle' => 'ASC '],
+    security: 'is_granted("' . \App\Entity\Utilisateur::ROLE_GESTIONNAIRE . '")',
+    provider: ParametreProvider::class,
+    stateOptions: new Options(entityClass: \App\Entity\Parametre::class),
 )]
 class Parametre
 {

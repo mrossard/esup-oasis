@@ -25,15 +25,15 @@ use App\State\Demande\EtatDemandeProvider;
         new GetCollection(uriTemplate: self::COLLECTION_URI),
     ],
     openapi: new Operation(tags: ['Referentiel']),
-    provider: EtatDemandeProvider::class,
-    stateOptions: new Options(entityClass: \App\Entity\EtatDemande::class)
+    stateOptions: new Options(entityClass: \App\Entity\EtatDemande::class),
 )]
 readonly class EtatDemande
 {
     public const string COLLECTION_URI = '/etats_demandes';
     public const string ITEM_URI = self::COLLECTION_URI . '/{id}';
 
-    public function __construct(public int $id, public string $libelle)
-    {
-    }
+    public function __construct(
+        public int $id,
+        public string $libelle,
+    ) {}
 }

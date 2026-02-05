@@ -19,8 +19,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: PeriodeRHRepository::class)]
+#[Map(target: \App\ApiResource\PeriodeRH::class)]
 class PeriodeRH
 {
     #[ORM\Id]
@@ -135,7 +137,7 @@ class PeriodeRH
     {
         $this->dateEnvoi = match ($dateEnvoi) {
             null => null,
-            default => DateTime::createFromInterface($dateEnvoi)
+            default => DateTime::createFromInterface($dateEnvoi),
         };
 
         return $this;

@@ -16,8 +16,10 @@ use App\Repository\CampusRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: CampusRepository::class)]
+#[Map(target: \App\ApiResource\Campus::class)]
 class Campus
 {
     #[ORM\Id]

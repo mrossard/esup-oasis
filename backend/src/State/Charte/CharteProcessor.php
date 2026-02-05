@@ -21,16 +21,17 @@ use App\Repository\CharteRepository;
 use App\Repository\ProfilBeneficiaireRepository;
 use App\State\TransformerService;
 use Override;
+use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class CharteProcessor implements ProcessorInterface
 {
-    public function __construct(private CharteRepository             $charteRepository,
-                                private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
-                                private TransformerService           $transformerService,
-                                private MessageBusInterface          $messageBus)
-    {
-    }
+    public function __construct(
+        private CharteRepository $charteRepository,
+        private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
+        private TransformerService $transformerService,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param Charte    $data
@@ -38,12 +39,14 @@ readonly class CharteProcessor implements ProcessorInterface
      * @param array     $uriVariables
      * @param array     $context
      * @return Charte
+     * @throws ExceptionInterface
      */
-    #[Override] public function process($data, Operation $operation, array $uriVariables = [], array $context = []): Charte
+    #[Override]
+    public function process($data, Operation $operation, array $uriVariables = [], array $context = []): Charte
     {
         $entity = match ($data->id) {
             null => new \App\Entity\Charte(),
-            default => $this->charteRepository->find($data->id)
+            default => $this->charteRepository->find($data->id),
         };
 
         $entity->setContenu($data->contenu);

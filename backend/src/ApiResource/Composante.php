@@ -23,31 +23,23 @@ use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\Composante\ComposanteProvider;
 use App\State\Composante\PatchComposanteProcessor;
+use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\ObjectMapper\Transform\MapCollection;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new Get(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: ['id']
-        ),
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI
-        ),
-        new Patch(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: ['id'],
-            security: "is_granted('ROLE_ADMIN')"
-        ),
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
+        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id'], security: "is_granted('ROLE_ADMIN')"),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
     openapi: new Operation(tags: ['Referentiel']),
-    provider: ComposanteProvider::class,
-    processor: PatchComposanteProcessor::class,
-    stateOptions: new Options(entityClass: \App\Entity\Composante::class)
+    stateOptions: new Options(entityClass: \App\Entity\Composante::class),
 )]
 #[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
+#[Map(target: \App\Entity\Composante::class)]
 final class Composante
 {
     public const string COLLECTION_URI = '/composantes';
@@ -62,9 +54,14 @@ final class Composante
     #[Groups([Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT, Amenagement::GROUP_OUT, self::GROUP_OUT])]
     public string $libelle;
 
+    /***
+     * TODO: à revoir plus tard - pb des collections
+     */
+
     /**
      * @var Utilisateur[]
      */
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
+    #[Map(transform: new MapCollection())]
     public array $referents;
 }

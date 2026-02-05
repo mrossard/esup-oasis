@@ -23,42 +23,27 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
-use App\State\CategorieAmenagement\CategorieAmenagementProcessor;
-use App\State\CategorieAmenagement\CategorieAmenagementProvider;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI
-        ),
-        new Get(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: ['id']
-        ),
-        new Post(
-            uriTemplate: self::COLLECTION_URI,
-            security: "is_granted('ROLE_ADMIN')",
-        ),
-        new Patch(
-            uriTemplate: self::ITEM_URI,
-            uriVariables: ['id'],
-            security: "is_granted('ROLE_ADMIN')",
-        ),
+        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
+        new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_ADMIN')"),
+        new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id'], security: "is_granted('ROLE_ADMIN')"),
     ],
     denormalizationContext: ['groups' => self::GROUP_IN],
     openapi: new Operation(tags: ['Referentiel']),
-    provider: CategorieAmenagementProvider::class,
-    processor: CategorieAmenagementProcessor::class,
-    stateOptions: new Options(entityClass: \App\Entity\CategorieAmenagement::class)
+    stateOptions: new Options(entityClass: \App\Entity\CategorieAmenagement::class),
 )]
 #[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
 #[ApiFilter(BooleanFilter::class, properties: [
     'typesAmenagement.examens',
     'typesAmenagement.pedagogique',
     'typesAmenagement.aideHumaine',
-]
-)]
+])]
+#[Map(target: \App\Entity\CategorieAmenagement::class)]
 class CategorieAmenagement
 {
     public const string COLLECTION_URI = '/categories_amenagements';

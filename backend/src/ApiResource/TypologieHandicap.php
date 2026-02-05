@@ -24,34 +24,24 @@ use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\TypologieHandicap\TypologieProcessor;
 use App\State\TypologieHandicap\TypologieProvider;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
-    operations            : [
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI,
-        ),
-        new Get(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id']
-        ),
-        new Patch(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id']
-        ),
-        new Post(
-            uriTemplate: self::COLLECTION_URI,
-        ),
+    operations: [
+        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
+        new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
+        new Post(uriTemplate: self::COLLECTION_URI),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    openapi               : new Operation(tags: ['Referentiel']),
-    security              : 'is_granted("' . BeneficiaireProfil::VOIR_PROFILS . '")',
-    provider              : TypologieProvider::class,
-    processor             : TypologieProcessor::class,
-    stateOptions          : new Options(entityClass: \App\Entity\TypologieHandicap::class)
+    openapi: new Operation(tags: ['Referentiel']),
+    security: 'is_granted("' . BeneficiaireProfil::VOIR_PROFILS . '")',
+    stateOptions: new Options(entityClass: \App\Entity\TypologieHandicap::class),
 )]
 #[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
+#[Map(target: \App\Entity\TypologieHandicap::class)]
 class TypologieHandicap
 {
     public const string COLLECTION_URI = '/typologies';

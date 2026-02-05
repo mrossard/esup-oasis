@@ -31,49 +31,38 @@ use App\Filter\UtilisateurConcerneParEvenementFilter;
 use App\State\Evenement\EvenementProcessor;
 use App\State\Evenement\EvenementProvider;
 use App\Validator\BeneficiaireNonNullConstraint;
-use App\Validator\NonEnvoyeRHConstraint;
 use App\Validator\EvenementSansChevauchementConstraint;
+use App\Validator\NonEnvoyeRHConstraint;
 use App\Validator\PeriodeNonBloqueeConstraint;
 use App\Validator\UtilisateurBeneficiaireEvenementConstraint;
 use DateTimeInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
-    operations            : [
-        new GetCollection(
-            uriTemplate: self::COLLECTION_URI
-        ),
+    operations: [
+        new GetCollection(uriTemplate: self::COLLECTION_URI),
         new Get(
-            uriTemplate : self::ITEM_URI,
+            uriTemplate: self::ITEM_URI,
             uriVariables: ['id'],
-            security    : "is_granted('" . self::VOIR . "', object)"
+            security: "is_granted('" . self::VOIR . "', object)",
         ),
-        new Post(
-            uriTemplate: self::COLLECTION_URI,
-            security   : "is_granted('ROLE_PLANIFICATEUR')",
-            read       : false,
-        ),
-        new Patch(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id'],
-            security    : "is_granted('ROLE_PLANIFICATEUR')"
-        ),
+        new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_PLANIFICATEUR')", read: false),
+        new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id'], security: "is_granted('ROLE_PLANIFICATEUR')"),
         new Delete(
-            uriTemplate      : self::ITEM_URI,
-            uriVariables     : ['id'],
-            security         : "is_granted('" . self::SUPPRIMER . "', object)",
+            uriTemplate: self::ITEM_URI,
+            uriVariables: ['id'],
+            security: "is_granted('" . self::SUPPRIMER . "', object)",
             validationContext: ['groups' => ['deleteValidation']],
-            validate         : true
-
+            validate: true,
         ),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    order                 : ['debut' => 'ASC'],
-    provider              : EvenementProvider::class,
-    processor             : EvenementProcessor::class,
-    stateOptions          : new Options(entityClass: \App\Entity\Evenement::class)
+    order: ['debut' => 'ASC'],
+    provider: EvenementProvider::class,
+    processor: EvenementProcessor::class,
+    stateOptions: new Options(entityClass: \App\Entity\Evenement::class),
 )]
 #[ApiFilter(SearchFilter::class, properties: [
     'type' => 'exact',
@@ -81,7 +70,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     'type.avecValidation' => 'exact',
     'type.forfait' => 'exact',
 ])]
-#[ApiFilter(ExistsFilter::class, properties: ['periodePriseEnCompteRH', 'dateAnnulation', 'intervenant', 'beneficiaires'])]
+#[ApiFilter(ExistsFilter::class, properties: [
+    'periodePriseEnCompteRH',
+    'dateAnnulation',
+    'intervenant',
+    'beneficiaires',
+])]
 #[ApiFilter(DateFilter::class, properties: ['debut', 'fin'])]
 #[ApiFilter(NestedUtilisateurFilter::class, properties: [
     'intervenant' => 'intervenant.utilisateur',
@@ -97,7 +91,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[NonEnvoyeRHConstraint]
 #[PeriodeNonBloqueeConstraint(groups: ['deleteValidation'])]
 #[BeneficiaireNonNullConstraint]
-#[Assert\Expression(expression: "this.type.forfait == false", message: "Type d'événement incompatible")]
+#[Assert\Expression(expression: 'this.type.forfait == false', message: "Type d'événement incompatible")]
 final class Evenement
 {
     public const string COLLECTION_URI = '/evenements';
@@ -191,5 +185,4 @@ final class Evenement
 
     #[Groups([self::GROUP_OUT])]
     public ?DateTimeInterface $dateValidation = null;
-
 }

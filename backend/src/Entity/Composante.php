@@ -16,8 +16,11 @@ use App\Repository\ComposanteRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\ObjectMapper\Transform\MapCollection;
 
 #[ORM\Entity(repositoryClass: ComposanteRepository::class)]
+#[Map(target: \App\ApiResource\Composante::class)]
 class Composante
 {
     #[ORM\Id]
@@ -31,13 +34,14 @@ class Composante
     #[ORM\Column(length: 10)]
     private ?string $codeExterne = null;
 
-    #[ORM\OneToMany(mappedBy: 'composante', targetEntity: Formation::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Formation::class, mappedBy: 'composante', orphanRemoval: true)]
     private Collection $formations;
 
     /**
      * @var Collection<int, Utilisateur>
      */
     #[ORM\ManyToMany(targetEntity: Utilisateur::class, inversedBy: 'composantes')]
+    #[Map(transform: new MapCollection())]
     private Collection $referents;
 
     public function __construct()

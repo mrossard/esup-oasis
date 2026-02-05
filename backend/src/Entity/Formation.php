@@ -16,8 +16,10 @@ use App\Repository\FormationRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: FormationRepository::class)]
+#[Map(target: 'App\ApiResource\Formation')]
 class Formation
 {
     #[ORM\Id]
@@ -31,7 +33,7 @@ class Formation
     #[ORM\Column(length: 10)]
     private ?string $codeExterne = null;
 
-    #[ORM\OneToMany(mappedBy: 'formation', targetEntity: Inscription::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Inscription::class, mappedBy: 'formation', orphanRemoval: true)]
     private Collection $inscriptions;
 
     #[ORM\ManyToOne(inversedBy: 'formations')]

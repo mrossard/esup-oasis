@@ -29,11 +29,9 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('ROLE_ADMIN')",
             processor: SportifHautNiveauUploadProcessor::class,
             extraProperties: ['standard_put' => true],
-            allowCreate: true
+            allowCreate: true,
         ),
-        new Get(
-            uriTemplate: '/liste_sportifs_haut_niveau'
-        ),
+        new Get(uriTemplate: '/liste_sportifs_haut_niveau'),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
     openapi: new Operation(tags: ['Referentiel']),
@@ -44,8 +42,8 @@ class ListeSportifsHautNiveau
     public const string GROUP_OUT = 'sportif_haut_niveau:out';
     public const string GROUP_IN = 'sportif_haut_niveau:post';
 
-
-    #[Ignore] public int $id = 1;
+    #[Ignore]
+    public int $id = 1;
 
     /**
      * @var SportifHautNiveau[]

@@ -21,10 +21,12 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Clock\ClockAwareTrait;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: UtilisateurRepository::class)]
 #[UniqueEntity('numeroAnonyme')]
+#[Map(target: \App\ApiResource\Utilisateur::class)]
 class Utilisateur implements UserInterface
 {
     use ClockAwareTrait;
@@ -47,6 +49,7 @@ class Utilisateur implements UserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(target: \App\ApiResource\Utilisateur::class, transform: [self::class, 'getId'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
@@ -61,9 +64,13 @@ class Utilisateur implements UserInterface
     #[ORM\Column(length: 255)]
     private ?string $prenom = null;
 
-    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: Beneficiaire::class,
-        cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[ORM\OrderBy(["debut" => "DESC"])]
+    #[ORM\OneToMany(
+        targetEntity: Beneficiaire::class,
+        mappedBy: 'utilisateur',
+        cascade: ['persist', 'remove'],
+        orphanRemoval: true,
+    )]
+    #[ORM\OrderBy(['debut' => 'DESC'])]
     private Collection $beneficiaires;
 
     #[ORM\OneToOne(mappedBy: 'utilisateur', cascade: ['persist', 'remove'])]
@@ -120,8 +127,12 @@ class Utilisateur implements UserInterface
     #[ORM\OneToMany(mappedBy: 'proprietaire', targetEntity: Fichier::class)]
     private Collection $fichiers;
 
-    #[ORM\OneToMany(mappedBy: 'utilisateur', targetEntity: MembreCommission::class,
-        cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        mappedBy: 'utilisateur',
+        targetEntity: MembreCommission::class,
+        cascade: ['persist'],
+        orphanRemoval: true,
+    )]
     private Collection $membreCommissions;
 
     #[ORM\Column(length: 1, nullable: true)]
@@ -160,7 +171,12 @@ class Utilisateur implements UserInterface
     /**
      * @var Collection<int, PieceJointeBeneficiaire>
      */
-    #[ORM\OneToMany(mappedBy: 'beneficiaire', targetEntity: PieceJointeBeneficiaire::class, cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OneToMany(
+        mappedBy: 'beneficiaire',
+        targetEntity: PieceJointeBeneficiaire::class,
+        cascade: ['persist'],
+        orphanRemoval: true,
+    )]
     private Collection $piecesJointes;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -235,7 +251,7 @@ class Utilisateur implements UserInterface
      */
     public function getUserIdentifier(): string
     {
-        return (string)$this->uid;
+        return (string) $this->uid;
     }
 
     /**
@@ -342,7 +358,6 @@ class Utilisateur implements UserInterface
 
         return $this;
     }
-
 
     public function getNom(): ?string
     {
@@ -749,7 +764,10 @@ class Utilisateur implements UserInterface
 
         //demande en cours?
         foreach ($this->getDemandes() as $demande) {
-            if ($demande->getEtat()->getId() === EtatDemande::EN_COURS || $demande->getEtat()->getId() === EtatDemande::NON_CONFORME) {
+            if (
+                $demande->getEtat()->getId() === EtatDemande::EN_COURS
+                || $demande->getEtat()->getId() === EtatDemande::NON_CONFORME
+            ) {
                 return true;
             }
         }
@@ -852,7 +870,10 @@ class Utilisateur implements UserInterface
         $now = $this->now();
         $benefs = [];
         foreach ($this->getBeneficiaires() as $beneficiaire) {
-            if ($now >= $beneficiaire->getDebut() && (null == $beneficiaire->getFin() || $now < $beneficiaire->getFin())) {
+            if (
+                $now >= $beneficiaire->getDebut()
+                && (null == $beneficiaire->getFin() || $now < $beneficiaire->getFin())
+            ) {
                 $benefs[] = $beneficiaire;
             }
         }
@@ -952,7 +973,7 @@ class Utilisateur implements UserInterface
         foreach ($this->getBeneficiairesActifs() as $beneficiaire) {
             $amenagementsActifs = array_filter(
                 $beneficiaire->getAmenagementsActifs(),
-                fn($amenagement) => !array_key_exists($amenagement->getId(), $amenagements)
+                fn($amenagement) => !array_key_exists($amenagement->getId(), $amenagements),
             );
             foreach ($amenagementsActifs as $amenagementsActif) {
                 $amenagements[$amenagementsActif->getId()] = $amenagementsActif;
@@ -1068,7 +1089,7 @@ class Utilisateur implements UserInterface
         $now = $this->now();
         return array_filter(
             $this->getInscriptions()->toArray(),
-            fn(Inscription $ins) => $now >= $ins->getDebut() && $now <= $ins->getFin()
+            fn(Inscription $ins) => $now >= $ins->getDebut() && $now <= $ins->getFin(),
         );
     }
 
@@ -1102,8 +1123,10 @@ class Utilisateur implements UserInterface
         return $this;
     }
 
-    public function getDecisionAmenagementExamens(DateTimeInterface $debut, DateTimeInterface $fin): DecisionAmenagementExamens|null
-    {
+    public function getDecisionAmenagementExamens(
+        DateTimeInterface $debut,
+        DateTimeInterface $fin,
+    ): ?DecisionAmenagementExamens {
         foreach ($this->getDecisionsAmenagementExamens() as $decision) {
             if ($debut == $decision->getDebut() && $fin == $decision->getFin()) {
                 return $decision;
@@ -1195,19 +1218,22 @@ class Utilisateur implements UserInterface
      * @param DateTime $fin
      * @return Beneficiaire[]
      */
-    public function getBeneficiairesParIntervalle(DateTimeInterface $debut, DateTimeInterface $fin,
-                                                  bool              $avecAccompagnement = true): array
-    {
+    public function getBeneficiairesParIntervalle(
+        DateTimeInterface $debut,
+        DateTimeInterface $fin,
+        bool $avecAccompagnement = true,
+    ): array {
         return array_filter(
             $this->getBeneficiaires()->toArray(),
             fn(Beneficiaire $benef) => (
                 (!$avecAccompagnement || $benef->isAvecAccompagnement())
                 && (
-                    ($debut >= $benef->getDebut() && ($debut < $benef->getFin() || $benef->getFin() === null))
-                    ||
-                    ($benef->getDebut() >= $debut && $benef->getDebut() < $fin)
+                    $debut >= $benef->getDebut()
+                    && ($debut < $benef->getFin() || $benef->getFin() === null)
+                    || $benef->getDebut() >= $debut
+                    && $benef->getDebut() < $fin
                 )
-            )
+            ),
         );
     }
 
@@ -1277,12 +1303,11 @@ class Utilisateur implements UserInterface
         return $this;
     }
 
-
     public function countEntretiens(DateTimeInterface $debut, DateTimeInterface $fin): int
     {
         $entretiensDansIntervalle = array_filter(
             $this->getEntretiens()->toArray(),
-            fn(Entretien $entretien) => $debut <= $entretien->getDate() && $entretien->getDate() <= $fin
+            fn(Entretien $entretien) => $debut <= $entretien->getDate() && $entretien->getDate() <= $fin,
         );
 
         return count($entretiensDansIntervalle);

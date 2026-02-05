@@ -17,8 +17,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TypeAmenagementRepository::class)]
+#[Map(target: \App\ApiResource\TypeAmenagement::class)]
 class TypeAmenagement
 {
     #[ORM\Id]
@@ -52,7 +54,6 @@ class TypeAmenagement
 
     #[ORM\ManyToOne(inversedBy: 'typesAmenagement')]
     private ?CategorieAmenagement $categorie = null;
-
 
     public function __construct()
     {

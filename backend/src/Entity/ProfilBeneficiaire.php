@@ -16,8 +16,10 @@ use App\Repository\ProfilBeneficiaireRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: ProfilBeneficiaireRepository::class)]
+#[Map(target: \App\ApiResource\ProfilBeneficiaire::class)]
 class ProfilBeneficiaire
 {
     public const int A_DETERMINER = -1;
@@ -30,19 +32,19 @@ class ProfilBeneficiaire
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
-    private ?int $id = null;
+    private(set) ?int $id = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $libelle = null;
+    private(set) ?string $libelle = null;
 
     #[ORM\Column(options: ['default' => true])]
-    private ?bool $actif = null;
+    private(set) ?bool $actif = null;
 
     #[ORM\OneToMany(mappedBy: 'profil', targetEntity: Beneficiaire::class)]
     private Collection $beneficiaires;
 
     #[ORM\Column(options: ['default' => false])]
-    private ?bool $avecTypologie = false;
+    private(set) ?bool $avecTypologie = false;
 
     #[ORM\ManyToMany(targetEntity: TypeDemande::class, mappedBy: 'profilsAssocies')]
     private Collection $typesDemandes;

@@ -17,8 +17,11 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
+use Symfony\Component\ObjectMapper\Transform\MapCollection;
 
 #[ORM\Entity(repositoryClass: CharteRepository::class)]
+#[Map(target: \App\ApiResource\Charte::class)]
 class Charte
 {
     #[ORM\Id]
@@ -30,6 +33,7 @@ class Charte
     private ?string $contenu = null;
 
     #[ORM\ManyToMany(targetEntity: ProfilBeneficiaire::class, inversedBy: 'chartes')]
+    #[Map(transform: new MapCollection())]
     private Collection $profilsAssocies;
 
     #[ORM\Column(length: 255)]

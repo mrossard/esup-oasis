@@ -16,8 +16,10 @@ use App\Repository\ServiceRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: ServiceRepository::class)]
+#[Map(target: \App\ApiResource\Service::class)]
 class Service
 {
     #[ORM\Id]
