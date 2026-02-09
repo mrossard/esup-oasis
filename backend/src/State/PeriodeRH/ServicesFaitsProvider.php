@@ -31,12 +31,11 @@ use Exception;
 
 class ServicesFaitsProvider implements ProviderInterface
 {
-
     private array $cachedResources;
 
-    public function __construct(private readonly PeriodeRHRepository $periodeRHRepository,
-                                private readonly TransformerService  $transformerService)
-    {
+    public function __construct(
+        private readonly PeriodeRHRepository $periodeRHRepository,
+    ) {
         $this->cachedResources = [
             TypeEvenementEntity::class => [],
             Utilisateur::class => [],
@@ -74,12 +73,12 @@ class ServicesFaitsProvider implements ProviderInterface
      */
     public function init(\App\Entity\PeriodeRH $periode, $uid): ServicesFaits
     {
-        $periodeResource = $this->transformerService->transform($periode, PeriodeRH::class);
+        $periodeResource = new PeriodeRH($periode);
 
         $servicesFaits = new ServicesFaits();
         $servicesFaits->id = $periodeResource->id;
         $servicesFaits->periode = $periodeResource;
-        $servicesFaits->structure = "Service Phase Pôle FIPVU"; //todo: param de conf quelque part...table parametre?
+        $servicesFaits->structure = 'Service Phase Pôle FIPVU'; //todo: param de conf quelque part...table parametre?
         $servicesFaits->lignes = [];
         $servicesFaits->uid = $uid ?? null;
         return $servicesFaits;
@@ -92,15 +91,15 @@ class ServicesFaitsProvider implements ProviderInterface
      */
     public function getEvenements(\App\Entity\PeriodeRH $periode, ?string $uid): array
     {
-        return array_filter(
-            array: [...$periode->getEvenements()->toArray(), ...$periode->getInterventionsForfait()],
-            callback: function (Evenement|InterventionForfait $evenement) use ($uid) {
-                if (null !== $uid) {
-                    return $evenement->getIntervenant()->getUtilisateur()->getUid() === $uid;
-                }
-                return (!$evenement->getIntervenant()->getUtilisateur()->isGestionnaire());
+        return array_filter(array: [
+            ...$periode->getEvenements()->toArray(),
+            ...$periode->getInterventionsForfait(),
+        ], callback: function (Evenement|InterventionForfait $evenement) use ($uid) {
+            if (null !== $uid) {
+                return $evenement->getIntervenant()->getUtilisateur()->getUid() === $uid;
             }
-        );
+            return !$evenement->getIntervenant()->getUtilisateur()->isGestionnaire();
+        });
     }
 
     /**
@@ -119,30 +118,32 @@ class ServicesFaitsProvider implements ProviderInterface
             $dateEvenement = $evenement instanceof Evenement ? $evenement->getDebut() : $servicesFaits->periode->debut;
             $tauxHoraire = $evenement->getType()->getTauxHoraireActifPourDate($dateEvenement);
             if (null === $tauxHoraire) {
-                throw new ConfigurationIncompleteException('Taux horaire non renseigné pour ' . $evenement->getType()->getLibelle());
+                throw new ConfigurationIncompleteException(
+                    'Taux horaire non renseigné pour ' . $evenement->getType()->getLibelle(),
+                );
             }
             $ligneId = $intervenant->getId() . '###' . $type->getId() . '###' . $tauxHoraire->getId();
-            $servicesFaits->lignes[$ligneId] = $this->append($servicesFaits->lignes[$ligneId] ?? null, $evenement, $tauxHoraire);
+            $servicesFaits->lignes[$ligneId] = $this->append(
+                $servicesFaits->lignes[$ligneId] ?? null,
+                $evenement,
+                $tauxHoraire,
+            );
         }
 
         //on repasse les indices en auto
         $servicesFaits->lignes = array_values($servicesFaits->lignes);
         //on recoupe à deux chiffres après la virgule - voir https://stackoverflow.com/questions/1642614/how-to-ceil-floor-and-round-bcmath-numbers ?
-        array_walk(array: $servicesFaits->lignes,
-            callback: function (LigneServiceFait $ligne) {
-                $ligne->nbHeures = bcadd($ligne->nbHeures, 0, 2);
-            }
-        );
+        array_walk(array: $servicesFaits->lignes, callback: function (LigneServiceFait $ligne) {
+            $ligne->nbHeures = bcadd($ligne->nbHeures, 0, 2);
+        });
 
         //on trie par intervenant et type d'événement
-        usort($servicesFaits->lignes,
-            function (LigneServiceFait $a, LigneServiceFait $b) {
-                if ($a->intervenant->nom === $b->intervenant->nom) {
-                    return $a->type->libelle <=> $b->type->libelle;
-                }
-                return $a->intervenant->nom <=> $b->intervenant->nom;
+        usort($servicesFaits->lignes, function (LigneServiceFait $a, LigneServiceFait $b) {
+            if ($a->intervenant->nom === $b->intervenant->nom) {
+                return $a->type->libelle <=> $b->type->libelle;
             }
-        );
+            return $a->intervenant->nom <=> $b->intervenant->nom;
+        });
 
         return $servicesFaits;
     }
@@ -154,8 +155,11 @@ class ServicesFaitsProvider implements ProviderInterface
      * @return LigneServiceFait
      * @throws Exception
      */
-    protected function append(?LigneServiceFait $ligne, Evenement|InterventionForfait $evenement, TauxHoraire $tauxHoraire): LigneServiceFait
-    {
+    protected function append(
+        ?LigneServiceFait $ligne,
+        Evenement|InterventionForfait $evenement,
+        TauxHoraire $tauxHoraire,
+    ): LigneServiceFait {
         if (null == $ligne) {
             $ligne = new LigneServiceFait();
             $ligne->type = $this->getTypeResource($evenement->getType());
@@ -179,8 +183,7 @@ class ServicesFaitsProvider implements ProviderInterface
     public function getTypeResource(TypeEvenementEntity $typeEntity): TypeEvenement
     {
         if (!array_key_exists($typeEntity->getId(), $this->cachedResources[TypeEvenementEntity::class])) {
-            $this->cachedResources[TypeEvenementEntity::class][$typeEntity->getId()] =
-                $this->transformerService->transform($typeEntity, TypeEvenement::class);
+            $this->cachedResources[TypeEvenementEntity::class][$typeEntity->getId()] = new TypeEvenement($typeEntity);
         }
         return $this->cachedResources[TypeEvenementEntity::class][$typeEntity->getId()];
     }
@@ -193,8 +196,7 @@ class ServicesFaitsProvider implements ProviderInterface
     private function getUtilisateurResource(Utilisateur $utilisateur): UtilisateurResource
     {
         if (!array_key_exists($utilisateur->getId(), $this->cachedResources[Utilisateur::class])) {
-            $this->cachedResources[Utilisateur::class][$utilisateur->getId()] =
-                $this->transformerService->transform($utilisateur, UtilisateurResource::class);
+            $this->cachedResources[Utilisateur::class][$utilisateur->getId()] = new UtilisateurResource($utilisateur);
         }
         return $this->cachedResources[Utilisateur::class][$utilisateur->getId()];
     }
@@ -207,11 +209,10 @@ class ServicesFaitsProvider implements ProviderInterface
     private function getTauxHoraireResource(TauxHoraire $tauxHoraire): \App\ApiResource\TauxHoraire
     {
         if (!array_key_exists($tauxHoraire->getId(), $this->cachedResources[TauxHoraire::class])) {
-            $this->cachedResources[TauxHoraire::class][$tauxHoraire->getId()] =
-                $this->transformerService->transform($tauxHoraire, \App\ApiResource\TauxHoraire::class);
+            $this->cachedResources[TauxHoraire::class][$tauxHoraire->getId()] = new \App\ApiResource\TauxHoraire(
+                $tauxHoraire,
+            );
         }
         return $this->cachedResources[TauxHoraire::class][$tauxHoraire->getId()];
     }
-
-
 }

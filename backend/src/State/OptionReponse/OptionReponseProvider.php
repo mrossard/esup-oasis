@@ -17,19 +17,19 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\OptionReponse;
 use App\ApiResource\Question;
-use App\Entity\DisciplineArtistique;
-use App\Entity\TypeAmenagement;
 use App\Entity\ClubSportif;
+use App\Entity\DisciplineArtistique;
 use App\Entity\Reponse;
+use App\Entity\TypeAmenagement;
 use App\Entity\TypeEngagement;
 use App\Entity\TypologieHandicap;
 use App\Repository\CategorieAmenagementRepository;
-use App\Repository\DisciplineArtistiqueRepository;
-use App\Repository\EtablissementEnseignementArtistiqueRepository;
-use App\Repository\TypeAmenagementRepository;
 use App\Repository\ClubSportifRepository;
+use App\Repository\DisciplineArtistiqueRepository;
 use App\Repository\DisciplineSportiveRepository;
+use App\Repository\EtablissementEnseignementArtistiqueRepository;
 use App\Repository\QuestionRepository;
+use App\Repository\TypeAmenagementRepository;
 use App\Repository\TypeEngagementRepository;
 use App\Repository\TypologieHandicapRepository;
 use App\State\AbstractEntityProvider;
@@ -38,23 +38,21 @@ use Exception;
 use Override;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class OptionReponseProvider extends AbstractEntityProvider
+readonly class OptionReponseProvider implements ProviderInterface
 {
-
-    public function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')] ProviderInterface       $itemProvider,
-                                #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')] ProviderInterface $collectionProvider,
-                                private readonly CategorieAmenagementRepository                                               $categorieAmenagementRepository,
-                                private readonly ClubSportifRepository                                                        $clubSportifRepository,
-                                private readonly QuestionRepository                                                           $questionRepository,
-                                private readonly DisciplineSportiveRepository                                                 $disciplineSportiveRepository,
-                                private readonly DisciplineArtistiqueRepository                                               $disciplineArtistiqueRepository,
-                                private readonly EtablissementEnseignementArtistiqueRepository                                $etablissementEnseignementArtistiqueRepository,
-                                private readonly TypologieHandicapRepository                                                  $typologieHandicapRepository,
-                                private readonly TypeEngagementRepository                                                     $typeEngagementRepository,
-                                private readonly TypeAmenagementRepository                                                    $amenagementRepository,)
-    {
-        parent::__construct($itemProvider, $collectionProvider);
-    }
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        private CategorieAmenagementRepository $categorieAmenagementRepository,
+        private ClubSportifRepository $clubSportifRepository,
+        private QuestionRepository $questionRepository,
+        private DisciplineSportiveRepository $disciplineSportiveRepository,
+        private DisciplineArtistiqueRepository $disciplineArtistiqueRepository,
+        private EtablissementEnseignementArtistiqueRepository $etablissementEnseignementArtistiqueRepository,
+        private TypologieHandicapRepository $typologieHandicapRepository,
+        private TypeEngagementRepository $typeEngagementRepository,
+        private TypeAmenagementRepository $amenagementRepository,
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
@@ -70,25 +68,15 @@ class OptionReponseProvider extends AbstractEntityProvider
             return $option;
         }
 
-
         $relevantVariables = ['id' => $uriVariables['id']];
 
         $link = new Link(parameterName: 'id', fromClass: OptionReponse::class, identifiers: ['id']);
-        $correctOperation = (new (get_class($operation)))->withClass(OptionReponse::class)
+        $correctOperation = new (get_class($operation))()
+            ->withClass(OptionReponse::class)
             ->withStateOptions($operation->getStateOptions())
             ->withUriVariables([$link]);
 
-        return parent::provide($correctOperation, $relevantVariables, $context);
-    }
-
-    #[Override] protected function getResourceClass(): string
-    {
-        return OptionReponse::class;
-    }
-
-    #[Override] protected function getEntityClass(): string
-    {
-        return \App\Entity\OptionReponse::class;
+        return $this->itemProvider->provide($correctOperation, $relevantVariables, $context);
     }
 
     /**
@@ -96,19 +84,11 @@ class OptionReponseProvider extends AbstractEntityProvider
      * @return OptionReponse
      * @throws Exception
      */
-    #[Override] public function transform($entity): mixed
+    public function transform($entity): mixed
     {
-        $resource = new OptionReponse();
-        $resource->id = $entity->getId();
-        $resource->libelle = $entity->getLibelle();
-        $resource->questionId = $entity->getQuestion()->getId();
-        $resource->questionsLiees = array_map(
-            fn($question) => $this->transformerService->transform($question, Question::class),
-            $entity->getQuestionsLiees()->toArray()
-        );
+        $resource = new OptionReponse($entity);
         return $resource;
     }
-
 
     /**
      * @param string $tableName
@@ -130,17 +110,14 @@ class OptionReponseProvider extends AbstractEntityProvider
             'clubs_centre_formation' => $this->getClubsCentresFormation(),
             'clubs_professionnels' => $this->getClubsProfessionnels(),
             'etablissement_artistique' => $this->getEtablissementsArtistiques(),
-            default => []
+            default => [],
         };
 
-        $options = array_map(
-            function ($item) use ($questionId) {
-                $option = $this->transformerService->transform($item, OptionReponse::class);
-                $option->questionId = $questionId;
-                return $option;
-            },
-            $originalValues
-        );
+        $options = array_map(function ($item) use ($questionId) {
+            $option = new OptionReponse($item);
+            $option->questionId = $questionId;
+            return $option;
+        }, $originalValues);
 
         usort($options, function (OptionReponse $a, OptionReponse $b) {
             return strtolower($a->libelle) <=> strtolower($b->libelle);
@@ -158,7 +135,7 @@ class OptionReponseProvider extends AbstractEntityProvider
     private function getOptionForTable(string $tableName, int $id): OptionReponse
     {
         $repo = $this->getRepository($tableName);
-        return $this->transformerService->transform($repo->find($id), OptionReponse::class);
+        return new OptionReponse($repo->find($id));
     }
 
     /**
@@ -177,19 +154,17 @@ class OptionReponseProvider extends AbstractEntityProvider
             'typologie_handicap' => $reponse->getTypologiesHandicap()->toArray(),
             'type_engagement' => $reponse->getTypesEngagement()->toArray(),
             'amenagement_examens', 'amenagement_pedagogique' => $reponse->getTypesAmenagement()->toArray(),
-            'categorie_amenagement_examens', 'categorie_amenagement_pedagogique' => $reponse->getCategoriesAmenagement()->toArray(),
+            'categorie_amenagement_examens', 'categorie_amenagement_pedagogique' => $reponse
+                ->getCategoriesAmenagement()
+                ->toArray(),
             'clubs_professionnels', 'clubs_centre_formation' => $reponse->getClubs()->toArray(),
         };
 
-        return array_values(array_map(
-                function ($option) use ($reponse) {
-                    $res = $this->transformerService->transform($option, OptionReponse::class);
-                    $res->questionId = $reponse->getQuestion()->getId();
-                    return $res;
-                },
-                $options
-            )
-        );
+        return array_values(array_map(function ($option) use ($reponse) {
+            $res = new OptionReponse($option);
+            $res->questionId = $reponse->getQuestion()->getId();
+            return $res;
+        }, $options));
     }
 
     /**
@@ -201,10 +176,7 @@ class OptionReponseProvider extends AbstractEntityProvider
     public function majReponseAvecOptions(Reponse $reponse, string $tableName, array $optionsChoisies): Reponse
     {
         $repo = $this->getRepository($tableName);
-        $options = array_map(
-            fn($option) => $repo->find($option->id),
-            $optionsChoisies
-        );
+        $options = array_map(fn($option) => $repo->find($option->id), $optionsChoisies);
 
         $reponse = match ($tableName) {
             'discipline_sportive' => $reponse->majDisciplinesSportives($options),
@@ -212,7 +184,9 @@ class OptionReponseProvider extends AbstractEntityProvider
             'typologie_handicap' => $reponse->majTypologies($options),
             'type_engagement' => $reponse->majTypesEngagement($options),
             'amenagement_examens', 'amenagement_pedagogique' => $reponse->majAmenagements($options),
-            'categorie_amenagement_examens', 'categorie_amenagement_pedagogique' => $reponse->majCategoriesAmenagement($options),
+            'categorie_amenagement_examens', 'categorie_amenagement_pedagogique' => $reponse->majCategoriesAmenagement(
+                $options,
+            ),
             'clubs_professionnels', 'clubs_centre_formation' => $reponse->majClubs($options),
             'etablissement_artistique' => $reponse->majEtablissementsEnseignementArtistique($options),
         };
@@ -232,7 +206,9 @@ class OptionReponseProvider extends AbstractEntityProvider
             'typologie_handicap' => $this->typologieHandicapRepository,
             'type_engagement' => $this->typeEngagementRepository,
             'amenagement_examens', 'amenagement_pedagogique' => $this->amenagementRepository,
-            'categorie_amenagement_examens', 'categorie_amenagement_pedagogique' => $this->categorieAmenagementRepository,
+            'categorie_amenagement_examens',
+            'categorie_amenagement_pedagogique',
+                => $this->categorieAmenagementRepository,
             'clubs_professionnels', 'clubs_centre_formation' => $this->clubSportifRepository,
             'etablissement_artistique' => $this->etablissementEnseignementArtistiqueRepository,
         };
@@ -338,5 +314,4 @@ class OptionReponseProvider extends AbstractEntityProvider
             'actif' => true,
         ]);
     }
-
 }

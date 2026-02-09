@@ -29,6 +29,7 @@ use App\Filter\NomIntervenantFilter;
 use App\State\InterventionForfait\InterventionForfaitProcessor;
 use App\State\InterventionForfait\InterventionForfaitProvider;
 use DateTimeInterface;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -79,26 +80,64 @@ class InterventionForfait
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotNull]
-    public Utilisateur $intervenant;
+    public ?Utilisateur $intervenant = null {
+        get {
+            if ($this->intervenant === null && $this->entity !== null && $this->entity->getIntervenant()) {
+                $this->intervenant = new Utilisateur($this->entity->getIntervenant()->getUtilisateur());
+            }
+            return $this->intervenant;
+        }
+    }
 
     /**
      * @var Utilisateur[]
      */
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\All([new Assert\Type(Utilisateur::class)])]
-    public array $beneficiaires;
+    public array $beneficiaires = [] {
+        get {
+            if (empty($this->beneficiaires) && $this->entity !== null) {
+                $this->beneficiaires = array_map(
+                    fn($b) => new Utilisateur($b->getUtilisateur()),
+                    $this->entity->getBeneficiaires()->toArray(),
+                );
+            }
+            return $this->beneficiaires ?? [];
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotNull]
-    public PeriodeRH $periode;
+    public ?PeriodeRH $periode = null {
+        get {
+            if ($this->periode === null && $this->entity !== null && $this->entity->getPeriode()) {
+                $this->periode = new PeriodeRH($this->entity->getPeriode());
+            }
+            return $this->periode;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotNull]
-    public TypeEvenement $type;
+    public ?TypeEvenement $type = null {
+        get {
+            if ($this->type === null && $this->entity !== null && $this->entity->getType()) {
+                $this->type = new TypeEvenement($this->entity->getType());
+            }
+            return $this->type;
+        }
+    }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank]
@@ -106,15 +145,62 @@ class InterventionForfait
     #[Assert\Type('numeric')]
     #[Assert\LessThan(10000)] //decimal(5,1)
     #[Assert\Positive]
-    public string $heures;
+    public ?string $heures = null {
+        get {
+            if ($this->heures === null && $this->entity !== null) {
+                $this->heures = $this->entity->getHeures() ?? '0';
+            }
+            return $this->heures;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
-    public ?DateTimeInterface $dateCreation = null;
+    public ?DateTimeInterface $dateCreation = null {
+        get {
+            if ($this->dateCreation === null && $this->entity !== null) {
+                $this->dateCreation = $this->entity->getDateCreation();
+            }
+            return $this->dateCreation ?? null;
+        }
+    }
     #[Groups([self::GROUP_OUT])]
-    public Utilisateur $utilisateurCreation;
+    public ?Utilisateur $utilisateurCreation = null {
+        get {
+            if (
+                $this->utilisateurCreation === null
+                && $this->entity !== null
+                && $this->entity->getUtilisateurCreation()
+            ) {
+                $this->utilisateurCreation = new Utilisateur($this->entity->getUtilisateurCreation());
+            }
+            return $this->utilisateurCreation;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
-    public ?DateTimeInterface $dateModification = null;
+    public ?DateTimeInterface $dateModification = null {
+        get {
+            if ($this->dateModification === null && $this->entity !== null) {
+                $this->dateModification = $this->entity->getDateModification();
+            }
+            return $this->dateModification ?? null;
+        }
+    }
     #[Groups([self::GROUP_OUT])]
-    public ?Utilisateur $utilisateurModification = null;
+    public ?Utilisateur $utilisateurModification = null {
+        get {
+            if (
+                $this->utilisateurModification === null
+                && $this->entity !== null
+                && $this->entity->getUtilisateurModification()
+            ) {
+                $this->utilisateurModification = new Utilisateur($this->entity->getUtilisateurModification());
+            }
+            return $this->utilisateurModification ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\InterventionForfait $entity = null,
+    ) {}
 }

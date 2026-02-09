@@ -20,31 +20,63 @@ use App\State\OptionReponse\OptionReponseProvider;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
-#[ApiResource(
-    operations  : [
-        new Get(
-            uriTemplate : self::ITEM_URI,
-            uriVariables: ['id', 'questionId'],
-            openapi     : false,
-            provider    : OptionReponseProvider::class
-        ),
-    ],
-    stateOptions: new Options(entityClass: \App\Entity\OptionReponse::class)
-)]
+#[ApiResource(operations: [
+    new Get(
+        uriTemplate: self::ITEM_URI,
+        uriVariables: ['id', 'questionId'],
+        openapi: false,
+        provider: OptionReponseProvider::class,
+    ),
+], stateOptions: new Options(entityClass: \App\Entity\OptionReponse::class))]
 class OptionReponse
 {
     public const string ITEM_URI = '/questions/{questionId}/options/{id}';
 
     #[ApiProperty(identifier: true)]
     #[Groups([Question::GROUP_OUT, Reponse::GROUP_OUT, Demande::GROUP_OUT])]
-    public ?int $id = null;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Ignore]
-    public int $questionId;
+    public ?int $questionId = null {
+        get {
+            if ($this->questionId === null && $this->entity !== null) {
+                $this->questionId = $this->entity->getQuestion()->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Groups([Question::GROUP_OUT, Reponse::GROUP_OUT, Demande::GROUP_OUT])]
-    public string $libelle;
+    public ?string $libelle = null {
+        get {
+            if ($this->libelle === null && $this->entity !== null) {
+                $this->libelle = $this->entity->getLibelle();
+            }
+            return $this->libelle ?? null;
+        }
+    }
 
     #[Groups([Question::GROUP_OUT, Reponse::GROUP_OUT])]
-    public array $questionsLiees;
+    public ?array $questionsLiees = null {
+        get {
+            if ($this->questionsLiees === null && $this->entity !== null) {
+                $this->questionsLiees = array_map(
+                    fn($entity) => new Question($entity),
+                    $this->entity->getQuestionsLiees()->toArray(),
+                );
+            }
+            return $this->questionsLiees ?? [];
+        }
+    }
+
+    public function __construct(
+        private readonly ?\App\Entity\OptionReponse $entity = null,
+    ) {}
 }

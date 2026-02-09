@@ -29,40 +29,31 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
-    operations            : [
+    operations: [
         new Post(
             uriTemplate: self::COLLECTION_URI,
-            controller : EnvoiPjAction::class,
-            openapi    : new Operation(
-                requestBody: new RequestBody(
-                    content: new ArrayObject([
-                        'multipart/form-data' => [
-                            'schema' => [
-                                'type' => 'object',
-                                'properties' => [
-                                    'file' => [
-                                        'type' => 'string',
-                                        'format' => 'binary',
-                                    ],
-                                ],
+            controller: EnvoiPjAction::class,
+            openapi: new Operation(requestBody: new RequestBody(content: new ArrayObject([
+                'multipart/form-data' => [
+                    'schema' => [
+                        'type' => 'object',
+                        'properties' => [
+                            'file' => [
+                                'type' => 'string',
+                                'format' => 'binary',
                             ],
                         ],
-                    ])
-                )
-            ),
-            security   : "is_granted('ROLE_GESTIONNAIRE') or is_granted('ROLE_RENFORT_DEMANDES') or is_granted('ROLE_DEMANDEUR')",
-            deserialize: false
+                    ],
+                ],
+            ]))),
+            security: "is_granted('ROLE_GESTIONNAIRE') or is_granted('ROLE_RENFORT_DEMANDES') or is_granted('ROLE_DEMANDEUR')",
+            deserialize: false,
         ),
-        new Get(
-            uriTemplate: self::ITEM_URI,
-            security   : "is_granted('" . Fichier::VOIR_FICHIER . "', object)"
-        ),
+        new Get(uriTemplate: self::ITEM_URI, security: "is_granted('" . Fichier::VOIR_FICHIER . "', object)"),
     ],
-    normalizationContext  : ['groups' => [self::GROUP_OUT]],
+    normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
-    provider              : TelechargementProvider::class,
-    processor             : TelechargementProcessor::class,
-    stateOptions          : new Options(entityClass: Fichier::class)
+    stateOptions: new Options(entityClass: Fichier::class),
 )]
 #[NoVirusConstraint]
 class Telechargement
@@ -73,20 +64,59 @@ class Telechargement
     public const string GROUP_OUT = 'telechargement:out';
 
     #[ApiProperty(identifier: true)]
-    public ?string $id = null;
+    public ?string $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Groups(self::GROUP_OUT)]
-    public Utilisateur $proprietaire;
+    public ?Utilisateur $proprietaire = null {
+        get {
+            if ($this->proprietaire === null && $this->entity !== null) {
+                $this->proprietaire = new Utilisateur($this->entity->getProprietaire());
+            }
+            return $this->proprietaire ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_IN])]
     public UploadedFile $file;
 
     #[Groups([self::GROUP_OUT])]
-    public string $nom;
+    public ?string $nom = null {
+        get {
+            if ($this->nom === null && $this->entity !== null) {
+                $this->nom = $this->entity->getNom();
+            }
+            return $this->nom ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
-    public string $typeMime;
+    public ?string $typeMime = null {
+        get {
+            if ($this->typeMime === null && $this->entity !== null) {
+                $this->typeMime = $this->entity->getTypeMime();
+            }
+            return $this->typeMime ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
-    public string $urlContenu;
+    public ?string $urlContenu = null {
+        get {
+            if ($this->urlContenu === null && $this->entity !== null) {
+                $this->urlContenu = '/fichiers/' . $this->id; //en dur, c'est moche
+            }
+            return $this->urlContenu ?? null;
+        }
+    }
+
+    public function __construct(
+        private readonly Fichier $entity,
+    ) {}
 }

@@ -31,17 +31,16 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 class AmenagementProcessor implements ProcessorInterface
 {
-
     use AnneeUniversitaireAwareTrait;
 
-    public function __construct(private readonly AmenagementRepository          $amenagementRepository,
-                                private readonly TypeAmenagementRepository      $typeAmenagementRepository,
-                                private readonly TypeSuiviAmenagementRepository $typeSuiviAmenagementRepository,
-                                private readonly UtilisateurManager             $utilisateurManager,
-                                private readonly TransformerService             $transformerService,
-                                private readonly MessageBusInterface            $messageBus)
-    {
-    }
+    public function __construct(
+        private readonly AmenagementRepository $amenagementRepository,
+        private readonly TypeAmenagementRepository $typeAmenagementRepository,
+        private readonly TypeSuiviAmenagementRepository $typeSuiviAmenagementRepository,
+        private readonly UtilisateurManager $utilisateurManager,
+        private readonly TransformerService $transformerService,
+        private readonly MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param Amenagement $data
@@ -51,7 +50,8 @@ class AmenagementProcessor implements ProcessorInterface
      * @return void
      * @throws ErreurLdapException
      */
-    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
+    #[Override]
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
         if (null !== $data->id) {
             $entity = $this->amenagementRepository->find($data->id);
@@ -76,14 +76,14 @@ class AmenagementProcessor implements ProcessorInterface
                 true => $this->getDebutSemestre1(),
                 false => $this->getDebutSemestre2(),
             },
-            default => $data->debut
+            default => $data->debut,
         };
         $fin = match ($data->debut) {
             null => match ($data->semestre2) {
                 true => $this->getFinSemestre2(),
                 false => $this->getFinSemestre1(),
             },
-            default => $data->fin
+            default => $data->fin,
         };
         if (null === $data->fin && $data->typeAmenagement->examens) {
             //on force la fin d'année pour les aménagements d'examens
@@ -98,13 +98,13 @@ class AmenagementProcessor implements ProcessorInterface
         $entity->setType($this->typeAmenagementRepository->find($data->typeAmenagement->id));
         $entity->setSuivi(match ($data->suivi) {
             null => null,
-            default => $this->typeSuiviAmenagementRepository->find($data->suivi->id)
+            default => $this->typeSuiviAmenagementRepository->find($data->suivi->id),
         });
 
         /**
          * Ajout/modification des bénéficiaires actifs pour l'utilisateur!
          */
-        $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']);//sur POST c'est pas rempli...
+        $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']); //sur POST c'est pas rempli...
         foreach ($utilisateur->getBeneficiaires() as $beneficiaire) {
             if ($entity->canHaveBeneficiaire($beneficiaire)) {
                 $entity->addBeneficiaire($beneficiaire);
@@ -114,7 +114,7 @@ class AmenagementProcessor implements ProcessorInterface
         $this->amenagementRepository->save($entity, true);
         $this->messageBus->dispatch(new AmenagementModifieMessage($entity));
 
-        $resource = $this->transformerService->transform($entity, Amenagement::class);
+        $resource = new Amenagement($entity);
         if (null !== $data->id) {
             $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
         } else {
@@ -123,5 +123,4 @@ class AmenagementProcessor implements ProcessorInterface
 
         return $resource;
     }
-
 }

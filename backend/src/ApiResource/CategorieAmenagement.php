@@ -43,7 +43,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     'typesAmenagement.pedagogique',
     'typesAmenagement.aideHumaine',
 ])]
-#[Map(target: \App\Entity\CategorieAmenagement::class)]
+#[Map(target: \App\Entity\CategorieAmenagement::class, transform: [self::class, 'toEntity'])]
 class CategorieAmenagement
 {
     public const string COLLECTION_URI = '/categories_amenagements';
@@ -83,4 +83,15 @@ class CategorieAmenagement
     public function __construct(
         private readonly ?\App\Entity\CategorieAmenagement $entity,
     ) {}
+
+    public static function toEntity(self $resource): \App\Entity\CategorieAmenagement
+    {
+        if ($resource->entity === null) {
+            $entity = new \App\Entity\CategorieAmenagement();
+            $entity->setActif($resource->actif);
+            $entity->setLibelle($resource->libelle);
+            return $entity;
+        }
+        return $resource->entity;
+    }
 }

@@ -13,11 +13,17 @@
 namespace App\Entity;
 
 use App\Repository\OptionReponseRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: OptionReponseRepository::class)]
+#[Map(target: \App\ApiResource\OptionReponse::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class OptionReponse
 {
     public const int OPTION_DEMANDE_ACCOMPAGNEMENT_OUI = -1;
@@ -26,16 +32,20 @@ class OptionReponse
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\ManyToOne(inversedBy: 'optionsReponse')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?Question $question = null;
 
     #[ORM\ManyToMany(targetEntity: Question::class)]
+    #[Map(if: false)]
     private Collection $questionsLiees;
 
     public function __construct()

@@ -42,25 +42,25 @@ class ReponseProcessor implements ProcessorInterface
 {
     use ClockAwareTrait;
 
-    public function __construct(private readonly ReponseRepository       $reponseRepository,
-                                private readonly DemandeRepository       $demandeRepository,
-                                private readonly QuestionRepository      $questionRepository,
-                                private readonly OptionReponseRepository $optionReponseRepository,
-                                private readonly FichierRepository       $fichierRepository,
-                                private readonly EtatDemandeRepository   $etatDemandeRepository,
-                                private readonly OptionReponseProvider   $optionReponseProvider,
-                                private readonly TransformerService      $transformerService,
-                                private readonly MessageBusInterface     $messageBus,
-                                private readonly Security                $security)
-    {
-    }
+    public function __construct(
+        private readonly ReponseRepository $reponseRepository,
+        private readonly DemandeRepository $demandeRepository,
+        private readonly QuestionRepository $questionRepository,
+        private readonly OptionReponseRepository $optionReponseRepository,
+        private readonly FichierRepository $fichierRepository,
+        private readonly EtatDemandeRepository $etatDemandeRepository,
+        private readonly OptionReponseProvider $optionReponseProvider,
+        private readonly MessageBusInterface $messageBus,
+        private readonly Security $security,
+    ) {}
 
     /**
      * @param Reponse $data
      * @throws Exception
      * @throws ExceptionInterface
      */
-    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Reponse
+    #[Override]
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Reponse
     {
         $demande = $this->demandeRepository->find($uriVariables['demandeId']);
         $question = $this->questionRepository->find($uriVariables['questionId']);
@@ -68,13 +68,11 @@ class ReponseProcessor implements ProcessorInterface
         /**
          * Support de PUT uniquement
          */
-        $reponse = $this->reponseRepository->findOneBy(
-            [
-                'campagne' => $demande->getCampagne(),
-                'question' => $question,
-                'repondant' => $demande->getDemandeur(),
-            ]
-        );
+        $reponse = $this->reponseRepository->findOneBy([
+            'campagne' => $demande->getCampagne(),
+            'question' => $question,
+            'repondant' => $demande->getDemandeur(),
+        ]);
 
         $new = false;
         if (!$reponse) {
@@ -82,8 +80,10 @@ class ReponseProcessor implements ProcessorInterface
             $new = true;
         }
 
-
-        $optionEntites = array_map(fn($option) => $this->optionReponseRepository->find($option->id), $data->optionsChoisies);
+        $optionEntites = array_map(
+            fn($option) => $this->optionReponseRepository->find($option->id),
+            $data->optionsChoisies,
+        );
 
         $reponse->setCampagne($demande->getCampagne());
         $reponse->setQuestion($question);
@@ -91,8 +91,10 @@ class ReponseProcessor implements ProcessorInterface
         $reponse->setRepondant($demande->getDemandeur());
         $reponse->setDateModification(new DatePoint());
 
-        if (null === ($tableName = $reponse->getQuestion()->getTableOptions())
-            || $reponse->getQuestion()->getTypeReponse() === Question::TYPE_TEXT) {
+        if (
+            null === ($tableName = $reponse->getQuestion()->getTableOptions())
+            || $reponse->getQuestion()->getTypeReponse() === Question::TYPE_TEXT
+        ) {
             /**
              * Cas des questions avec options "classiques"
              */
@@ -108,25 +110,27 @@ class ReponseProcessor implements ProcessorInterface
             /**
              * Cas des questions avec options basées sur une table de ref
              */
-            $reponse = $this->optionReponseProvider->majReponseAvecOptions($reponse, $tableName, $data->optionsChoisies);
+            $reponse = $this->optionReponseProvider->majReponseAvecOptions(
+                $reponse,
+                $tableName,
+                $data->optionsChoisies,
+            );
         }
 
         /**
          * Fichiers attachés
          */
-        $reponse->setPiecesJustificatives(
-            array_map(
-                fn(Telechargement $pj) => $this->fichierRepository->find($pj->id),
-                $data->piecesJustificatives
-            )
-        );
+        $reponse->setPiecesJustificatives(array_map(
+            fn(Telechargement $pj) => $this->fichierRepository->find($pj->id),
+            $data->piecesJustificatives,
+        ));
 
         $this->reponseRepository->save($reponse, true);
 
         /**
          * Est-ce qu'on a validé tout le questionnaire?
          */
-        $demandeResource = $this->transformerService->transform($demande, Demande::class);
+        $demandeResource = new Demande($demande);
         if ($question->getTypeReponse() == Question::TYPE_SUBMIT) {
             //vérification faite en amont par ValidationDemandePossibleConstraintValidator
             $etatPrecedent = $demande->getEtat();
@@ -134,22 +138,22 @@ class ReponseProcessor implements ProcessorInterface
             $demande->setDateDepot($this->now());
             $this->demandeRepository->save($demande, true);
 
-            $this->messageBus->dispatch(new EtatDemandeModifieMessage(
+            $this->messageBus->dispatch(
+                new EtatDemandeModifieMessage(
                     $demande->getId(),
                     $etatPrecedent->getId(),
                     $demande->getEtat()->getId(),
                     $this->security->getuser()->getUserIdentifier(),
                     null,
-                    null
-                )
+                    null,
+                ),
             );
-
         }
 
         //la demande doit être invalidée dans tous les cas - recalcul du champ 'complete"
         $this->messageBus->dispatch(new RessourceModifieeMessage($demandeResource));
 
-        $resource = $this->transformerService->transform($reponse, Reponse::class);
+        $resource = new Reponse($reponse);
         if ($new) {
             $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
         } else {

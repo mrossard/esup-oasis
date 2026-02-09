@@ -29,6 +29,7 @@ use App\Validator\BeneficiaireDifferentGestionnaireContraint;
 use App\Validator\BeneficiaireSupprimableConstraint;
 use App\Validator\ProfilAvecTypologieConstraint;
 use DateTimeInterface;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -113,9 +114,9 @@ final class BeneficiaireProfil
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank(groups: [self::GROUP_VALIDATION_IN])]
-    public DateTimeInterface $debut {
+    public ?DateTimeInterface $debut = null {
         get {
-            if (!isset($this->debut) && $this->entity !== null) {
+            if ($this->debut === null && $this->entity !== null) {
                 $this->debut = $this->entity->getDebut();
             }
             return $this->debut;
@@ -134,9 +135,9 @@ final class BeneficiaireProfil
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank(groups: [self::GROUP_VALIDATION_IN])]
-    public Utilisateur $gestionnaire {
+    public ?Utilisateur $gestionnaire = null {
         get {
-            if (!isset($this->gestionnaire) && $this->entity !== null && $this->entity->getGestionnaire()) {
+            if ($this->gestionnaire === null && $this->entity !== null) {
                 $this->gestionnaire = new Utilisateur($this->entity->getGestionnaire());
             }
             return $this->gestionnaire;
@@ -154,7 +155,7 @@ final class BeneficiaireProfil
             if (!isset($this->typologies) && $this->entity !== null) {
                 $this->typologies = array_map(
                     fn($t) => new TypologieHandicap($t),
-                    $this->entity->getTypologies()->toArray()
+                    $this->entity->getTypologies()->toArray(),
                 );
             }
             return $this->typologies ?? [];
@@ -172,7 +173,6 @@ final class BeneficiaireProfil
     }
 
     public function __construct(
-        private readonly ?\App\Entity\Beneficiaire $entity = null,
-    ) {
-    }
+        private readonly ?Beneficiaire $entity = null,
+    ) {}
 }

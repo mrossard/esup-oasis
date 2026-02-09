@@ -149,7 +149,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(EtatDecisionAmenagementFilter::class)]
 #[ApiFilter(UtilisateurRoleFilter::class)]
 #[NumeroAnonymeUniqueConstraint]
-#[Map(target: \App\Entity\Utilisateur::class)]
 final class Utilisateur
 {
     public const string COLLECTION_URI = '/utilisateurs';

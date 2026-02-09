@@ -14,47 +14,68 @@ namespace App\ApiResource;
 
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
-use App\State\TransformerService;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource(
-    operations: [new Get()],
-    openapi   : false
-)]
+#[ApiResource(operations: [new Get()], openapi: false)]
 class ReponseDemande
 {
-    public int $id;
+    public ?int $id = null {
+        get {
+            if ($this->id === null && $this->entity !== null) {
+                $this->id = $this->entity->getId();
+            }
+            return $this->id ?? null;
+        }
+    }
 
     #[Groups([Demande::GROUP_OUT])]
-    public ?string $commentaire;
+    public ?string $commentaire = null {
+        get {
+            if ($this->commentaire === null && $this->entity !== null) {
+                $this->commentaire = $this->entity->getCommentaire();
+            }
+            return $this->commentaire ?? null;
+        }
+    }
+
     /**
      * @var OptionReponse[]
      */
     #[Groups([Demande::GROUP_OUT])]
-    public array $optionsReponses;
+    public ?array $optionsReponses = null {
+        get {
+            if ($this->optionsReponses === null && $this->entity !== null) {
+                $this->optionsReponses = array_map(
+                    fn($option) => new OptionReponse($option),
+                    $this->entity->getOptionsChoisiesTousTypes(),
+                );
+                //on ajoute l'id de question qui manque...
+                array_walk(
+                    $this->optionsReponses,
+                    fn($option) => $option->questionId = $this->entity->getQuestion()->getId(),
+                );
+            }
+            return $this->optionsReponses ?? [];
+        }
+    }
 
     /**
      * @var Telechargement[]
      */
     #[Groups([Demande::GROUP_OUT])]
-    public array $piecesJustificatives;
-
-    function __construct(\App\Entity\Reponse $reponse, private readonly TransformerService $transformerService)
-    {
-        $this->id = $reponse->getId();
-        $this->commentaire = $reponse->getCommentaire();
-        $this->optionsReponses = array_map(
-            fn($option) => $this->transformerService->transform($option, OptionReponse::class),
-            $reponse->getOptionsChoisiesTousTypes()
-        );
-
-        $this->piecesJustificatives = array_map(
-            fn($pj) => $this->transformerService->transform($pj, Telechargement::class),
-            $reponse->getPiecesJustificatives()->toArray()
-        );
-
-        //on ajoute l'id de question qui manque...
-        array_walk($this->optionsReponses, fn($option) => $option->questionId = $reponse->getQuestion()->getId());
+    public ?array $piecesJustificatives = null {
+        get {
+            if ($this->piecesJustificatives === null && $this->entity !== null) {
+                $this->piecesJustificatives = array_map(
+                    fn($pj) => new Telechargement($pj),
+                    $this->entity->getPiecesJustificatives()->toArray(),
+                );
+            }
+            return $this->piecesJustificatives ?? [];
+        }
     }
 
+    public function __construct(
+        private ?\App\Entity\Reponse $entity = null,
+    ) {}
 }

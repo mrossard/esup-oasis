@@ -36,16 +36,16 @@ class InterventionForfaitProcessor implements ProcessorInterface
     use ClockAwareTrait;
     use MajBeneficiairesTrait;
 
-    public function __construct(private readonly InterventionForfaitRepository $repository,
-                                private readonly PeriodeRHRepository           $periodeRHRepository,
-                                private readonly TypeEvenementRepository       $typeEvenementRepository,
-                                private readonly UtilisateurManager            $utilisateurManager,
-                                private readonly UtilisateurRepository         $utilisateurRepository,
-                                private readonly TransformerService            $transformerService,
-                                private readonly MessageBusInterface           $messageBus,
-                                private readonly Security                      $security)
-    {
-    }
+    public function __construct(
+        private readonly InterventionForfaitRepository $repository,
+        private readonly PeriodeRHRepository $periodeRHRepository,
+        private readonly TypeEvenementRepository $typeEvenementRepository,
+        private readonly UtilisateurManager $utilisateurManager,
+        private readonly UtilisateurRepository $utilisateurRepository,
+        private readonly TransformerService $transformerService,
+        private readonly MessageBusInterface $messageBus,
+        private readonly Security $security,
+    ) {}
 
     /**
      * @param InterventionForfait $data
@@ -56,8 +56,12 @@ class InterventionForfaitProcessor implements ProcessorInterface
      * @throws ErreurLdapException
      * @throws ExceptionInterface
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?InterventionForfait
-    {
+    public function process(
+        mixed $data,
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): ?InterventionForfait {
         if (null !== $data->id) {
             $entity = $this->repository->find($data->id);
             $entity->setDateModification($this->now());
@@ -76,14 +80,14 @@ class InterventionForfaitProcessor implements ProcessorInterface
 
         $entity->setPeriode($this->periodeRHRepository->find($data->periode->id));
         $entity->setType($this->typeEvenementRepository->find($data->type->id));
-        $entity->setIntervenant(($this->utilisateurManager->parUid($data->intervenant->uid))->getIntervenant());
+        $entity->setIntervenant($this->utilisateurManager->parUid($data->intervenant->uid)->getIntervenant());
         $entity->setHeures($data->heures);
 
         $this->majBeneficiaires($data->beneficiaires ?? [], $entity);
 
         $this->repository->save($entity, true);
 
-        $resource = $this->transformerService->transform($entity, InterventionForfait::class);
+        $resource = new InterventionForfait($entity);
         if (null !== $data->id) {
             $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
         } else {

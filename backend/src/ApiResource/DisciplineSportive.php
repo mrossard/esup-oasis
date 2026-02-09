@@ -75,7 +75,7 @@ class DisciplineSportive
             if (null === $this->actif && $this->entity !== null) {
                 return $this->entity->isActif() ?? true;
             }
-            return $this->actif;
+            return $this->actif ?? true;
         }
     }
 

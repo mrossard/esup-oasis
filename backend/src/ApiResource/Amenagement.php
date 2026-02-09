@@ -45,28 +45,28 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: ['uid'],
-            security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))",
+            security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.attributes.get('uid'))",
         ),
         new GetCollection(
             uriTemplate: '/amenagements',
             security: "is_granted('" . self::VOIR_AMENAGEMENTS . "')",
             provider: AmenagementSansFiltreProvider::class,
         ),
-        new Post(uriTemplate: self::COLLECTION_URI, uriVariables: ['uid'], read: false),
+        new Post(uriTemplate: self::COLLECTION_URI, uriVariables: ['uid'], read: false, map: false),
         new Get(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
-            security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))",
+            security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.attributes.get('uid'))",
         ),
         new Patch(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
-            security: "is_granted('" . self::MODIFIER_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))",
+            security: "is_granted('" . self::MODIFIER_AMENAGEMENTS_UTILISATEUR . "', request.attributes.get('uid'))",
         ),
         new Delete(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
-            security: "is_granted('" . self::MODIFIER_AMENAGEMENTS_UTILISATEUR . "', request.get('uid'))",
+            security: "is_granted('" . self::MODIFIER_AMENAGEMENTS_UTILISATEUR . "', request.attributes.get('uid'))",
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
@@ -111,6 +111,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     ],
 ])]
 #[AmenagementDatesConstraint]
+//#[Map(target: \App\Entity\Amenagement::class, transform: [self::class, 'toEntity'])]
 class Amenagement
 {
     public const string COLLECTION_URI = '/utilisateurs/{uid}/amenagements';
@@ -139,10 +140,10 @@ class Amenagement
                 // Logic from Provider
                 $beneficiaires = $this->entity->getBeneficiaires();
                 if ($beneficiaires->count() > 0) {
-                     $firstBenef = $beneficiaires->current();
-                     if ($firstBenef) {
-                         $this->uid = $firstBenef->getUtilisateur()->getUid();
-                     }
+                    $firstBenef = $beneficiaires->current();
+                    if ($firstBenef) {
+                        $this->uid = $firstBenef->getUtilisateur()->getUid();
+                    }
                 }
             }
             return $this->uid ?? null;
@@ -155,18 +156,18 @@ class Amenagement
             if (!isset($this->beneficiaire) && $this->entity !== null) {
                 $beneficiaires = $this->entity->getBeneficiaires();
                 if ($beneficiaires->count() > 0) {
-                     $firstBenef = $beneficiaires->current();
-                     if ($firstBenef) {
-                         $user = $firstBenef->getUtilisateur();
-                         $this->beneficiaire = new Utilisateur($user);
-                         
-                         $derniereInscription = $user->getDerniereInscription();
-                         if ($derniereInscription) {
-                             $this->beneficiaire->inscriptions = [new Inscription($derniereInscription)];
-                         } else {
-                             $this->beneficiaire->inscriptions = [];
-                         }
-                     }
+                    $firstBenef = $beneficiaires->current();
+                    if ($firstBenef) {
+                        $user = $firstBenef->getUtilisateur();
+                        $this->beneficiaire = new Utilisateur($user);
+
+                        $derniereInscription = $user->getDerniereInscription();
+                        if ($derniereInscription) {
+                            $this->beneficiaire->inscriptions = [new Inscription($derniereInscription)];
+                        } else {
+                            $this->beneficiaire->inscriptions = [];
+                        }
+                    }
                 }
             }
             return $this->beneficiaire;
@@ -196,7 +197,7 @@ class Amenagement
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     public bool $semestre2 = false {
         get {
-             if ($this->entity !== null) {
+            if ($this->entity !== null) {
                 return $this->entity->isSemestre2() ?? false;
             }
             return $this->semestre2;
@@ -206,7 +207,7 @@ class Amenagement
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     public ?DateTimeInterface $debut = null {
         get {
-             if (!isset($this->debut) && $this->entity !== null) {
+            if (!isset($this->debut) && $this->entity !== null) {
                 $this->debut = $this->entity->getDebut();
             }
             return $this->debut ?? null;
@@ -216,7 +217,7 @@ class Amenagement
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     public ?DateTimeInterface $fin = null {
         get {
-             if (!isset($this->fin) && $this->entity !== null) {
+            if (!isset($this->fin) && $this->entity !== null) {
                 $this->fin = $this->entity->getFin();
             }
             return $this->fin ?? null;
@@ -226,7 +227,7 @@ class Amenagement
     #[Groups([self::GROUP_OUT, self::GROUP_IN, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
     public ?string $commentaire = null {
         get {
-             if (!isset($this->commentaire) && $this->entity !== null) {
+            if (!isset($this->commentaire) && $this->entity !== null) {
                 $this->commentaire = $this->entity->getCommentaire();
             }
             return $this->commentaire ?? null;
@@ -245,6 +246,5 @@ class Amenagement
 
     public function __construct(
         private readonly ?\App\Entity\Amenagement $entity = null,
-    ) {
-    }
+    ) {}
 }

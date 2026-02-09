@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\State\TypeEvenement\TypeEvenementProcessor;
 use App\State\TypeEvenement\TypeEvenementProvider;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -46,8 +47,8 @@ use Symfony\Component\Validator\Constraints as Assert;
                 description: "Retourne le détail du type d'événements demandé",
             ),
         ),
-        new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_ADMIN')"),
-        new Patch(uriTemplate: self::ITEM_URI, security: "is_granted('ROLE_ADMIN')"),
+        new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_ADMIN')", map: false),
+        new Patch(uriTemplate: self::ITEM_URI, security: "is_granted('ROLE_ADMIN')", map: false),
     ],
     normalizationContext: ['groups' => self::GROUP_OUT],
     denormalizationContext: ['groups' => self::GROUP_IN],
@@ -132,7 +133,7 @@ final class TypeEvenement
             if (empty($this->tauxHoraires) && $this->entity !== null) {
                 $this->tauxHoraires = array_map(
                     fn($entity) => new TauxHoraire($entity),
-                    $this->entity->getTauxHoraires()->toArray()
+                    $this->entity->getTauxHoraires()->toArray(),
                 );
             }
             return $this->tauxHoraires;
@@ -162,6 +163,5 @@ final class TypeEvenement
 
     public function __construct(
         private readonly ?\App\Entity\TypeEvenement $entity = null,
-    ) {
-    }
+    ) {}
 }

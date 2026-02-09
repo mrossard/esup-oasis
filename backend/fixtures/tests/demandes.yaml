@@ -1,0 +1,6 @@
+App\Entity\Demande:
+  demande_receptionnee_1:
+    campagne: '@campagne1_sportifs'
+    demandeur: '@demandeur'
+    etat: '@demande_receptionnee'
+    dateDepot: <date_create('2030-01-15 10:00:00')>

@@ -14,18 +14,18 @@ namespace App\MessageHandler;
 
 use App\Message\RessourceModifieeMessage;
 use App\Service\HttpCacheInvalidator;
+use Symfony\Component\DependencyInjection\Attribute\WhenNot;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
 readonly class RessourceModifieeMessageHandler
 {
-    public function __construct(private HttpCacheInvalidator $httpCacheInvalidator)
-    {
-    }
+    public function __construct(
+        private HttpCacheInvalidator $httpCacheInvalidator,
+    ) {}
 
     public function __invoke(RessourceModifieeMessage $message): void
     {
         $this->httpCacheInvalidator->invalidateRessource($message->getResource());
     }
-
 }

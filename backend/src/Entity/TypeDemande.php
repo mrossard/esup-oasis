@@ -13,39 +13,50 @@
 namespace App\Entity;
 
 use App\Repository\TypeDemandeRepository;
+use App\State\EntityToResourceTransformer;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TypeDemandeRepository::class)]
+#[Map(target: \App\ApiResource\TypeDemande::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class TypeDemande
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\ManyToMany(targetEntity: EtapeDemande::class, mappedBy: 'demande')]
     #[ORM\OrderBy(['ordre' => 'asc'])]
+    #[Map(if: false)]
     private Collection $etapes;
 
-    #[ORM\OneToMany(mappedBy: 'typeDemande', targetEntity: CampagneDemande::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: CampagneDemande::class, mappedBy: 'typeDemande', orphanRemoval: true)]
+    #[Map(if: false)]
     private Collection $campagnes;
 
     #[ORM\ManyToMany(targetEntity: ProfilBeneficiaire::class, inversedBy: 'typesDemandes')]
+    #[Map(if: false)]
     private Collection $profilsAssocies;
 
     #[ORM\Column(options: ['default' => true])]
+    #[Map(if: false)]
     private ?bool $actif = true;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private ?bool $visibiliteLimitee = false;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private ?bool $accompagnementOptionnel = false;
 
     public function __construct()

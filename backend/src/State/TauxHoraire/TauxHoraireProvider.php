@@ -48,26 +48,14 @@ class TauxHoraireProvider extends AbstractEntityProvider
         );
 
         //devrait être une contrainte de validation
-        if ($taux->typeId !== $uriVariables['typeId']) {
+        if ($taux->typeId !== (int)$uriVariables['typeId']) {
             throw new UnprocessableEntityHttpException($uriVariables['typeId'] . " n'a pas de taux d'id " . $uriVariables['id']);
         }
         return $taux;
     }
 
-    /**
-     * @param \App\Entity\TauxHoraire $entity
-     * @return TauxHoraire
-     */
     public function transform($entity): TauxHoraire
     {
-        $resource = new TauxHoraire();
-        $resource->id = $entity->getId();
-        $resource->montant = $entity->getMontant();
-        $resource->typeId = $entity->getTypeEvenement()->getId();
-        $resource->debut = $entity->getDebut();
-        $resource->fin = $entity->getFin();
-        $resource->typeEvenement = new TypeEvenement();
-        $resource->typeEvenement->id = $resource->typeId;
-        return $resource;
+        return new TauxHoraire($entity);
     }
 }

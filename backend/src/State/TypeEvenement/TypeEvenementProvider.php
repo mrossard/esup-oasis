@@ -12,27 +12,45 @@
 
 namespace App\State\TypeEvenement;
 
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TauxHoraire;
 use App\ApiResource\TypeEvenement;
-use App\State\AbstractEntityProvider;
 use Exception;
 use Override;
 use Symfony\Component\Clock\ClockAwareTrait;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class TypeEvenementProvider extends AbstractEntityProvider
+class TypeEvenementProvider implements ProviderInterface
 {
-
     use ClockAwareTrait;
 
-    #[Override] public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private readonly ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private readonly ProviderInterface $collectionProvider,
+    ) {}
+
+    #[Override]
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         //on ajoute un tri par défaut sur les libellés
         if (null == ($context['filters']['order'] ?? null)) {
             $context['filters']['order']['libelle'] = 'asc';
         }
+        if ($operation instanceof GetCollection) {
+            $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            return array_map($this->transform(...), $results);
+        }
 
-        return parent::provide($operation, $uriVariables, $context);
+        $typeEvenement = $this->itemProvider->provide($operation, $uriVariables, $context);
+
+        return match ($typeEvenement) {
+            null => null,
+            default => $this->transform($typeEvenement),
+        };
     }
 
     /**
@@ -42,36 +60,18 @@ class TypeEvenementProvider extends AbstractEntityProvider
      */
     public function transform($entity): TypeEvenement
     {
-        $resource = new TypeEvenement();
-        $resource->id = $entity->getId();
-        $resource->libelle = $entity->getLibelle();
-        $resource->actif = $entity->isActif();
-        $resource->couleur = $entity->getCouleur();
-        $resource->avecValidation = $entity->isAvecValidation();
-        $resource->visibleParDefaut = $entity->isVisibleParDefaut();
-        $resource->forfait = $entity->isForfait();
+        $resource = new TypeEvenement($entity);
 
-        $resource->tauxHoraires = array_map(
-            fn($taux) => $this->transformerService->transform($taux, TauxHoraire::class),
-            $entity->getTauxHoraires()->toArray()
-        );
+        $resource->tauxHoraires = array_map(fn($taux) => new TauxHoraire($taux), $entity->getTauxHoraires()->toArray());
 
-        $resource->tauxActif = array_reduce($entity->getTauxHoraires()->toArray(),
-            fn($carry, \App\Entity\TauxHoraire $taux) => match (true) {
-                $taux->getDebut() <= $this->now() && (null == $taux->getFin() || $taux->getFin() > $this->now()) => $this->transformerService->transform($taux, TauxHoraire::class),
-                default => null
-            }
-        );
+        $resource->tauxActif = array_reduce($entity->getTauxHoraires()->toArray(), fn(
+            $carry,
+            \App\Entity\TauxHoraire $taux,
+        ) => match (true) {
+            $taux->getDebut() <= $this->now() && (null == $taux->getFin() || $taux->getFin() > $this->now())
+                => new TauxHoraire($taux),
+            default => null,
+        });
         return $resource;
-    }
-
-    protected function getResourceClass(): string
-    {
-        return TypeEvenement::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\TypeEvenement::class;
     }
 }

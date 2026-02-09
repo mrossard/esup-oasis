@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Patch;
 use App\State\DecisionAmenagementExamens\DecisionAmenagementExamensProcessor;
 use App\State\DecisionAmenagementExamens\DecisionAmenagementExamensProvider;
 use App\Validator\EtatDecisionValideConstraint;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 
@@ -42,6 +43,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     processor             : DecisionAmenagementExamensProcessor::class,
     stateOptions          : new Options(entityClass: \App\Entity\DecisionAmenagementExamens::class)
 )]
+#[Map(target: \App\Entity\DecisionAmenagementExamens::class)]
 class DecisionAmenagementExamens
 {
     public const string ITEM_URI = '/utilisateurs/{uid}/decisions/{annee}';

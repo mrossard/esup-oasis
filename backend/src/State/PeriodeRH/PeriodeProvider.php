@@ -12,52 +12,30 @@
 
 namespace App\State\PeriodeRH;
 
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\PeriodeRH;
-use App\ApiResource\Utilisateur;
-use App\State\AbstractEntityProvider;
-use Exception;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class PeriodeProvider extends AbstractEntityProvider
+readonly class PeriodeProvider implements ProviderInterface
 {
+    function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+    ) {}
 
-    function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')] ProviderInterface       $itemProvider,
-                         #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')] ProviderInterface $collectionProvider)
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
+        if ($operation instanceof GetCollection) {
+            return array_map(
+                fn($periode) => new PeriodeRH($periode),
+                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
+            );
+        }
 
-        parent::__construct($itemProvider, $collectionProvider);
-    }
-
-    /**
-     * @param \App\Entity\PeriodeRH $entity
-     * @return PeriodeRH
-     * @throws Exception
-     */
-    public function transform($entity): PeriodeRH
-    {
-        $resource = new PeriodeRH();
-        $resource->id = $entity->getId();
-        $resource->debut = $entity->getDebut();
-        $resource->fin = $entity->getFin();
-        $resource->butoir = $entity->getButoir();
-        $resource->dateEnvoi = $entity->getDateEnvoi();
-        $resource->utilisateurEnvoi = match ($entity->getDateEnvoi()) {
-            null => null,
-            default => $this->transformerService->transform($entity->getUtilisateurEnvoi(), Utilisateur::class)
-        };
-        $resource->envoyee = (null !== $entity->getDateEnvoi());
-
-        return $resource;
-    }
-
-    protected function getResourceClass(): string
-    {
-        return PeriodeRH::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\PeriodeRH::class;
+        return new PeriodeRH($this->itemProvider->provide($operation, $uriVariables, $context));
     }
 }

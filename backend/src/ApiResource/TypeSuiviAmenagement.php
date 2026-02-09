@@ -40,7 +40,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     stateOptions: new Options(entityClass: \App\Entity\TypeSuiviAmenagement::class),
 )]
 #[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
-#[Map(target: \App\Entity\TypeSuiviAmenagement::class)]
+#[Map(target: \App\Entity\TypeSuiviAmenagement::class, transform: [self::class, 'toEntity'])]
 class TypeSuiviAmenagement
 {
     public const string COLLECTION_URI = '/types_suivi_amenagements';
@@ -79,6 +79,16 @@ class TypeSuiviAmenagement
 
     public function __construct(
         private readonly ?\App\Entity\TypeSuiviAmenagement $entity = null,
-    ) {
+    ) {}
+
+    public static function toEntity(self $resource): \App\Entity\TypeSuiviAmenagement
+    {
+        if ($resource->entity === null) {
+            $entity = new \App\Entity\TypeSuiviAmenagement();
+            $entity->setActif($resource->actif);
+            $entity->setLibelle($resource->libelle);
+            return $entity;
+        }
+        return $resource->entity;
     }
 }

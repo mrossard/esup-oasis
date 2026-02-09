@@ -27,10 +27,9 @@ class UtilisateurBeneficiaireAmenagementConstraintValidator extends ConstraintVa
     use UtilisateurBeneficiaireValidatorTrait;
     use AnneeUniversitaireAwareTrait;
 
-    public function __construct(private readonly UtilisateurManager $utilisateurManager,
-                                private readonly TransformerService $transformerService)
-    {
-    }
+    public function __construct(
+        private readonly UtilisateurManager $utilisateurManager,
+    ) {}
 
     public function validate(mixed $value, Constraint $constraint): void
     {
@@ -52,16 +51,16 @@ class UtilisateurBeneficiaireAmenagementConstraintValidator extends ConstraintVa
                 true => $this->getDebutSemestre1(),
                 false => $this->getDebutSemestre2(),
             },
-            default => $value->debut
+            default => $value->debut,
         };
-        $utilisateur = $this->transformerService->transform($this->utilisateurManager->parUid($value->uid), Utilisateur::class);
+        $entity = $this->utilisateurManager->parUid($value->uid);
+        $utilisateur = new Utilisateur($entity);
 
         if (!$this->utilisateurValide($utilisateur, $dateObservee)) {
-            $this->context->buildViolation($constraint->message)
+            $this->context
+                ->buildViolation($constraint->message)
                 ->setParameter('{{ string }}', $utilisateur->uid)
                 ->addViolation();
         }
-
-
     }
 }

@@ -38,6 +38,7 @@ class ModifierDemandeVoter extends Voter
      * @param mixed $subject
      * @param TokenInterface $token
      * @param Vote|null $vote* @return bool
+     * @return bool
      */
     #[Override]
     protected function voteOnAttribute(
@@ -58,7 +59,7 @@ class ModifierDemandeVoter extends Voter
 
         [$previous, $new] = $subject;
 
-        //les renforts peuvent tout faire sauf passer à refusé/validé
+        //les renforts peuvent tout faire sauf passer à "refusé" / validé
         if (
             in_array(Utilisateur::ROLE_RENFORT_DEMANDES, $token->getRoleNames())
             && !in_array($new->etat->id, [EtatDemande::REFUSEE, EtatDemande::VALIDEE])
@@ -66,7 +67,7 @@ class ModifierDemandeVoter extends Voter
             return true;
         }
 
-        //l'utilisateur lui même peut passer la demande à réceptionnée mais rien d'autre
+        //l'utilisateur lui-même peut passer la demande à "réceptionnée" mais rien d'autre
         if ($token->getUserIdentifier() === $subject[0]->demandeur->uid) {
             if (
                 $previous->typeDemande->id !== $new->typeDemande->id

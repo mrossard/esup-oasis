@@ -38,7 +38,7 @@ class ListerUtilisateursParRoleVoter extends Voter
         if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_ADMIN)) {
             return true;
         }
-        if ($subject->get('roleId') === \App\Entity\Utilisateur::ROLE_ADMIN) {
+        if ($subject->attributes->get('roleId') === \App\Entity\Utilisateur::ROLE_ADMIN) {
             return false;
         }
 

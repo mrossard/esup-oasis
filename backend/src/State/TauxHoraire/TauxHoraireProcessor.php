@@ -27,13 +27,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class TauxHoraireProcessor implements ProcessorInterface
 {
-
-    public function __construct(private TypeEvenementRepository $typeEvenementRepository,
-                                private TauxHoraireRepository   $tauxHoraireRepository,
-                                private TransformerService      $transformerService,
-                                private MessageBusInterface     $messageBus)
-    {
-    }
+    public function __construct(
+        private TypeEvenementRepository $typeEvenementRepository,
+        private TauxHoraireRepository $tauxHoraireRepository,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param TauxHoraire $data
@@ -43,14 +41,18 @@ readonly class TauxHoraireProcessor implements ProcessorInterface
      * @return TauxHoraire|null
      * @throws Exception
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?TauxHoraire
-    {
+    public function process(
+        mixed $data,
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): ?TauxHoraire {
         $type = $this->typeEvenementRepository->find($uriVariables['typeId']);
         //DELETE
         if ($operation instanceof Delete) {
             foreach ($type->getTauxHoraires() as $tauxHoraire) {
                 if ($tauxHoraire->getId() === $data->id) {
-                    $type->removeTauxHoraire($tauxHoraire);
+                    //                    $type->removeTauxHoraire($tauxHoraire);
                     $this->tauxHoraireRepository->remove($tauxHoraire, true);
                     $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
                     return null;
@@ -70,14 +72,13 @@ readonly class TauxHoraireProcessor implements ProcessorInterface
         $tauxHoraire->setFin($data->fin);
         $tauxHoraire->setMontant($data->montant);
 
-
         if (!$this->tauxCoherents($type->getTauxHoraires()->toArray())) {
-            throw new UnprocessableEntityHttpException("Un seul taux actif à la fois");
+            throw new UnprocessableEntityHttpException('Un seul taux actif à la fois');
         }
 
         $this->tauxHoraireRepository->save($tauxHoraire, true);
 
-        $resource = $this->transformerService->transform($tauxHoraire, TauxHoraire::class);
+        $resource = new TauxHoraire($tauxHoraire);
         if (null !== $data->id) {
             $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
         } else {
@@ -93,7 +94,7 @@ readonly class TauxHoraireProcessor implements ProcessorInterface
      */
     private function tauxCoherents(array $tauxHoraires): bool
     {
-        for ($i = 0; $i < count($tauxHoraires) - 1; $i++) {
+        for ($i = 0; $i < (count($tauxHoraires) - 1); $i++) {
             for ($j = $i + 1; $j < count($tauxHoraires); $j++) {
                 if ($this->chevauchement($tauxHoraires[$i], $tauxHoraires[$j])) {
                     return false;
@@ -105,7 +106,11 @@ readonly class TauxHoraireProcessor implements ProcessorInterface
 
     private function chevauchement(\App\Entity\TauxHoraire $t1, \App\Entity\TauxHoraire $t2): bool
     {
-        return (($t1->getDebut() >= $t2->getDebut() && ($t1->getDebut() < $t2->getFin() || null === $t2->getFin())) ||
-            ($t2->getDebut() >= $t1->getDebut() && ($t2->getDebut() < $t1->getFin() || null === $t1->getFin())));
+        return (
+            $t1->getDebut() >= $t2->getDebut()
+            && ($t1->getDebut() < $t2->getFin() || null === $t2->getFin())
+            || $t2->getDebut() >= $t1->getDebut()
+            && ($t2->getDebut() < $t1->getFin() || null === $t1->getFin())
+        );
     }
 }

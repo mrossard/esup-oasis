@@ -28,16 +28,18 @@ use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class AmenagementSansFiltreProvider extends AbstractEntityProvider
+class AmenagementSansFiltreProvider implements ProviderInterface
 {
-    public function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')] ProviderInterface       $itemProvider,
-                                #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')] ProviderInterface $collectionProvider,
-                                private readonly Security                                                                     $security)
-    {
-        parent::__construct($itemProvider, $collectionProvider);
-    }
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private readonly ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private readonly ProviderInterface $collectionProvider,
+        private readonly Security $security,
+    ) {}
 
-    #[Override] public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    #[Override]
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
             //on ne veut que les aménagements sur les bénéficiaires actifs
@@ -60,62 +62,13 @@ class AmenagementSansFiltreProvider extends AbstractEntityProvider
                 if (!array_key_exists('composante', $context['filters'] ?? [])) {
                     $context['filters']['composante'] = array_map(
                         fn($cmp) => Composante::COLLECTION_URI . '/' . $cmp->getId(),
-                        $user->getComposantes()->toArray()
+                        $user->getComposantes()->toArray(),
                     );
                 }
             }
+            return $this->collectionProvider->provide($operation, $uriVariables, $context);
         }
 
-        return parent::provide($operation, $uriVariables, $context);
-    }
-
-
-    #[Override] protected function getResourceClass(): string
-    {
-        return Amenagement::class;
-    }
-
-    #[Override] protected function getEntityClass(): string
-    {
-        return \App\Entity\Amenagement::class;
-    }
-
-    /**
-     * @param \App\Entity\Amenagement $entity
-     * @return Amenagement
-     * @throws Exception
-     */
-    #[Override] public function transform($entity): mixed
-    {
-        $resource = new Amenagement();
-
-        $resource->typeAmenagement = $this->transformerService->transform($entity->getType(), TypeAmenagement::class);
-
-        $resource->id = $entity->getId();
-        $utilisateruBeneficiaire = ($entity->getBeneficiaires())->current()->getUtilisateur();
-        $resource->beneficiaire = $this->transformerService->transform($utilisateruBeneficiaire, Utilisateur::class);
-
-        $derniereInscription = $utilisateruBeneficiaire->getDerniereInscription();
-        $resource->beneficiaire->inscriptions = match ($derniereInscription) {
-            null => [],
-            default => [$this->transformerService->transform($derniereInscription, Inscription::class)]
-        };
-
-        $resource->uid = $utilisateruBeneficiaire->getUid();
-
-        $resource->commentaire = $entity->getCommentaire();
-
-        $resource->semestre1 = $entity->isSemestre1();
-        $resource->semestre2 = $entity->isSemestre2();
-
-        $resource->debut = $entity->getDebut();
-        $resource->fin = $entity->getFin();
-
-        $resource->suivi = match ($suivi = $entity->getSuivi()) {
-            null => null,
-            default => $this->transformerService->transform($suivi, TypeSuiviAmenagement::class)
-        };
-
-        return $resource;
+        return $this->itemProvider->provide($operation, $uriVariables, $context);
     }
 }

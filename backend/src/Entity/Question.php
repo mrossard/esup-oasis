@@ -13,12 +13,15 @@
 namespace App\Entity;
 
 use App\Repository\QuestionRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: QuestionRepository::class)]
+#[Map(target: \App\ApiResource\Question::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class Question
 {
     public const string TYPE_SUBMIT = 'submit';
@@ -35,40 +38,50 @@ class Question
 
     public const int QUESTION_DEMANDE_ACCOMPAGNEMENT = -1;
 
-
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $libelle = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Map(if: false)]
     private ?string $aide = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $typeReponse = null;
 
     #[ORM\OneToMany(mappedBy: 'question', targetEntity: OptionReponse::class, cascade: ['persist'])]
+    #[Map(if: false)]
     private Collection $optionsReponse;
 
     #[ORM\OneToMany(mappedBy: 'question', targetEntity: Reponse::class, indexBy: 'repondant_id')]
+    #[Map(if: false)]
     private Collection $reponses;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private ?bool $obligatoire = false;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private ?bool $reponseConservable = false;
 
     #[ORM\Column(options: ['default' => false])]
+    #[Map(if: false)]
     private ?bool $choixMultiple = false;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Map(if: false)]
     private ?string $tableOptions = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Map(if: false)]
     private ?string $champCible = null;
 
     public function __construct()
@@ -264,5 +277,4 @@ class Question
 
         return $this;
     }
-
 }

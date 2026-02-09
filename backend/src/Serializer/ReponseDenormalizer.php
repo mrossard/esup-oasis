@@ -26,15 +26,14 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 readonly class ReponseDenormalizer implements DenormalizerInterface
 {
-    public function __construct(private AbstractItemNormalizer $itemNormalizer,
-                                private QuestionRepository     $questionRepository,
-                                private DemandeRepository      $demandeRepository,
-                                private TransformerService     $transformerService)
-    {
-    }
+    public function __construct(
+        private AbstractItemNormalizer $itemNormalizer,
+        private QuestionRepository $questionRepository,
+        private DemandeRepository $demandeRepository,
+    ) {}
 
-
-    #[Override] public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    #[Override]
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         /**
          * @var Reponse $reponse
@@ -47,22 +46,28 @@ readonly class ReponseDenormalizer implements DenormalizerInterface
         $question = $this->questionRepository->find($reponse->questionId);
 
         if (null === $demande || null === $question) {
-            throw new NotFoundHttpException("Demande / question inexistante");
+            throw new NotFoundHttpException('Demande / question inexistante');
         }
 
-        $reponse->demande = $this->transformerService->transform($demande, Demande::class);
-        $reponse->question = $this->transformerService->transform($question, Question::class);
-        $reponse->repondant = $this->transformerService->transform($demande->getDemandeur(), Utilisateur::class);
+        $reponse->demande = new Demande($demande);
+        $reponse->question = new Question($question);
+        $reponse->repondant = new Utilisateur($demande->getDemandeur());
 
         return $reponse;
     }
 
-    #[Override] public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
-    {
+    #[Override]
+    public function supportsDenormalization(
+        mixed $data,
+        string $type,
+        ?string $format = null,
+        array $context = [],
+    ): bool {
         return $type === Reponse::class;
     }
 
-    #[Override] public function getSupportedTypes(?string $format): array
+    #[Override]
+    public function getSupportedTypes(?string $format): array
     {
         return [
             Reponse::class => true,

@@ -26,14 +26,12 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class ValeurParametreProcessor implements ProcessorInterface
 {
-
-    public function __construct(private ParametreRepository       $parametreRepository,
-                                private ValeurParametreRepository $valeurParametreRepository,
-                                private FichierRepository         $fichierRepository,
-                                private TransformerService        $transformerService,
-                                private MessageBusInterface       $messageBus)
-    {
-    }
+    public function __construct(
+        private ParametreRepository $parametreRepository,
+        private ValeurParametreRepository $valeurParametreRepository,
+        private FichierRepository $fichierRepository,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param ValeurParametre $data
@@ -43,8 +41,12 @@ readonly class ValeurParametreProcessor implements ProcessorInterface
      * @return ValeurParametre
      * @throws Exception
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ValeurParametre
-    {
+    public function process(
+        mixed $data,
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): ValeurParametre {
         $parametre = $this->parametreRepository->findOneBy([
             'cle' => $uriVariables['cle'],
         ]);
@@ -58,7 +60,7 @@ readonly class ValeurParametreProcessor implements ProcessorInterface
         $entity->setValeur($data->valeur);
         $fichier = match ($data->fichier) {
             null => null,
-            default => $this->fichierRepository->find($data->fichier->id)
+            default => $this->fichierRepository->find($data->fichier->id),
         };
         $entity->setFichier($fichier);
         $entity->setDebut($data->debut);
@@ -66,7 +68,7 @@ readonly class ValeurParametreProcessor implements ProcessorInterface
 
         $this->parametreRepository->save($parametre, true);
 
-        $resource = $this->transformerService->transform($entity, ValeurParametre::class);
+        $resource = new ValeurParametre($entity);
         if (null !== $data->id) {
             $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
         } else {

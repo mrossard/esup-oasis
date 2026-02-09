@@ -27,24 +27,27 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class TypeDemandeProcessor implements ProcessorInterface
 {
-    function __construct(private TypeDemandeRepository        $typeDemandeRepository,
-                         private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
-                         private TransformerService           $transformerService,
-                         private MessageBusInterface          $messageBus)
-    {
-    }
+    function __construct(
+        private TypeDemandeRepository $typeDemandeRepository,
+        private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param TypeDemande $data
      * @throws Exception
      */
-    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): TypeDemande
-    {
-        if (null === $data->id) {
-            $entity = new \App\Entity\TypeDemande();
-        } else {
-            $entity = $this->typeDemandeRepository->find($data->id);
-        }
+    #[Override]
+    public function process(
+        mixed $data,
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): TypeDemande {
+        $entity = match ($data->id) {
+            null => new \App\Entity\TypeDemande(),
+            default => $this->typeDemandeRepository->find($data->id),
+        };
 
         $entity->setLibelle($data->libelle);
         $entity->setActif($data->actif);
@@ -52,7 +55,10 @@ readonly class TypeDemandeProcessor implements ProcessorInterface
         $entity->setAccompagnementOptionnel($data->accompagnementOptionnel);
 
         $profilIds = array_map(fn(ProfilBeneficiaire $profil) => $profil->id, $data->profilsCibles ?? []);
-        $supprimes = array_filter($entity->getProfilsAssocies()->toArray(), fn(\App\Entity\ProfilBeneficiaire $profil) => !in_array($profil->getId(), $profilIds));
+        $supprimes = array_filter(
+            $entity->getProfilsAssocies()->toArray(),
+            fn(\App\Entity\ProfilBeneficiaire $profil) => !in_array($profil->getId(), $profilIds),
+        );
         foreach ($supprimes as $supprime) {
             $entity->removeProfilAssocie($supprime);
         }
@@ -62,7 +68,7 @@ readonly class TypeDemandeProcessor implements ProcessorInterface
 
         $this->typeDemandeRepository->save($entity, true);
 
-        $resource = $this->transformerService->transform($entity, TypeDemande::class);
+        $resource = new TypeDemande($entity);
         if (null !== $data->id) {
             $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
         } else {

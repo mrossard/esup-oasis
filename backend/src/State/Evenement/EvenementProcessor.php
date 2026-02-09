@@ -26,13 +26,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 readonly class EvenementProcessor implements ProcessorInterface
 {
-
-    public function __construct(private EvenementManager    $evenementManager,
-                                private TransformerService  $transformerService,
-                                private ValidatorInterface  $validator,
-                                private MessageBusInterface $messageBus)
-    {
-    }
+    public function __construct(
+        private EvenementManager $evenementManager,
+        private ValidatorInterface $validator,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param Evenement $data
@@ -53,7 +51,7 @@ readonly class EvenementProcessor implements ProcessorInterface
             $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
             return null;
         } else {
-            $resource = $this->transformerService->transform($this->evenementManager->maj($data), Evenement::class);
+            $resource = new Evenement($this->evenementManager->maj($data));
             if (null !== $data->id) {
                 $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
             } else {

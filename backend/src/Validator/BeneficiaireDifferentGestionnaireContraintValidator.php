@@ -21,11 +21,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class BeneficiaireDifferentGestionnaireContraintValidator extends ConstraintValidator
 {
-
-    public function __construct(private readonly RequestStack $request)
-    {
-
-    }
+    public function __construct(
+        private readonly RequestStack $request,
+    ) {}
 
     public function validate(mixed $value, Constraint $constraint): void
     {
@@ -38,12 +36,13 @@ class BeneficiaireDifferentGestionnaireContraintValidator extends ConstraintVali
         }
 
         if (!isset($value->uid)) {
-            $value->uid = $this->request->getCurrentRequest()->get('uid');
+            $value->uid = $this
+                ->request->getCurrentRequest()
+                ->attributes->get('uid');
         }
 
         if ($value->uid === $value->gestionnaire->uid) {
-            $this->context->buildViolation($constraint->message)
-                ->addViolation();
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
 }

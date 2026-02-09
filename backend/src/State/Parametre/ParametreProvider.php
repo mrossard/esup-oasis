@@ -12,46 +12,29 @@
 
 namespace App\State\Parametre;
 
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Parametre;
-use App\ApiResource\ValeurParametre;
-use App\State\AbstractEntityProvider;
-use Exception;
-use Symfony\Component\Clock\ClockAwareTrait;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class ParametreProvider extends AbstractEntityProvider
+readonly class ParametreProvider implements ProviderInterface
 {
-    use ClockAwareTrait;
+    function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+    ) {}
 
-    /**
-     * @param \App\Entity\Parametre $entity
-     * @return Parametre
-     * @throws Exception
-     */
-    public function transform($entity): Parametre
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $param = new Parametre();
-        $param->cle = $entity->getCle();
-        $param->fichier = $entity->isFichier();
-        $param->valeurs = array_map(
-            fn($val) => $this->transformerService->transform($val, ValeurParametre::class),
-            $entity->getValeursParametres()->toArray()
-        );
-
-        $param->valeursCourantes = array_map(
-            fn($valeur) => $this->transformerService->transform($valeur, ValeurParametre::class),
-            $entity->getValeurCourante(true) ?? [],
-        );
-
-        return $param;
-    }
-
-    protected function getResourceClass(): string
-    {
-        return Parametre::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\Parametre::class;
+        if ($operation instanceof GetCollection) {
+            return array_map(
+                fn($param) => new Parametre($param),
+                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
+            );
+        }
+        return new Parametre($this->itemProvider->provide($operation, $uriVariables, $context));
     }
 }

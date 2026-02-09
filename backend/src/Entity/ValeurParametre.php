@@ -13,12 +13,18 @@
 namespace App\Entity;
 
 use App\Repository\ValeurParametreRepository;
+use App\State\EntityToResourceTransformer;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: ValeurParametreRepository::class)]
+#[Map(target: \App\ApiResource\ValeurParametre::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class ValeurParametre
 {
     #[ORM\Id]
@@ -80,7 +86,7 @@ class ValeurParametre
     {
         $this->fin = match ($fin) {
             null => null,
-            default => DateTime::createFromInterface($fin)
+            default => DateTime::createFromInterface($fin),
         };
 
         return $this;

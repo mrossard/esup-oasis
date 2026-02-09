@@ -105,70 +105,9 @@ class EvenementProvider extends AbstractEntityProvider
 
     }
 
-    /**
-     * @param \App\Entity\Evenement $entity
-     * @return Evenement
-     * @throws Exception
-     */
     public function transform($entity): mixed
     {
-        $resource = new Evenement();
-        $resource->id = $entity->getId();
-
-        //Quoi?
-        $resource->type = $this->transformerService->transform($entity->getType(), TypeEvenement::class);
-        $resource->libelle = $entity->getLibelle();
-
-        //Quand?
-        $resource->debut = $entity->getDebut();
-        $resource->fin = $entity->getFin();
-        $resource->tempsPreparation = $entity->getTempsPreparation();
-        $resource->tempsSupplementaire = $entity->getTempsSupplementaire();
-
-        //Qui?
-        $resource->beneficiaires = array_map(
-            fn($benef) => $this->transformerService->transform($benef->getUtilisateur(), Utilisateur::class),
-            $entity->getBeneficiaires()->toArray());
-        $resource->beneficiaires = array_values(array_reduce($resource->beneficiaires,
-            fn($carry, Utilisateur $benef) => match (true) {
-                array_key_exists($benef->uid, $carry ?? []) => $carry,
-                default => [...($carry ?? []), $benef->uid => $benef]
-            }
-        ) ?? []);
-        $resource->intervenant = match ($entity->getIntervenant()) {
-            null => null,
-            default => $this->transformerService->transform($entity->getIntervenant()->getUtilisateur(), Utilisateur::class),
-        };
-        $resource->suppleants = array_map(fn($suppleant) => $this->transformerService->transform($suppleant->getUtilisateur(), Utilisateur::class),
-            $entity->getSuppleants()->toArray());
-        $resource->enseignants = array_map(fn($enseignant) => $this->transformerService->transform($enseignant, Utilisateur::class),
-            $entity->getEnseignants()->toArray());
-
-        //Où?
-        $resource->campus = $this->transformerService->transform($entity->getCampus(), Campus::class);
-        $resource->salle = $entity->getSalle();
-
-        //Comment
-        $resource->equipements = array_map(fn($type) => $this->transformerService->transform($type, TypeEquipement::class),
-            $entity->getEquipements()->toArray());
-
-        //état
-        $resource->dateAnnulation = $entity->getDateAnnulation();
-        $resource->dateEnvoiRH = $entity->getPeriodePriseEnCompteRH()?->getFin();
-        $resource->dateCreation = $entity->getDateCreation();
-        $resource->dateModification = $entity->getDateModification();
-        $resource->utilisateurCreation = $this->transformerService->transform($entity->getUtilisateurCreation(), Utilisateur::class);
-        $resource->utilisateurModification = match ($utilisateurModif = $entity->getUtilisateurModification()) {
-            null => null,
-            default => $this->transformerService->transform($utilisateurModif, Utilisateur::class)
-        };
-
-        if ($entity->getType()->getId() === \App\Entity\TypeEvenement::TYPE_RENFORT) {
-            $resource->valide = (null !== $entity->getDateValidation());
-            $resource->dateValidation = $entity->getDateValidation();
-        }
-
-        return $resource;
+        return new Evenement($entity);
     }
 
     protected function getResourceClass(): string

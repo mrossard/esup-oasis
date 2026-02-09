@@ -12,12 +12,16 @@
 
 namespace App\Entity;
 
+use App\ApiResource\Telechargement;
 use App\Repository\FichierRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: FichierRepository::class)]
+#[Map(target: Telechargement::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class Fichier
 {
     public const string VOIR_FICHIER = 'VOIR_FICHIER';

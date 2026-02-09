@@ -25,25 +25,15 @@ use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class InterventionForfaitProvider extends AbstractEntityProvider
+readonly class InterventionForfaitProvider implements ProviderInterface
 {
-
-    public function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')] ProviderInterface       $itemProvider,
-                                #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')] ProviderInterface $collectionProvider,
-                                private readonly Security                                                                     $security)
-    {
-        parent::__construct($itemProvider, $collectionProvider);
-    }
-
-    protected function getResourceClass(): string
-    {
-        return InterventionForfait::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\InterventionForfait::class;
-    }
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+        private Security $security,
+    ) {}
 
     function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
@@ -56,46 +46,12 @@ class InterventionForfaitProvider extends AbstractEntityProvider
                 $user = $this->security->getUser();
                 $context['filters']['intervenant'] = Utilisateur::COLLECTION_URI . '/' . $user->getUserIdentifier();
             }
+            return array_map(
+                fn($entity) => new InterventionForfait($entity),
+                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
+            );
         }
 
-        return parent::provide($operation, $uriVariables, $context);
-    }
-
-    /**
-     * @param \App\Entity\InterventionForfait $entity
-     * @return InterventionForfait
-     * @throws Exception
-     */
-    public function transform($entity): InterventionForfait
-    {
-        $resource = new InterventionForfait();
-        $resource->id = $entity->getId();
-        $resource->intervenant = $this->transformerService->transform($entity->getIntervenant()->getUtilisateur(), Utilisateur::class);
-        $resource->type = $this->transformerService->transform($entity->getType(), TypeEvenement::class);
-        $resource->periode = $this->transformerService->transform($entity->getPeriode(), PeriodeRH::class);
-        $resource->heures = $entity->getHeures();
-
-        $resource->dateCreation = $entity->getDateCreation();
-        $resource->utilisateurCreation = $this->transformerService->transform($entity->getUtilisateurCreation(), Utilisateur::class);
-
-        if (null !== $entity->getDateModification()) {
-            $resource->dateModification = $entity->getDateModification();
-            $resource->utilisateurModification = $this->transformerService->transform($entity->getUtilisateurModification(), Utilisateur::class);
-        }
-
-        $resource->beneficiaires = array_values(
-            array_reduce(
-                array   : $entity->getBeneficiaires()->toArray(),
-                callback: function ($carry, Beneficiaire $beneficiaire) {
-                    if (!array_key_exists($beneficiaire->getUtilisateur()->getUid(), $carry)) {
-                        $carry[$beneficiaire->getUtilisateur()->getUid()] = $this->transformerService->transform($beneficiaire->getUtilisateur(), Utilisateur::class);
-                    }
-                    return $carry;
-                },
-                initial : []
-            )
-        );
-
-        return $resource;
+        return new InterventionForfait($this->itemProvider->provide($operation, $uriVariables, $context));
     }
 }

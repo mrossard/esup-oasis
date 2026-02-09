@@ -22,6 +22,7 @@ use ApiPlatform\Metadata\UrlGeneratorInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\DependencyInjection\Attribute\WhenNot;
 
 readonly class HttpCacheInvalidator
 {

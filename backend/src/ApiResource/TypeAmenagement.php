@@ -136,6 +136,5 @@ class TypeAmenagement
 
     public function __construct(
         private readonly ?\App\Entity\TypeAmenagement $entity = null,
-    ) {
-    }
+    ) {}
 }

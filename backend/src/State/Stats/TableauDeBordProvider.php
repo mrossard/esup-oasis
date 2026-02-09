@@ -44,7 +44,7 @@ readonly class TableauDeBordProvider implements ProviderInterface
     {
         if (!$this->security->isGranted(Utilisateur::ROLE_PLANIFICATEUR)) {
             //si non planificateur, ajout du filtre sur lui-même
-            $utilisateur = $this->transformerService->transform($this->security->getUser(), \App\ApiResource\Utilisateur::class);
+            $utilisateur = new \App\ApiResource\Utilisateur($this->security->getUser());
         } else {
             //filtre custom - cf définition openapi de l'opération
             if (isset($context['filters']['utilisateur'])) {

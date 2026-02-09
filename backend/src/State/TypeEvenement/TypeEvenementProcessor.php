@@ -19,8 +19,6 @@ use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
 use App\Repository\TauxHoraireRepository;
 use App\Repository\TypeEvenementRepository;
-use App\State\MappedEntityProcessor;
-use App\State\TransformerService;
 use ReflectionException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -30,7 +28,6 @@ readonly class TypeEvenementProcessor implements ProcessorInterface
     public function __construct(
         private TypeEvenementRepository $typeEvenementRepository,
         private TauxHoraireRepository $tauxHoraireRepository,
-        private TransformerService $transformerService,
         private MessageBusInterface $messageBus,
     ) {}
 
@@ -78,6 +75,6 @@ readonly class TypeEvenementProcessor implements ProcessorInterface
         }
         $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
 
-        return $this->transformerService->transform($entity, \App\ApiResource\TypeEvenement::class);
+        return new \App\ApiResource\TypeEvenement($entity);
     }
 }

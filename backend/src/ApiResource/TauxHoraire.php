@@ -28,6 +28,7 @@ use App\State\TauxHoraire\TauxHoraireCollectionProvider;
 use App\State\TauxHoraire\TauxHoraireProcessor;
 use App\State\TauxHoraire\TauxHoraireProvider;
 use DateTimeInterface;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -51,6 +52,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             ],
             security: "is_granted('ROLE_ADMIN')",
             read: false,
+            map: false,
         ),
         new Patch(
             uriTemplate: self::ITEM_URI,
@@ -59,6 +61,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                 'id',
             ],
             security: "is_granted('ROLE_ADMIN')",
+            map: false,
         ),
         new Delete(
             uriTemplate: self::ITEM_URI,
@@ -159,6 +162,5 @@ class TauxHoraire
 
     public function __construct(
         private readonly ?\App\Entity\TauxHoraire $entity = null,
-    ) {
-    }
+    ) {}
 }

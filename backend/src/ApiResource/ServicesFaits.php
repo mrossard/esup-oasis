@@ -27,7 +27,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new GetCollection(
             uriTemplate: '/intervenants/{uid}/services_faits',
             uriVariables: ['uid'],
-            security: "is_granted('ROLE_ADMIN') or request.get('uid') == user.getUid()",
+            security: "is_granted('ROLE_ADMIN') or request.attributes.get('uid') == user.getUid()",
             provider: IntervenantServicesFaitsProvider::class,
         ),
         new Get(

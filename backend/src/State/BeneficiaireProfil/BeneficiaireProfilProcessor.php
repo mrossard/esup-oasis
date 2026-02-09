@@ -33,14 +33,13 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 final readonly class BeneficiaireProfilProcessor implements ProcessorInterface
 {
-    public function __construct(private UtilisateurManager           $utilisateurManager,
-                                private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
-                                private TypologieHandicapRepository  $typologieHandicapRepository,
-                                private TransformerService           $transformerService,
-                                private MessageBusInterface          $messageBus,
-                                private ValidatorInterface           $validator,)
-    {
-    }
+    public function __construct(
+        private UtilisateurManager $utilisateurManager,
+        private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
+        private TypologieHandicapRepository $typologieHandicapRepository,
+        private MessageBusInterface $messageBus,
+        private ValidatorInterface $validator,
+    ) {}
 
     /**
      * @param BeneficiaireProfil $data
@@ -50,8 +49,12 @@ final readonly class BeneficiaireProfilProcessor implements ProcessorInterface
      * @return BeneficiaireProfil|null
      * @throws Exception
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): BeneficiaireProfil|null
-    {
+    public function process(
+        mixed $data,
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): ?BeneficiaireProfil {
         try {
             $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']);
             $gestionnaire = $this->utilisateurManager->parUid($data->gestionnaire->uid);
@@ -73,11 +76,20 @@ final readonly class BeneficiaireProfilProcessor implements ProcessorInterface
             }
         } else {
             try {
-                $beneficiaireEntity = $this->utilisateurManager->majBeneficiaires($utilisateur, $profil, $data->debut,
-                    $data->fin, $data->id, $gestionnaire,
-                    array_map(fn($typo) => $this->typologieHandicapRepository->find($typo->id), $data->typologies ?? []),
-                    $data->avecAccompagnement);
-                $resource = $this->transformerService->transform($beneficiaireEntity, BeneficiaireProfil::class);
+                $beneficiaireEntity = $this->utilisateurManager->majBeneficiaires(
+                    $utilisateur,
+                    $profil,
+                    $data->debut,
+                    $data->fin,
+                    $data->id,
+                    $gestionnaire,
+                    array_map(
+                        fn($typo) => $this->typologieHandicapRepository->find($typo->id),
+                        $data->typologies ?? [],
+                    ),
+                    $data->avecAccompagnement,
+                );
+                $resource = new BeneficiaireProfil($beneficiaireEntity); //, BeneficiaireProfil::class);
                 if (null !== $data->id) {
                     $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
                 } else {

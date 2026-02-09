@@ -12,73 +12,36 @@
 
 namespace App\State\BilanActivite;
 
+use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\BilanActivite;
-use App\ApiResource\Telechargement;
-use App\ApiResource\Utilisateur;
-use App\Entity\Bilan;
-use App\State\AbstractEntityProvider;
-use Exception;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class BilanActiviteProvider extends AbstractEntityProvider
+readonly class BilanActiviteProvider implements ProviderInterface
 {
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+        private IriConverterInterface $iriConverter,
+    ) {}
 
-    public function __construct(#[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')] ProviderInterface       $itemProvider,
-                                #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')] ProviderInterface $collectionProvider,
-                                private readonly IriConverterInterface                                                        $iriConverter)
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        parent::__construct($itemProvider, $collectionProvider);
+        if ($operation instanceof GetCollection) {
+            $data = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            $result = [];
+            foreach ($data as $item) {
+                $result[] = new BilanActivite($item, $this->iriConverter);
+            }
+            return $result;
+        }
+
+        $item = $this->itemProvider->provide($operation, $uriVariables, $context);
+
+        return new BilanActivite($item, $this->iriConverter);
     }
-
-    protected function getResourceClass(): string
-    {
-        return BilanActivite::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return Bilan::class;
-    }
-
-    /**
-     * @param Bilan $entity
-     * @return mixed
-     * @throws Exception
-     */
-    public function transform($entity): mixed
-    {
-        $resource = new BilanActivite();
-        $resource->id = $entity->getId();
-        $resource->debut = $entity->getDebut();
-        $resource->fin = $entity->getFin();
-        $resource->dateDemande = $entity->getDateDemande();
-        $resource->demandeur = $this->transformerService->transform(
-            $entity->getDemandeur(), Utilisateur::class);
-        $resource->dateGeneration = $entity->getDateGeneration();
-        $resource->fichier = $this->transformerService->transform(
-            $entity->getFichier(), Telechargement::class);
-
-        $resource->gestionnaires = array_map(
-            fn($iri) => $this->iriConverter->getResourceFromIri($iri),
-            $entity->getParametre('gestionnaires') ?? []
-        );
-        $resource->composantes = array_map(
-            fn($iri) => $this->iriConverter->getResourceFromIri($iri),
-            $entity->getParametre('composantes') ?? []
-        );
-        $resource->formations = array_map(
-            fn($iri) => $this->iriConverter->getResourceFromIri($iri),
-            $entity->getParametre('formations') ?? []
-        );
-        $resource->profils = array_map(
-            fn($iri) => $this->iriConverter->getResourceFromIri($iri),
-            $entity->getParametre('profils') ?? []
-        );
-
-
-        return $resource;
-    }
-
 }
