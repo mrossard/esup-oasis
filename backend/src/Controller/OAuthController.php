@@ -124,9 +124,9 @@ class OAuthController extends AbstractController
         #[Autowire('%env(JWT_COOKIE_NAME)%')] string $cookieName,
         #[Autowire('%env(JWT_COOKIE_DOMAIN)%')] string $cookieDomain,
     ): Response {
-        $isJson = null !== $request->get('json');
+        $isJson = null !== $request->attributes->get('json');
         if (!$isJson) {
-            $accessToken = $request->get('accessToken');
+            $accessToken = $request->attributes->get('accessToken');
             if (null === $accessToken) {
                 return new JsonResponse(['error' => 'parametre accessToken manquant'], 400);
             }
