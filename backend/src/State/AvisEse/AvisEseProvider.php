@@ -12,24 +12,14 @@
 
 namespace App\State\AvisEse;
 
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\AvisEse;
 use App\ApiResource\Telechargement;
 use App\ApiResource\Utilisateur;
-use App\State\AbstractEntityProvider;
 
-class AvisEseProvider extends AbstractEntityProvider
+class AvisEseProvider implements ProviderInterface
 {
-
-    protected function getResourceClass(): string
-    {
-        return AvisEse::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\AvisEse::class;
-    }
-
     /**
      * @param \App\Entity\AvisEse $entity
      * @return AvisEse
@@ -47,5 +37,10 @@ class AvisEseProvider extends AbstractEntityProvider
         $resource->fichier = $this->transformerService->transform($entity->getFichier(), Telechargement::class);
 
         return $resource;
+    }
+
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    {
+        // TODO: Implement provide() method.
     }
 }

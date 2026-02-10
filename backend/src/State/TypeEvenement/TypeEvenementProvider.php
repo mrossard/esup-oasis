@@ -42,7 +42,7 @@ class TypeEvenementProvider implements ProviderInterface
         }
         if ($operation instanceof GetCollection) {
             $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
-            return array_map($this->transform(...), $results);
+            return array_map($this->transform(...), iterator_to_array($results));
         }
 
         $typeEvenement = $this->itemProvider->provide($operation, $uriVariables, $context);

@@ -31,7 +31,6 @@ class VoirFichierVoter extends Voter
     public function __construct(
         private readonly Security $security,
         private readonly FichierRepository $fichierRepository,
-        private readonly TransformerService $transformerService,
     ) {}
 
     #[Override]
@@ -68,10 +67,7 @@ class VoirFichierVoter extends Voter
         if ($this->security->isGranted(Utilisateur::ROLE_MEMBRE_COMMISSION) && $subject->getReponses()->count() > 0) {
             // On va voir si c'est lié à une réponse pour une demande
             // qui est gérée par une des commissions de l'utilisateur
-            $demande = $this->transformerService->transform(
-                $subject->getReponses()->current()->getDemande(),
-                Demande::class,
-            );
+            $demande = new Demande($subject->getReponses()->current()->getDemande());
 
             if ($this->peutVoirDemande($token, $demande)) {
                 return true;

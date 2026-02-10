@@ -27,15 +27,12 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class AvisEsePostProcessor implements ProcessorInterface
 {
-
-    public function __construct(private FichierRepository   $fichierRepository,
-                                private AvisEseRepository   $avisEseRepository,
-                                private UtilisateurManager  $utilisateurManager,
-                                private TransformerService  $transformerService,
-                                private MessageBusInterface $messageBus)
-    {
-
-    }
+    public function __construct(
+        private FichierRepository $fichierRepository,
+        private AvisEseRepository $avisEseRepository,
+        private UtilisateurManager $utilisateurManager,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param AvisEse $data
@@ -55,7 +52,7 @@ readonly class AvisEsePostProcessor implements ProcessorInterface
         $entity->setFin($data->fin);
         $entity->setFichier(match ($data->fichier) {
             null => null,
-            default => $this->fichierRepository->find($data->fichier->id)
+            default => $this->fichierRepository->find($data->fichier->id),
         });
         $entity->setUtilisateur($this->utilisateurManager->parUid($uriVariables['uid']));
 
