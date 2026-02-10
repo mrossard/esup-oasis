@@ -124,7 +124,7 @@ class OAuthController extends AbstractController
         #[Autowire('%env(JWT_COOKIE_NAME)%')] string $cookieName,
         #[Autowire('%env(JWT_COOKIE_DOMAIN)%')] string $cookieDomain,
     ): Response {
-        $isJson = null !== $request->attributes->get('json');
+        $isJson = null !== $request->query->get('json');
         if (!$isJson) {
             $accessToken = $request->attributes->get('accessToken');
             if (null === $accessToken) {
