@@ -132,7 +132,7 @@ readonly class OptionReponseProvider implements ProviderInterface
     private function getOptionForTable(string $tableName, int $id): OptionReponse
     {
         $repo = $this->getRepository($tableName);
-        return new OptionReponse($repo->find($id));
+        return OptionReponse::fromReference($repo->find($id));
     }
 
     /**
@@ -158,7 +158,7 @@ readonly class OptionReponseProvider implements ProviderInterface
         };
 
         return array_values(array_map(function ($option) use ($reponse) {
-            $res = new OptionReponse($option);
+            $res = OptionReponse::fromReference($option);
             $res->questionId = $reponse->getQuestion()->getId();
             return $res;
         }, $options));

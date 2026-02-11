@@ -45,10 +45,9 @@ class ReponseDemande
     public ?array $optionsReponses = null {
         get {
             if ($this->optionsReponses === null && $this->entity !== null) {
-                $this->optionsReponses = array_map(
-                    fn($option) => new OptionReponse($option),
-                    $this->entity->getOptionsChoisiesTousTypes(),
-                );
+                $this->optionsReponses = array_map(fn($option) => $option instanceof \App\Entity\OptionReponse
+                    ? new OptionReponse($option)
+                    : OptionReponse::fromReference($option), $this->entity->getOptionsChoisiesTousTypes());
                 //on ajoute l'id de question qui manque...
                 array_walk(
                     $this->optionsReponses,

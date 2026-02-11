@@ -55,22 +55,25 @@ class Demande
     #[Map(if: false)]
     private ?Beneficiaire $beneficiaire = null;
 
-    #[ORM\OneToMany(mappedBy: 'demande', targetEntity: ModificationEtatDemande::class, orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ModificationEtatDemande::class, mappedBy: 'demande', orphanRemoval: true)]
     #[Map(if: false)]
     private Collection $modifications;
 
     #[ORM\OneToMany(
-        mappedBy: 'demande',
         targetEntity: CharteDemandeur::class,
+        mappedBy: 'demande',
         cascade: ['persist'],
         orphanRemoval: true,
     )]
+    #[Map(if: false)]
     private Collection $chartes;
 
     #[ORM\ManyToOne]
+    #[Map(if: false)]
     private ?ProfilBeneficiaire $profilAttribue = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Map(if: false)]
     private ?string $commentaire = null;
 
     public function __construct()

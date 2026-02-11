@@ -45,14 +45,16 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: self::ITEM_URI,
             uriVariables: ['id'],
             security: "is_granted('" . self::VOIR_DEMANDE . "', object)",
+            map: false,
         ),
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, map: false),
         new GetCollection(
             uriTemplate: self::COLLECTION_UTILISATEUR_URI,
             uriVariables: ['uid'],
             security: "is_granted('ROLE_GESTIONNAIRE') or request.attributes.get('uid') == user.getUid()",
             forceEager: false,
             provider: DemandesUtilisateurProvider::class,
+            map: false,
         ),
         new Post(
             uriTemplate: self::COLLECTION_URI,
@@ -147,15 +149,20 @@ class Demande
     #[Assert\NotNull(message: 'Impossible si le DemandeDenormalizer fait son job')]
     public ?Utilisateur $demandeur = null {
         get {
-            if ($this->demandeur === null && $this->entity !== null) {
+            if ($this->demandeur === null && $this->entity !== null && $this->entity->getDemandeur() !== null) {
                 $this->demandeur = new Utilisateur($this->entity->getDemandeur());
             }
             return $this->demandeur ?? null;
         }
     }
 
-    public string $uid {
-        get => $this->demandeur->uid;
+    public ?string $uid = null {
+        get {
+            if ($this->uid === null && $this->entity !== null && $this->entity->getDemandeur() !== null) {
+                $this->uid = $this->entity->getDemandeur()->getUid();
+            }
+            return $this->uid ?? null;
+        }
     }
 
     #[Groups([self::GROUP_OUT])]

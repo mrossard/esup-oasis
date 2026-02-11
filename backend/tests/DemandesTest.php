@@ -35,6 +35,13 @@ class DemandesTest extends ApiTestCaseCustom
         ]);
     }
 
+    public function testGestionnaireCanSeeAllDemandes(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        $client->request('GET', '/demandes');
+        $this->assertResponseIsSuccessful();
+    }
+
     public function testDemandeurCanSeeOnlyOwnDemandes(): void
     {
         // Ce test suppose que les fixtures sont chargées et que 'demandeur' a des demandes
