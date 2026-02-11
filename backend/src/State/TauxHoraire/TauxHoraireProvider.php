@@ -14,48 +14,40 @@ namespace App\State\TauxHoraire;
 
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TauxHoraire;
-use App\ApiResource\TypeEvenement;
-use App\State\AbstractEntityProvider;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
-class TauxHoraireProvider extends AbstractEntityProvider
+readonly class TauxHoraireProvider implements ProviderInterface
 {
-
-    protected function getResourceClass(): string
-    {
-        return TauxHoraire::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\TauxHoraire::class;
-    }
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $relevantVariables = ['id' => $uriVariables['id']];
 
         $link = new Link(parameterName: 'id', fromClass: TauxHoraire::class, identifiers: ['id']);
-        $relevantOperation = (new (get_class($operation)))->withClass(TauxHoraire::class)
+        $relevantOperation = new (get_class($operation))()
+            ->withClass(TauxHoraire::class)
             ->withStateOptions($operation->getStateOptions())
             ->withUriVariables([$link]);
 
-        $taux = parent::provide(
+        $taux = new TauxHoraire($this->itemProvider->provide(
             operation: $relevantOperation,
             uriVariables: $relevantVariables,
-            context: $context
-        );
+            context: $context,
+        ));
 
         //devrait être une contrainte de validation
-        if ($taux->typeId !== (int)$uriVariables['typeId']) {
-            throw new UnprocessableEntityHttpException($uriVariables['typeId'] . " n'a pas de taux d'id " . $uriVariables['id']);
+        if ($taux->typeId !== (int) $uriVariables['typeId']) {
+            throw new UnprocessableEntityHttpException(
+                $uriVariables['typeId'] . " n'a pas de taux d'id " . $uriVariables['id'],
+            );
         }
         return $taux;
-    }
-
-    public function transform($entity): TauxHoraire
-    {
-        return new TauxHoraire($entity);
     }
 }

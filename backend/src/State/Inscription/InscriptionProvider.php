@@ -12,38 +12,33 @@
 
 namespace App\State\Inscription;
 
-use App\ApiResource\Formation;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Inscription;
-use App\State\AbstractEntityProvider;
-use Exception;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class InscriptionProvider extends AbstractEntityProvider
+class InscriptionProvider implements ProviderInterface
 {
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+    ) {}
 
-    protected function getResourceClass(): string
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        return Inscription::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\Inscription::class;
-    }
-
-    /**
-     * @param \App\Entity\Inscription $entity
-     * @return Inscription
-     * @throws Exception
-     */
-    public function transform($entity): mixed
-    {
-        $resource = new Inscription();
-
-        $resource->id = $entity->getId();
-        $resource->formation = $this->transformerService->transform($entity->getFormation(), Formation::class);
-        $resource->debut = $entity->getDebut();
-        $resource->fin = $entity->getFin();
-
-        return $resource;
+        if ($operation instanceof GetCollection) {
+            return array_map(
+                fn($avis) => new Inscription($avis),
+                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
+            );
+        }
+        $entity = $this->itemProvider->provide($operation, $uriVariables, $context);
+        return match ($entity) {
+            null => null,
+            default => new Inscription($entity),
+        };
     }
 }

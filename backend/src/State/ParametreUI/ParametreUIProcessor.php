@@ -20,22 +20,17 @@ use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
 use App\Repository\ParametreUIRepository;
 use App\Service\ErreurLdapException;
-use App\State\TransformerService;
 use App\State\Utilisateur\UtilisateurManager;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class ParametreUIProcessor implements ProcessorInterface
 {
-
     public function __construct(
         private ParametreUIRepository $parametreUIRepository,
-        private UtilisateurManager    $utilisateurManager,
-        private TransformerService    $transformerService,
-        private MessageBusInterface   $messageBus)
-    {
-
-    }
+        private UtilisateurManager $utilisateurManager,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param ParametreUI $data
@@ -46,8 +41,12 @@ readonly class ParametreUIProcessor implements ProcessorInterface
      * @throws ErreurLdapException
      * @throws ExceptionInterface
      */
-    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?ParametreUI
-    {
+    public function process(
+        mixed $data,
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): ?ParametreUI {
         $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']);
         $param = $this->parametreUIRepository->findOneBy([
             'utilisateur' => $utilisateur,
@@ -56,7 +55,7 @@ readonly class ParametreUIProcessor implements ProcessorInterface
 
         $param = match ($param) {
             null => new \App\Entity\ParametreUI(),
-            default => $param
+            default => $param,
         };
 
         //DELETE
@@ -73,7 +72,7 @@ readonly class ParametreUIProcessor implements ProcessorInterface
 
         $this->parametreUIRepository->save($param, true);
 
-        $resource = $this->transformerService->transform($param, ParametreUI::class);
+        $resource = new ParametreUI($param);
 
         $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
         $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));

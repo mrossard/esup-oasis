@@ -26,7 +26,6 @@ use App\Entity\TauxHoraire;
 use App\Entity\TypeEvenement as TypeEvenementEntity;
 use App\Entity\Utilisateur;
 use App\Repository\PeriodeRHRepository;
-use App\State\TransformerService;
 use Exception;
 
 class ServicesFaitsProvider implements ProviderInterface

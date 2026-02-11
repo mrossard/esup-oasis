@@ -23,7 +23,6 @@ use App\ApiResource\TypeEvenement;
 use App\ApiResource\Utilisateur;
 use App\Entity\Evenement;
 use App\Entity\InterventionForfait;
-use App\State\TransformerService;
 use Exception;
 
 readonly class ActiviteIntervenantProvider implements ProviderInterface

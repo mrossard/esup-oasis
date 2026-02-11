@@ -13,25 +13,35 @@
 namespace App\Entity;
 
 use App\Repository\MembreCommissionRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: MembreCommissionRepository::class)]
+#[Map(target: \App\ApiResource\MembreCommission::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class MembreCommission
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'membres')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?Commission $commission = null;
 
     #[ORM\Column]
+    #[Map(if: false)]
     private array $roles = [];
 
     #[ORM\ManyToOne(inversedBy: 'membreCommissions')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?Utilisateur $utilisateur = null;
 
     public function getId(): ?int

@@ -20,7 +20,6 @@ use App\Message\RessourceModifieeMessage;
 use App\Repository\FichierRepository;
 use App\Repository\ParametreRepository;
 use App\Repository\ValeurParametreRepository;
-use App\State\TransformerService;
 use Exception;
 use Symfony\Component\Messenger\MessageBusInterface;
 

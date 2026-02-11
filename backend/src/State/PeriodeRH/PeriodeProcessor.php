@@ -17,18 +17,15 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\PeriodeRH;
 use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
-use App\State\TransformerService;
 use Exception;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class PeriodeProcessor implements ProcessorInterface
 {
-    public function __construct(private PeriodeManager      $manager,
-                                private TransformerService  $transformerService,
-                                private MessageBusInterface $messageBus)
-    {
-
-    }
+    public function __construct(
+        private PeriodeManager $manager,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param PeriodeRH $data
@@ -41,7 +38,7 @@ readonly class PeriodeProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         //on n'a que POST et PATCH
-        $resource = $this->transformerService->transform($this->manager->save($data), PeriodeRH::class);
+        $resource = new PeriodeRH($this->manager->save($data));
 
         if (null !== $data->id) {
             $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
@@ -51,5 +48,4 @@ readonly class PeriodeProcessor implements ProcessorInterface
 
         return $resource;
     }
-
 }

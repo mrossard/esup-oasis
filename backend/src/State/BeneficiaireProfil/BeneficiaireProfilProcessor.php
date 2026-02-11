@@ -23,7 +23,6 @@ use App\Message\RessourceModifieeMessage;
 use App\Repository\ProfilBeneficiaireRepository;
 use App\Repository\TypologieHandicapRepository;
 use App\Service\ErreurLdapException;
-use App\State\TransformerService;
 use App\State\Utilisateur\BeneficiaireInconnuException;
 use App\State\Utilisateur\UtilisateurManager;
 use Exception;

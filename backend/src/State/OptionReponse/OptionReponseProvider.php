@@ -16,7 +16,6 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\OptionReponse;
-use App\ApiResource\Question;
 use App\Entity\ClubSportif;
 use App\Entity\DisciplineArtistique;
 use App\Entity\Reponse;
@@ -32,10 +31,8 @@ use App\Repository\QuestionRepository;
 use App\Repository\TypeAmenagementRepository;
 use App\Repository\TypeEngagementRepository;
 use App\Repository\TypologieHandicapRepository;
-use App\State\AbstractEntityProvider;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Exception;
-use Override;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class OptionReponseProvider implements ProviderInterface
@@ -114,7 +111,7 @@ readonly class OptionReponseProvider implements ProviderInterface
         };
 
         $options = array_map(function ($item) use ($questionId) {
-            $option = new OptionReponse($item);
+            $option = OptionReponse::fromReference($item);
             $option->questionId = $questionId;
             return $option;
         }, $originalValues);

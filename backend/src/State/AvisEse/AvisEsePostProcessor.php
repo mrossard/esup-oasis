@@ -20,7 +20,6 @@ use App\Message\RessourceCollectionModifieeMessage;
 use App\Repository\AvisEseRepository;
 use App\Repository\FichierRepository;
 use App\Service\ErreurLdapException;
-use App\State\TransformerService;
 use App\State\Utilisateur\UtilisateurManager;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;

@@ -13,25 +13,32 @@
 namespace App\Entity;
 
 use App\Repository\ParametreUIRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: ParametreUIRepository::class)]
+#[Map(target: \App\ApiResource\ParametreUI::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class ParametreUI
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'parametresUI')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?Utilisateur $utilisateur = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $cle = null;
 
     #[ORM\Column(type: Types::TEXT)]
+    #[Map(if: false)]
     private ?string $valeur = null;
 
     public function getId(): ?int

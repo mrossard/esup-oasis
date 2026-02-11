@@ -79,4 +79,15 @@ class OptionReponse
     public function __construct(
         private readonly ?\App\Entity\OptionReponse $entity = null,
     ) {}
+
+    public static function fromReference(mixed $item): self
+    {
+        //toutes les classes en entrée ont id et libellé, pas de support des questions liées
+        $resource = new self();
+        $resource->id = $item->getId();
+        $resource->libelle = $item->getLibelle();
+        $resource->questionsLiees = [];
+
+        return $resource;
+    }
 }

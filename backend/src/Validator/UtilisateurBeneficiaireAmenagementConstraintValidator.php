@@ -14,7 +14,6 @@ namespace App\Validator;
 
 use App\ApiResource\Amenagement;
 use App\ApiResource\Utilisateur;
-use App\State\TransformerService;
 use App\State\Utilisateur\UtilisateurManager;
 use App\Util\AnneeUniversitaireAwareTrait;
 use Symfony\Component\Validator\Constraint;

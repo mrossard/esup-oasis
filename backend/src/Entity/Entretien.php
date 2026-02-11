@@ -13,34 +13,43 @@
 namespace App\Entity;
 
 use App\Repository\EntretienRepository;
+use App\State\EntityToResourceTransformer;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: EntretienRepository::class)]
+#[Map(target: \App\ApiResource\Entretien::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class Entretien
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Map(if: false)]
     private ?string $commentaire = null;
 
     #[ORM\OneToOne(inversedBy: 'entretien', cascade: ['persist', 'remove'])]
+    #[Map(if: false)]
     private ?Fichier $fichier = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Map(if: false)]
     private ?DateTimeInterface $date = null;
 
     #[ORM\ManyToOne(inversedBy: 'entretiens')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?Utilisateur $utilisateur = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?Utilisateur $gestionnaire = null;
 
     public function getId(): ?int

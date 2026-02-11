@@ -15,7 +15,6 @@ namespace App\Serializer;
 use ApiPlatform\Serializer\AbstractItemNormalizer;
 use App\ApiResource\Demande;
 use App\ApiResource\Utilisateur;
-use App\State\TransformerService;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Serializer\Exception\ExceptionInterface;

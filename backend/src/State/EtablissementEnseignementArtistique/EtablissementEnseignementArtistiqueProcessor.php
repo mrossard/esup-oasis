@@ -14,25 +14,15 @@ namespace App\State\EtablissementEnseignementArtistique;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Entity\EtablissementEnseignementArtistique;
-use App\State\MappedEntityProcessor;
 use Override;
 
 readonly class EtablissementEnseignementArtistiqueProcessor implements ProcessorInterface
 {
+    function __construct() {}
 
-    function __construct(private MappedEntityProcessor $processor)
+    #[Override]
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-    }
-
-    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
-    {
-        return $this->processor->process(
-            data: $data,
-            operation: $operation,
-            entityClass: EtablissementEnseignementArtistique::class,
-            uriVariables: $uriVariables,
-            context: $context
-        );
+        assert('This should not be called  : ' . __CLASS__ . '::' . __METHOD__);
     }
 }

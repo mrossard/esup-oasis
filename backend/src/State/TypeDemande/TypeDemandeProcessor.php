@@ -20,7 +20,6 @@ use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
 use App\Repository\ProfilBeneficiaireRepository;
 use App\Repository\TypeDemandeRepository;
-use App\State\TransformerService;
 use Exception;
 use Override;
 use Symfony\Component\Messenger\MessageBusInterface;

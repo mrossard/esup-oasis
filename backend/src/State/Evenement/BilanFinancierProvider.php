@@ -30,7 +30,6 @@ use App\Entity\TauxHoraire as TauxHoraireEntity;
 use App\Entity\TypeEvenement as TypeEvenementEntity;
 use App\Entity\Utilisateur as UtilisateurEntity;
 use App\Repository\ParametreRepository;
-use App\State\TransformerService;
 use Exception;
 
 class BilanFinancierProvider implements ProviderInterface
@@ -154,17 +153,10 @@ class BilanFinancierProvider implements ProviderInterface
         return $bilan;
     }
 
-    /**
-     * todo: move those into a CachedTransformerService or something
-     */
-
     public function getPeriodeResource(PeriodeRHEntity $periodeRH): PeriodeRH
     {
         if (!array_key_exists($periodeRH->getId(), $this->cachedResources[PeriodeRHEntity::class])) {
-            $this->cachedResources[PeriodeRHEntity::class][$periodeRH->getId()] = $this->transformerService->transform(
-                $periodeRH,
-                PeriodeRH::class,
-            );
+            $this->cachedResources[PeriodeRHEntity::class][$periodeRH->getId()] = new PeriodeRH($periodeRH);
         }
         return $this->cachedResources[PeriodeRHEntity::class][$periodeRH->getId()];
     }
@@ -177,10 +169,7 @@ class BilanFinancierProvider implements ProviderInterface
     public function getTypeResource(TypeEvenementEntity $typeEntity): TypeEvenement
     {
         if (!array_key_exists($typeEntity->getId(), $this->cachedResources[TypeEvenementEntity::class])) {
-            $this->cachedResources[TypeEvenementEntity::class][$typeEntity->getId()] = $this->transformerService->transform(
-                $typeEntity,
-                TypeEvenement::class,
-            );
+            $this->cachedResources[TypeEvenementEntity::class][$typeEntity->getId()] = new TypeEvenement($typeEntity);
         }
         return $this->cachedResources[TypeEvenementEntity::class][$typeEntity->getId()];
     }

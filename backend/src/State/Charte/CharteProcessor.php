@@ -19,7 +19,6 @@ use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
 use App\Repository\CharteRepository;
 use App\Repository\ProfilBeneficiaireRepository;
-use App\State\TransformerService;
 use Override;
 use Symfony\Component\Messenger\Exception\ExceptionInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -29,7 +28,6 @@ readonly class CharteProcessor implements ProcessorInterface
     public function __construct(
         private CharteRepository $charteRepository,
         private ProfilBeneficiaireRepository $profilBeneficiaireRepository,
-        private TransformerService $transformerService,
         private MessageBusInterface $messageBus,
     ) {}
 
@@ -68,7 +66,7 @@ readonly class CharteProcessor implements ProcessorInterface
 
         $this->charteRepository->save($entity, true);
 
-        $resource = $this->transformerService->transform($entity, Charte::class);
+        $resource = new Charte($entity);
 
         if (null !== $data->id) {
             $this->messageBus->dispatch(new RessourceModifieeMessage($resource));

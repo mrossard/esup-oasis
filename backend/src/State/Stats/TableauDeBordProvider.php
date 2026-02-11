@@ -18,20 +18,17 @@ use ApiPlatform\State\ProviderInterface;
 use App\Entity\Utilisateur;
 use App\State\Demande\DemandeManager;
 use App\State\Evenement\EvenementManager;
-use App\State\TransformerService;
 use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 
 readonly class TableauDeBordProvider implements ProviderInterface
 {
-    public function __construct(private EvenementManager      $evenementManager,
-                                private DemandeManager        $demandeManager,
-                                private IriConverterInterface $iriConverter,
-                                private Security              $security,
-                                private TransformerService    $transformerService)
-    {
-
-    }
+    public function __construct(
+        private EvenementManager $evenementManager,
+        private DemandeManager $demandeManager,
+        private IriConverterInterface $iriConverter,
+        private Security $security,
+    ) {}
 
     /**
      * @param Operation $operation
@@ -56,7 +53,6 @@ readonly class TableauDeBordProvider implements ProviderInterface
 
         $tdb = $this->evenementManager->tableauDeBord($utilisateur);
         $tdb = $this->demandeManager->tableauDeBord($utilisateur, $tdb);
-
 
         return $tdb;
     }

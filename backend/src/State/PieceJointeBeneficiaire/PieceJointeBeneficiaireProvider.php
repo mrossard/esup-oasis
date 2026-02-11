@@ -15,15 +15,20 @@ namespace App\State\PieceJointeBeneficiaire;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\PieceJointeBeneficiaire;
-use App\ApiResource\Telechargement;
-use App\ApiResource\Utilisateur;
 use App\Filter\PieceJointeBeneficiaireUidFilter;
-use App\State\AbstractEntityProvider;
-use Exception;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class PieceJointeBeneficiaireProvider extends AbstractEntityProvider
+class PieceJointeBeneficiaireProvider implements ProviderInterface
 {
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+    ) {}
+
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
@@ -31,50 +36,29 @@ class PieceJointeBeneficiaireProvider extends AbstractEntityProvider
             $context['filters'][PieceJointeBeneficiaireUidFilter::PROPERTY] = $uriVariables['uid'];
             unset($uriVariables['uid']);
 
-            return parent::provide($operation, $uriVariables, $context);
+            return array_map(
+                fn($pj) => new PieceJointeBeneficiaire($pj),
+                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
+            );
         }
 
         //on reconstruit une opération qui ne va pas exploser en vol
         $relevantVariables = ['id' => $uriVariables['id']];
 
         $link = new Link(parameterName: 'id', fromClass: PieceJointeBeneficiaire::class, identifiers: ['id']);
-        $relevantOperation = (new (get_class($operation)))->withClass(PieceJointeBeneficiaire::class)
+        $relevantOperation = new (get_class($operation))()
+            ->withClass(PieceJointeBeneficiaire::class)
             ->withStateOptions($operation->getStateOptions())
             ->withUriVariables([$link]);
 
-        return parent::provide(
-            operation   : $relevantOperation,
+        $entity = $this->itemProvider->provide(
+            operation: $relevantOperation,
             uriVariables: $relevantVariables,
-            context     : $context
+            context: $context,
         );
-    }
-
-
-    protected function getResourceClass(): string
-    {
-        return PieceJointeBeneficiaire::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\PieceJointeBeneficiaire::class;
-    }
-
-    /**
-     * @param \App\Entity\PieceJointeBeneficiaire $entity
-     * @return PieceJointeBeneficiaire
-     * @throws Exception
-     */
-    public function transform($entity): mixed
-    {
-        $resource = new PieceJointeBeneficiaire();
-        $resource->id = $entity->getId();
-        $resource->uid = $entity->getBeneficiaire()->getUid();
-        $resource->libelle = $entity->getLibelle();
-        $resource->utilisateurCreation = $this->transformerService->transform($entity->getUtilisateurCreation(), Utilisateur::class);
-        $resource->dateDepot = $entity->getDateDepot();
-        $resource->fichier = $this->transformerService->transform($entity->getFichier(), Telechargement::class);
-
-        return $resource;
+        return match ($entity) {
+            null => null,
+            default => new PieceJointeBeneficiaire($entity),
+        };
     }
 }

@@ -12,57 +12,33 @@
 
 namespace App\State\TypologieHandicap;
 
-use App\ApiResource\OptionReponse;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TypologieHandicap;
-use App\State\AbstractEntityProvider;
-use Override;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class TypologieProvider extends AbstractEntityProvider
+readonly class TypologieProvider implements ProviderInterface
 {
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+    ) {}
 
-    protected function getResourceClass(): string
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        return TypologieHandicap::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\TypologieHandicap::class;
-    }
-
-    /**
-     * @param \App\Entity\TypologieHandicap $entity
-     * @return mixed
-     */
-    public function transform($entity): mixed
-    {
-        $resource = new TypologieHandicap();
-        $resource->id = $entity->getId();
-        $resource->libelle = $entity->getLibelle();
-        $resource->actif = $entity->isActif();
-
-        return $resource;
-    }
-
-    /**
-     * @param \App\Entity\TypologieHandicap $entity
-     * @return OptionReponse
-     */
-    public function transformIntoOptionReponse(\App\Entity\TypologieHandicap $entity): OptionReponse
-    {
-        $resource = new OptionReponse();
-        $resource->id = $entity->getId();
-        $resource->libelle = $entity->getLibelle();
-        $resource->questionsLiees = [];
-        return $resource;
-    }
-
-    #[Override] protected function registerTransformations(): void
-    {
-        $this->transformerService->addTransformation(
-            from: $this->getEntityClass(),
-            to: OptionReponse::class,
-            callback: $this->transformIntoOptionReponse(...));
-        parent::registerTransformations();
+        if ($operation instanceof GetCollection) {
+            return array_map(
+                fn($avis) => new TypologieHandicap($avis),
+                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
+            );
+        }
+        $entity = $this->itemProvider->provide($operation, $uriVariables, $context);
+        return match ($entity) {
+            null => null,
+            default => new TypologieHandicap($entity),
+        };
     }
 }

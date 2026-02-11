@@ -16,12 +16,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\InterventionForfait;
-use App\ApiResource\PeriodeRH;
-use App\ApiResource\TypeEvenement;
 use App\ApiResource\Utilisateur;
-use App\Entity\Beneficiaire;
-use App\State\AbstractEntityProvider;
-use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 

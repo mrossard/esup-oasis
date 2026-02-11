@@ -15,15 +15,9 @@ namespace App\State\Amenagement;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\Amenagement;
 use App\ApiResource\Composante;
-use App\ApiResource\Inscription;
-use App\ApiResource\TypeAmenagement;
-use App\ApiResource\TypeSuiviAmenagement;
-use App\ApiResource\Utilisateur;
+use App\Entity\Utilisateur;
 use App\Filter\AmenagementBeneficiaireActifFilter;
-use App\State\AbstractEntityProvider;
-use Exception;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -46,16 +40,16 @@ class AmenagementSansFiltreProvider implements ProviderInterface
             $context['filters'][AmenagementBeneficiaireActifFilter::PROPERTY] = true;
 
             // les renforts ne voient que les aménagements aide humaine!
-            if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_RENFORT)) {
+            if ($this->security->isGranted(Utilisateur::ROLE_RENFORT)) {
                 $context['filters']['type.examens'] = false;
                 $context['filters']['type.pedagogique'] = false;
             }
 
             //les référents composante ne voient que les aménagements d'examens et pédagogiques de leur composante
-            if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_REFERENT_COMPOSANTE)) {
+            if ($this->security->isGranted(Utilisateur::ROLE_REFERENT_COMPOSANTE)) {
                 $context['filters']['type.aideHumaine'] = false;
                 /**
-                 * @var \App\Entity\Utilisateur $user
+                 * @var Utilisateur $user
                  */
                 $user = $this->security->getUser();
 

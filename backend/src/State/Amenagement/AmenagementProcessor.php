@@ -23,7 +23,6 @@ use App\Repository\AmenagementRepository;
 use App\Repository\TypeAmenagementRepository;
 use App\Repository\TypeSuiviAmenagementRepository;
 use App\Service\ErreurLdapException;
-use App\State\TransformerService;
 use App\State\Utilisateur\UtilisateurManager;
 use App\Util\AnneeUniversitaireAwareTrait;
 use Override;
@@ -38,17 +37,11 @@ class AmenagementProcessor implements ProcessorInterface
         private readonly TypeAmenagementRepository $typeAmenagementRepository,
         private readonly TypeSuiviAmenagementRepository $typeSuiviAmenagementRepository,
         private readonly UtilisateurManager $utilisateurManager,
-        private readonly TransformerService $transformerService,
         private readonly MessageBusInterface $messageBus,
     ) {}
 
     /**
      * @param Amenagement $data
-     * @param Operation $operation
-     * @param array $uriVariables
-     * @param array $context
-     * @return void
-     * @throws ErreurLdapException
      */
     #[Override]
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])

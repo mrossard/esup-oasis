@@ -20,7 +20,6 @@ use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
 use App\Repository\TauxHoraireRepository;
 use App\Repository\TypeEvenementRepository;
-use App\State\TransformerService;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;

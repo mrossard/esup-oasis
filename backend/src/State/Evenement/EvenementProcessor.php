@@ -18,7 +18,6 @@ use ApiPlatform\State\ProcessorInterface;
 use App\ApiResource\Evenement;
 use App\Message\RessourceCollectionModifieeMessage;
 use App\Message\RessourceModifieeMessage;
-use App\State\TransformerService;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\Messenger\MessageBusInterface;

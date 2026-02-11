@@ -12,52 +12,33 @@
 
 namespace App\State\Composante;
 
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Composante;
-use App\ApiResource\Utilisateur;
-use App\State\AbstractEntityProvider;
-use Exception;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class ComposanteProvider extends AbstractEntityProvider
+readonly class ComposanteProvider implements ProviderInterface
 {
+    public function __construct(
+        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')]
+        private ProviderInterface $itemProvider,
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+    ) {}
 
-    protected function getResourceClass(): string
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        return Composante::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\Composante::class;
-    }
-
-    /**
-     * @param \App\Entity\Composante $entity
-     * @return Composante
-     * @throws Exception
-     */
-    public function transform($entity): mixed
-    {
-        $resource = new Composante();
-        $resource->id = $entity->getId();
-        $resource->libelle = $entity->getLibelle();
-
-        $resource->referents = array_values(array_map(
-                fn($referent) => $this->transformerService->transform($referent, Utilisateur::class),
-                //on crée une copie light de l'entité pour éviter des requêtes en cascade + boucles éventuelles
-                array_map(
-                    function (\App\Entity\Utilisateur $referent) {
-                        $ref = new \App\Entity\Utilisateur();
-                        $ref->setNom($referent->getNom())
-                            ->setPrenom($referent->getPrenom())
-                            ->setEmail($referent->getEmail())
-                            ->setUid($referent->getUid());
-
-                        return $ref;
-                    },
-                    $entity->getReferents()->toArray(),
-                )
-            )
-        );
-        return $resource;
+        if ($operation instanceof GetCollection) {
+            return array_map(
+                fn($avis) => new Composante($avis),
+                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
+            );
+        }
+        $entity = $this->itemProvider->provide($operation, $uriVariables, $context);
+        return match ($entity) {
+            null => null,
+            default => new Composante($entity),
+        };
     }
 }

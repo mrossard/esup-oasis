@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\State\ProcessorInterface;
 use App\Entity\Campus;
 use App\Repository\CampusRepository;
-use App\State\MappedEntityProcessor;
 use Override;
 
 readonly class CampusProcessor implements ProcessorInterface

@@ -16,27 +16,26 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\ParametreUI;
-use App\ApiResource\Utilisateur;
 use App\Repository\ParametreUIRepository;
-use App\State\AbstractEntityProvider;
 use App\State\Utilisateur\UtilisateurManager;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
-class ParametreUIProvider extends AbstractEntityProvider
+readonly class ParametreUIProvider implements ProviderInterface
 {
     public function __construct(
-        #[Autowire(service: 'api_platform.doctrine.orm.state.item_provider')] ProviderInterface       $itemProvider,
-        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')] ProviderInterface $collectionProvider,
-        private readonly ParametreUIRepository                                                        $parametreUIRepository,
-        private readonly UtilisateurManager                                                           $utilisateurManager)
-    {
-        parent::__construct($itemProvider, $collectionProvider);
-    }
+        #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
+        private ProviderInterface $collectionProvider,
+        private ParametreUIRepository $parametreUIRepository,
+        private UtilisateurManager $utilisateurManager,
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            return parent::provide($operation, $uriVariables, $context);
+            return array_map(
+                fn($param) => new ParametreUI($param),
+                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
+            );
         }
 
         $param = $this->parametreUIRepository->findOneBy([
@@ -46,33 +45,7 @@ class ParametreUIProvider extends AbstractEntityProvider
 
         return match ($param) {
             null => null,
-            default => $this->transform($param)
+            default => new ParametreUI($param),
         };
-    }
-
-    protected function getResourceClass(): string
-    {
-        return ParametreUI::class;
-    }
-
-    protected function getEntityClass(): string
-    {
-        return \App\Entity\ParametreUI::class;
-    }
-
-    /**
-     * @param \App\Entity\ParametreUI $entity
-     * @return mixed
-     */
-    public function transform($entity): mixed
-    {
-        $resource = new ParametreUI();
-        $resource->uid = $entity->getUtilisateur()->getUid();
-        $resource->id = $entity->getId();
-        $resource->cle = $entity->getCle();
-        $resource->valeur = $entity->getValeur();
-        $resource->utilisateur = $this->transformerService->transform($entity->getUtilisateur(), Utilisateur::class);
-
-        return $resource;
     }
 }

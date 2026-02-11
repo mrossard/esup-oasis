@@ -25,7 +25,6 @@ use App\Message\DemandeValideeMessage;
 use App\Message\EtatDemandeModifieMessage;
 use App\Message\RessourceCollectionModifieeMessage;
 use App\State\Demande\DemandeManager;
-use App\State\TransformerService;
 use App\State\Utilisateur\UtilisateurManager;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;

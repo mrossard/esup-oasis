@@ -16,14 +16,9 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Composante;
 use App\ApiResource\Inscription;
-use App\ApiResource\Tag;
-use App\ApiResource\TypeAmenagement;
 use App\ApiResource\Utilisateur;
 use App\Entity\Amenagement;
-use App\Entity\Beneficiaire;
 use App\Filter\BeneficiaireAvecAmenagementEnCoursFilter;
-use App\State\AbstractEntityProvider;
-use Exception;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -124,7 +119,5 @@ class AmenagementsParUtilisateurProvider implements ProviderInterface
         return $resource;
     }
 
-    public function registerTransformations(): void
-    {
-    }
+    public function registerTransformations(): void {}
 }

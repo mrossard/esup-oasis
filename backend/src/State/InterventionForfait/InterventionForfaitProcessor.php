@@ -24,7 +24,6 @@ use App\Repository\TypeEvenementRepository;
 use App\Repository\UtilisateurRepository;
 use App\Service\ErreurLdapException;
 use App\State\MajBeneficiairesTrait;
-use App\State\TransformerService;
 use App\State\Utilisateur\UtilisateurManager;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Clock\ClockAwareTrait;
@@ -42,7 +41,6 @@ class InterventionForfaitProcessor implements ProcessorInterface
         private readonly TypeEvenementRepository $typeEvenementRepository,
         private readonly UtilisateurManager $utilisateurManager,
         private readonly UtilisateurRepository $utilisateurRepository,
-        private readonly TransformerService $transformerService,
         private readonly MessageBusInterface $messageBus,
         private readonly Security $security,
     ) {}
@@ -75,7 +73,7 @@ class InterventionForfaitProcessor implements ProcessorInterface
         if ($operation instanceof Delete) {
             $this->repository->remove($entity, true);
             $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
-            return null; //ou data?
+            return null;
         }
 
         $entity->setPeriode($this->periodeRHRepository->find($data->periode->id));

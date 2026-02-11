@@ -19,7 +19,6 @@ use App\Entity\Fichier;
 use App\Message\RessourceCollectionModifieeMessage;
 use App\Repository\FichierRepository;
 use App\Service\FileStorage\StorageProviderInterface;
-use App\State\TransformerService;
 use Exception;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -27,22 +26,24 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class TelechargementProcessor implements ProcessorInterface
 {
-    public function __construct(private StorageProviderInterface $storageProvider,
-                                private FichierRepository        $fichierRepository,
-                                private Security                 $security,
-                                private TransformerService       $transformerService,
-                                private MessageBusInterface      $messageBus)
-    {
-
-    }
-
+    public function __construct(
+        private StorageProviderInterface $storageProvider,
+        private FichierRepository $fichierRepository,
+        private Security $security,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param Telechargement $data
      * @throws Exception
      */
-    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): Telechargement
-    {
+    #[Override]
+    public function process(
+        mixed $data,
+        Operation $operation,
+        array $uriVariables = [],
+        array $context = [],
+    ): Telechargement {
         //On envoie le fichier sur le stockage
         $metadata = $this->storageProvider->copy($data->file);
 
@@ -55,7 +56,7 @@ readonly class TelechargementProcessor implements ProcessorInterface
 
         $this->fichierRepository->save($fichier, true);
 
-        $resource = $this->transformerService->transform($fichier, Telechargement::class);
+        $resource = new Telechargement($fichier);
 
         $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
 

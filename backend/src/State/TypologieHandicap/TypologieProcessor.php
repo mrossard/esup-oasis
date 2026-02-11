@@ -12,25 +12,15 @@
 
 namespace App\State\TypologieHandicap;
 
-
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\Entity\TypologieHandicap;
-use App\State\MappedEntityProcessor;
 
 readonly class TypologieProcessor implements ProcessorInterface
 {
-    function __construct(private MappedEntityProcessor $processor)
-    {
-    }
+    function __construct() {}
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = [])
     {
-        return $this->processor->process(
-            data        : $data,
-            operation   : $operation,
-            entityClass : TypologieHandicap::class,
-            uriVariables: $uriVariables,
-            context     : $context);
+        assert('This should not be called  : ' . __CLASS__ . '::' . __METHOD__);
     }
 }

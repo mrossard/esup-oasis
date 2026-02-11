@@ -19,7 +19,6 @@ use App\Message\AvisEseModifieMessage;
 use App\Message\RessourceModifieeMessage;
 use App\Repository\AvisEseRepository;
 use App\Repository\FichierRepository;
-use App\State\TransformerService;
 use Exception;
 use Symfony\Component\Messenger\MessageBusInterface;
 
