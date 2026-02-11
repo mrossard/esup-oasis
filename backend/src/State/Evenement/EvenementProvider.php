@@ -52,19 +52,6 @@ readonly class EvenementProvider implements ProviderInterface
 
         if ($operation instanceof GetCollection) {
             $result = $this->collectionProvider->provide($operation, $uriVariables, $context);
-            if (
-                !array_key_exists('filters', $context)
-                || !array_key_exists('debut', $context['filters'])
-                || !array_key_exists('fin', $context['filters'])
-            ) {
-                //noop
-            } else {
-                $start = new DatePoint(current($context['filters']['debut']));
-                $end = new DatePoint(current($context['filters']['fin']));
-                while ($start <= $end) {
-                    $start = $start->modify('+1 day');
-                }
-            }
             assert($result instanceof PaginatorInterface);
             return new MappedCollectionPaginator($result, fn($utilisateur) => new Evenement($utilisateur));
         }
