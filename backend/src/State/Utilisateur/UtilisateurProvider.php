@@ -21,6 +21,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Utilisateur;
 use App\Service\ErreurLdapException;
 use App\State\DecisionAmenagementExamens\DecisionAmenagementManager;
+use App\State\MappedCollectionPaginator;
 use Override;
 use RuntimeException;
 use Symfony\Component\Clock\ClockAwareTrait;
@@ -76,7 +77,9 @@ class UtilisateurProvider implements ProviderInterface
             $context['filters']['beneficiairefilter'] = true;
         }
 
-        return $this->collectionProvider->provide($operation, $uriVariables, $context);
+        $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+        assert($results instanceof PaginatorInterface);
+        return new MappedCollectionPaginator($results, fn($utilisateur) => new Utilisateur($utilisateur));
     }
 
     /**
@@ -95,7 +98,9 @@ class UtilisateurProvider implements ProviderInterface
         if ($operation instanceof CollectionOperationInterface) {
             if (!isset($context['filters']['term'])) {
                 if (isset($context['filters']['recherche'])) {
-                    return $this->collectionProvider->provide($operation, $uriVariables, $context);
+                    $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+                    assert($results instanceof PaginatorInterface);
+                    return new MappedCollectionPaginator($results, fn($utilisateur) => new Utilisateur($utilisateur));
                 }
                 throw new RuntimeException('Paramètre "term" ou "recherche" manquant.');
             }
