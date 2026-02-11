@@ -37,7 +37,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
     openapi: new Operation(tags: ['Utilisateurs']),
-    security: "is_granted('ROLE_GESTIONNAIRE') or request.get('uid') == user.getUid()",
+    security: "is_granted('ROLE_GESTIONNAIRE') or request.attributes.get('uid') == user.getUid()",
     provider: PieceJointeBeneficiaireProvider::class,
     processor: PieceJointeBeneficiaireProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\PieceJointeBeneficiaire::class),

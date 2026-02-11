@@ -34,7 +34,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
         new Delete(uriTemplate: self::ITEM_URI, uriVariables: ['uid', 'cle']),
     ],
     openapi: new Operation(tags: ['Utilisateurs']),
-    security: 'user.getUid() == request.get("uid")',
+    security: 'user.getUid() == request.attributes.get("uid")',
     provider: ParametreUIProvider::class,
     processor: ParametreUIProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\ParametreUI::class),

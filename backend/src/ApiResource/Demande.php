@@ -50,7 +50,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: self::COLLECTION_UTILISATEUR_URI,
             uriVariables: ['uid'],
-            security: "is_granted('ROLE_GESTIONNAIRE') or request.get('uid') == user.getUid()",
+            security: "is_granted('ROLE_GESTIONNAIRE') or request.attributes.get('uid') == user.getUid()",
             forceEager: false,
             provider: DemandesUtilisateurProvider::class,
         ),
