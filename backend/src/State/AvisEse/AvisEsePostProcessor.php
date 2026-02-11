@@ -60,7 +60,7 @@ readonly class AvisEsePostProcessor implements ProcessorInterface
 
         $this->messageBus->dispatch(new AvisEseModifieMessage($entity));
 
-        $resource = $this->transformerService->transform($entity, AvisEse::class);
+        $resource = new AvisEse($entity);
 
         $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
 

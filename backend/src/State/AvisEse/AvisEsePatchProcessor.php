@@ -25,14 +25,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class AvisEsePatchProcessor implements ProcessorInterface
 {
-
-    public function __construct(private FichierRepository   $fichierRepository,
-                                private AvisEseRepository   $avisEseRepository,
-                                private TransformerService  $transformerService,
-                                private MessageBusInterface $messageBus)
-    {
-
-    }
+    public function __construct(
+        private FichierRepository $fichierRepository,
+        private AvisEseRepository $avisEseRepository,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param AvisEse $data
@@ -51,7 +48,7 @@ readonly class AvisEsePatchProcessor implements ProcessorInterface
         $entity->setFin($data->fin);
         $entity->setFichier(match ($data->fichier) {
             null => null,
-            default => $this->fichierRepository->find($data->fichier->id)
+            default => $this->fichierRepository->find($data->fichier->id),
         });
 
         $this->avisEseRepository->save($entity, true);
@@ -59,6 +56,6 @@ readonly class AvisEsePatchProcessor implements ProcessorInterface
         $this->messageBus->dispatch(new AvisEseModifieMessage($entity));
         $this->messageBus->dispatch(new RessourceModifieeMessage($data));
 
-        return $this->transformerService->transform($entity, AvisEse::class);
+        return new AvisEse($entity);
     }
 }

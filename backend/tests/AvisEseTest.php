@@ -30,7 +30,7 @@ class AvisEseTest extends ApiTestCaseCustom
             'json' => [
                 'libelle' => 'Nouvel avis ESE',
                 'commentaire' => 'Commentaire de test',
-                'debut' => (new DateTime())->format('Y-m-d'),
+                'debut' => new DateTime()->format('Y-m-d'),
             ],
         ]);
 
@@ -48,7 +48,7 @@ class AvisEseTest extends ApiTestCaseCustom
         $client->request('POST', '/utilisateurs/beneficiaire/avis_ese', [
             'json' => [
                 'libelle' => 'Avis par gestionnaire',
-                'debut' => (new DateTime())->format('Y-m-d'),
+                'debut' => new DateTime()->format('Y-m-d'),
             ],
         ]);
 
@@ -61,11 +61,11 @@ class AvisEseTest extends ApiTestCaseCustom
         $client->request('POST', '/utilisateurs/beneficiaire/avis_ese', [
             'json' => [
                 'libelle' => 'Mon propre avis',
-                'debut' => (new DateTime())->format('Y-m-d'),
+                'debut' => new DateTime()->format('Y-m-d'),
             ],
         ]);
 
-        // Expect 403 if security is correctly implemented, 
+        // Expect 403 if security is correctly implemented,
         // but currently it might be 201 or 500 (due to the bug I found)
         $this->assertResponseStatusCodeSame(403);
     }
@@ -74,18 +74,11 @@ class AvisEseTest extends ApiTestCaseCustom
     {
         $container = static::getContainer();
         $em = $container->get('doctrine')->getManager();
-        
-        $user = $em->getRepository(Utilisateur::class)->findOneBy(['uid' => 'beneficiaire']);
-        
-        $avis = new AvisEse();
-        $avis->setUtilisateur($user);
-        $avis->setLibelle('Initial');
-        $avis->setDebut(new DateTime());
-        $em->persist($avis);
-        $em->flush();
+
+        $user = $em->getRepository(Utilisateur::class)->findOneBy(['uid' => 'beneficiaire2']);
 
         $client = $this->createClientWithCredentials('admin');
-        $client->request('PATCH', '/utilisateurs/beneficiaire/avis_ese/' . $avis->getId(), [
+        $client->request('PATCH', '/utilisateurs/beneficiaire2/avis_ese/1', [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
                 'libelle' => 'Modifié',
@@ -102,25 +95,16 @@ class AvisEseTest extends ApiTestCaseCustom
     {
         $container = static::getContainer();
         $em = $container->get('doctrine')->getManager();
-        
-        $user = $em->getRepository(Utilisateur::class)->findOneBy(['uid' => 'beneficiaire']);
-        
-        $avis = new AvisEse();
-        $avis->setUtilisateur($user);
-        $avis->setLibelle('To delete');
-        $avis->setDebut(new DateTime());
-        $em->persist($avis);
-        $em->flush();
 
-        $id = $avis->getId();
+        $user = $em->getRepository(Utilisateur::class)->findOneBy(['uid' => 'beneficiaire2']);
 
         $client = $this->createClientWithCredentials('admin');
-        $client->request('DELETE', '/utilisateurs/beneficiaire/avis_ese/' . $id);
+        $client->request('DELETE', '/utilisateurs/beneficiaire2/avis_ese/1');
 
         $this->assertResponseStatusCodeSame(204);
-        
+
         $em->clear();
-        $deletedAvis = $em->getRepository(AvisEse::class)->find($id);
+        $deletedAvis = $em->getRepository(AvisEse::class)->find(1);
         $this->assertNull($deletedAvis);
     }
 }

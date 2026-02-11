@@ -53,7 +53,7 @@ RUN dos2unix /usr/local/bin/docker-entrypoint && chmod 755 /usr/local/bin/docker
 COPY --link --chmod=755 ./docker/php-overrides.ini /usr/local/etc/php/conf.d/99-overrides.ini
 COPY --link --chmod=755 ./docker/php-overrides-prod.ini /usr/local/etc/php/conf.d/99-overrides-prod.ini
 
-ENV FRANKENPHP_CONFIG="worker ./public/index.php"
+#ENV FRANKENPHP_CONFIG="worker ./public/index.php"
 
 ENTRYPOINT ["/usr/local/bin/docker-entrypoint"]
 

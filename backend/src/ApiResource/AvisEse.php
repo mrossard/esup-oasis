@@ -15,6 +15,7 @@ namespace App\ApiResource;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -39,28 +40,39 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriVariables: [
                 'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
             ],
+            security: "is_granted('" . \App\Entity\Utilisateur::ROLE_GESTIONNAIRE . "')",
             read: false,
-            //            processor: AvisEsePostProcessor::class,
+            processor: AvisEsePostProcessor::class,
+            map: false,
         ),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: [
             'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
             'id',
         ]),
-        new Patch(uriTemplate: self::ITEM_URI, uriVariables: [
-            'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
-            'id',
-        ]
-            //            processor: AvisEsePatchProcessor::class,
+        new Patch(
+            uriTemplate: self::ITEM_URI,
+            uriVariables: [
+                'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
+                'id',
+            ],
+            security: "is_granted('" . \App\Entity\Utilisateur::ROLE_GESTIONNAIRE . "')",
+            read: true,
+            processor: AvisEsePatchProcessor::class,
         ),
-        new Delete(uriTemplate: self::ITEM_URI, uriVariables: [
-            'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
-            'id',
-        ]
-            //            processor: AvisEseDeleteProcessor::class,
+        new Delete(
+            uriTemplate: self::ITEM_URI,
+            uriVariables: [
+                'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
+                'id',
+            ],
+            security: "is_granted('" . \App\Entity\Utilisateur::ROLE_GESTIONNAIRE . "')",
+            read: true,
+            processor: AvisEseDeleteProcessor::class,
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
+    provider: AvisEseProvider::class,
     stateOptions: new Options(entityClass: \App\Entity\AvisEse::class),
 )]
 #[ApiFilter(OrderFilter::class, properties: ['debut'])]
@@ -71,9 +83,17 @@ class AvisEse
     public const string GROUP_IN = 'avis_ese:in';
     public const string GROUP_OUT = 'avis_ese:out';
 
-    public Utilisateur $utilisateur;
+    public ?Utilisateur $utilisateur = null {
+        get {
+            if ($this->utilisateur === null && $this->entity !== null && $this->entity->getUtilisateur() !== null) {
+                $this->utilisateur = new Utilisateur($this->entity->getUtilisateur());
+            }
+            return $this->utilisateur ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
+    #[ApiProperty(identifier: true)]
     public ?int $id = null {
         get {
             if ($this->id === null && $this->entity !== null) {
