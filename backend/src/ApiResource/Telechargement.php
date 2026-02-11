@@ -53,6 +53,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
     denormalizationContext: ['groups' => [self::GROUP_IN]],
+    provider: TelechargementProvider::class,
+    processor: TelechargementProcessor::class,
     stateOptions: new Options(entityClass: Fichier::class),
 )]
 #[NoVirusConstraint]
@@ -76,7 +78,7 @@ class Telechargement
     #[Groups(self::GROUP_OUT)]
     public ?Utilisateur $proprietaire = null {
         get {
-            if ($this->proprietaire === null && $this->entity !== null) {
+            if ($this->proprietaire === null && $this->entity !== null && $this->entity->getProprietaire() !== null) {
                 $this->proprietaire = new Utilisateur($this->entity->getProprietaire());
             }
             return $this->proprietaire ?? null;
@@ -117,6 +119,6 @@ class Telechargement
     }
 
     public function __construct(
-        private readonly Fichier $entity,
+        private readonly ?Fichier $entity = null,
     ) {}
 }
