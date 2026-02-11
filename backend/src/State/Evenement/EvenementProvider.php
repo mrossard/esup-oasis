@@ -98,7 +98,7 @@ readonly class EvenementProvider implements ProviderInterface
                 foreach ($result as $res) {
                     $item->tag('evenement_' . $res->getId());
                 }
-                return array_map(fn($event) => new Evenement($event), iterator_to_array($result));
+                return array_map(fn($event) => new Evenement($event), iterator_to_array($result)); //todo: pagination??
             }
 
             $result = $this->itemProvider->provide($operation, $uriVariables, $context);

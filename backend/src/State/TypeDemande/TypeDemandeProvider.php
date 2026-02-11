@@ -14,9 +14,12 @@ namespace App\State\TypeDemande;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\CampagneDemande;
+use App\ApiResource\Charte;
 use App\ApiResource\TypeDemande;
+use App\State\MappedCollectionPaginator;
 use Exception;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -36,7 +39,8 @@ class TypeDemandeProvider implements ProviderInterface
     {
         if ($operation instanceof GetCollection) {
             $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
-            return array_map(callback: fn($entity) => $this->transform($entity), array: iterator_to_array($results));
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, $this->transform(...));
         }
 
         $entity = $this->itemProvider->provide($operation, $uriVariables, $context);

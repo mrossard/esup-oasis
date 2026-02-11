@@ -14,10 +14,13 @@ namespace App\State\Utilisateur;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Charte;
 use App\ApiResource\Tag;
 use App\ApiResource\TagUtilisateur;
 use App\ApiResource\Utilisateur;
+use App\State\MappedCollectionPaginator;
 use Exception;
 use Override;
 use Symfony\Component\Clock\ClockAwareTrait;

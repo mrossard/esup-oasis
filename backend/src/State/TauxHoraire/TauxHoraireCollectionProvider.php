@@ -3,8 +3,10 @@
 namespace App\State\TauxHoraire;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\TauxHoraire;
+use App\State\MappedCollectionPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class TauxHoraireCollectionProvider implements ProviderInterface
@@ -16,8 +18,8 @@ readonly class TauxHoraireCollectionProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $data = $this->collectionProvider->provide($operation, $uriVariables, $context);
-
-        return array_map(fn($taux) => new TauxHoraire($taux), iterator_to_array($data));
+        $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+        assert($results instanceof PaginatorInterface);
+        return new MappedCollectionPaginator($results, fn($entity) => new TauxHoraire($entity));
     }
 }

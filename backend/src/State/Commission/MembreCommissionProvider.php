@@ -14,12 +14,15 @@ namespace App\State\Commission;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Charte;
 use App\ApiResource\Commission;
 use App\ApiResource\MembreCommission;
 use App\ApiResource\Utilisateur;
 use App\Repository\CommissionRepository;
 use App\Repository\MembreCommissionRepository;
+use App\State\MappedCollectionPaginator;
 use App\State\Utilisateur\UtilisateurManager;
 use Exception;
 use Override;
@@ -39,10 +42,9 @@ readonly class MembreCommissionProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            return array_map(
-                fn($membre) => new MembreCommission($membre),
-                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
-            );
+            $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, fn($entity) => new MembreCommission($entity));
         }
         //on fait du custom pour le cas complexe
         $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']);

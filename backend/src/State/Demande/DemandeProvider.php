@@ -14,6 +14,7 @@ namespace App\State\Demande;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Demande;
 use App\ApiResource\EtapeDemandeEtudiant;
@@ -27,6 +28,8 @@ use App\Entity\Reponse;
 use App\Repository\QuestionRepository;
 use App\Repository\ReponseRepository;
 use App\Repository\TypeDemandeRepository;
+use App\State\MappedCollectionPaginator;
+use ArrayObject;
 use DateTime;
 use Exception;
 use Override;
@@ -63,7 +66,8 @@ class DemandeProvider implements ResetInterface, ProviderInterface
         $results = $provider->provide($operation, $uriVariables, $context);
 
         if ($operation instanceof GetCollection) {
-            return array_map($this->transform(...), iterator_to_array($results ?? []));
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, $this->transform(...));
         }
 
         return match ($results) {

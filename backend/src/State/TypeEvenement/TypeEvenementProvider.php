@@ -14,9 +14,12 @@ namespace App\State\TypeEvenement;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Charte;
 use App\ApiResource\TauxHoraire;
 use App\ApiResource\TypeEvenement;
+use App\State\MappedCollectionPaginator;
 use Exception;
 use Override;
 use Symfony\Component\Clock\ClockAwareTrait;
@@ -42,7 +45,8 @@ class TypeEvenementProvider implements ProviderInterface
         }
         if ($operation instanceof GetCollection) {
             $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
-            return array_map($this->transform(...), iterator_to_array($results));
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, $this->transform(...));
         }
 
         $typeEvenement = $this->itemProvider->provide($operation, $uriVariables, $context);

@@ -14,9 +14,12 @@ namespace App\State\InterventionForfait;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Charte;
 use App\ApiResource\InterventionForfait;
 use App\ApiResource\Utilisateur;
+use App\State\MappedCollectionPaginator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -41,10 +44,9 @@ readonly class InterventionForfaitProvider implements ProviderInterface
                 $user = $this->security->getUser();
                 $context['filters']['intervenant'] = Utilisateur::COLLECTION_URI . '/' . $user->getUserIdentifier();
             }
-            return array_map(
-                fn($entity) => new InterventionForfait($entity),
-                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
-            );
+            $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, fn($entity) => new InterventionForfait($entity));
         }
 
         return new InterventionForfait($this->itemProvider->provide($operation, $uriVariables, $context));

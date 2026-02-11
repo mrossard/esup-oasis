@@ -15,9 +15,12 @@ namespace App\State\PieceJointeBeneficiaire;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Charte;
 use App\ApiResource\PieceJointeBeneficiaire;
 use App\Filter\PieceJointeBeneficiaireUidFilter;
+use App\State\MappedCollectionPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class PieceJointeBeneficiaireProvider implements ProviderInterface
@@ -36,10 +39,9 @@ class PieceJointeBeneficiaireProvider implements ProviderInterface
             $context['filters'][PieceJointeBeneficiaireUidFilter::PROPERTY] = $uriVariables['uid'];
             unset($uriVariables['uid']);
 
-            return array_map(
-                fn($pj) => new PieceJointeBeneficiaire($pj),
-                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
-            );
+            $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, fn($entity) => new PieceJointeBeneficiaire($entity));
         }
 
         //on reconstruit une opération qui ne va pas exploser en vol

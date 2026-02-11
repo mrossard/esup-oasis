@@ -14,8 +14,10 @@ namespace App\State\AvisEse;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\AvisEse;
+use App\State\MappedCollectionPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 readonly class AvisEseProvider implements ProviderInterface
@@ -30,11 +32,11 @@ readonly class AvisEseProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            return array_map(
-                fn($avis) => new AvisEse($avis),
-                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
-            );
+            $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, fn($avis) => new AvisEse($avis));
         }
+
         $entity = $this->itemProvider->provide($operation, $uriVariables, $context);
         return match ($entity) {
             null => null,

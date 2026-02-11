@@ -14,9 +14,12 @@ namespace App\State\Question;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Charte;
 use App\ApiResource\OptionReponse;
 use App\ApiResource\Question;
+use App\State\MappedCollectionPaginator;
 use App\State\OptionReponse\OptionReponseProvider;
 use Exception;
 use Override;
@@ -35,10 +38,9 @@ readonly class QuestionProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            return array_map(
-                $this->handleReferenceTableOptions(...),
-                iterator_to_array($this->collectionProvider->provide($operation, $uriVariables, $context)),
-            );
+            $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, $this->handleReferenceTableOptions(...));
         }
         $entity = $this->itemProvider->provide($operation, $uriVariables, $context);
         return match ($entity) {
