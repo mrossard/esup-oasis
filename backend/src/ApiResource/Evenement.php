@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use App\Entity\Beneficiaire;
 use App\Filter\EvenementsAValiderFilter;
 use App\Filter\NestedUtilisateurFilter;
 use App\Filter\NomIntervenantFilter;
@@ -154,10 +155,16 @@ final class Evenement
     public array $beneficiaires {
         get {
             if (!isset($this->beneficiaires) && $this->entity !== null) {
-                $utilisateursBeneficiaires = array_unique(array_map(
-                    fn($b) => $b->getUtilisateur(),
+                $utilisateursBeneficiaires = array_reduce(
                     $this->entity->getBeneficiaires()->toArray(),
-                ));
+                    function ($carry, Beneficiaire $item) {
+                        if (!array_key_exists($item->getUtilisateur()->getId(), $carry)) {
+                            $carry[$item->getUtilisateur()->getId()] = $item->getUtilisateur();
+                        }
+                        return $carry;
+                    },
+                    [],
+                );
                 $this->beneficiaires = array_values(array_map(
                     fn($b) => new Utilisateur($b),
                     $utilisateursBeneficiaires,
