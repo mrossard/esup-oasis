@@ -446,7 +446,10 @@ final class Utilisateur
         get {
             if (!isset($this->amenagements) && $this->entity !== null) {
                 // Using getAmenagementsActifs from Entity logic
-                $this->amenagements = array_map(fn($a) => new Amenagement($a), $this->entity->getAmenagementsActifs());
+                $this->amenagements = array_values(array_map(
+                    fn($a) => new Amenagement($a),
+                    $this->entity->getAmenagementsActifs(),
+                ));
             }
             return $this->amenagements ?? [];
         }
