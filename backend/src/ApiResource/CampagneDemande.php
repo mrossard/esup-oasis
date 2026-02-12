@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
             uriVariables: ['typeId'],
             security: "is_granted('ROLE_ADMIN')",
             read: false,
+            map: false,
         ),
         new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id', 'typeId'], security: "is_granted('ROLE_ADMIN')"),
     ],
