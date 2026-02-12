@@ -29,7 +29,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 #[ApiResource(
     operations: [
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id', 'typeId']),
-        new GetCollection(uriTemplate: self::COLLECTION_URI, uriVariables: ['typeId']),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, uriVariables: ['typeId'], map: false),
         new Post(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: ['typeId'],
