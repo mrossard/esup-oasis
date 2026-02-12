@@ -29,41 +29,53 @@ class Fichier
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Map(if: false)]
     private array $metadata = [];
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $nom = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $typeMime = null;
 
     #[ORM\ManyToOne(inversedBy: 'fichiers')]
+    #[Map(if: false)]
     private ?Utilisateur $proprietaire = null;
 
     #[ORM\ManyToMany(targetEntity: Reponse::class, mappedBy: 'piecesJustificatives')]
+    #[Map(if: false)]
     private Collection $reponses;
 
     #[ORM\OneToOne(mappedBy: 'fichier', cascade: ['persist', 'remove'])]
+    #[Map(if: false)]
     private ?AvisEse $avisEse = null;
     #[ORM\OneToOne(mappedBy: 'fichier', cascade: ['persist', 'remove'])]
+    #[Map(if: false)]
     private ?Entretien $entretien = null;
 
     #[ORM\OneToOne(mappedBy: 'fichier', cascade: ['persist', 'remove'])]
+    #[Map(if: false)]
     private ?PieceJointeBeneficiaire $pieceJointeBeneficiaire = null;
 
     #[ORM\OneToOne(mappedBy: 'fichier', cascade: ['persist', 'remove'])]
+    #[Map(if: false)]
     private ?DecisionAmenagementExamens $decisionAmenagementExamens = null;
 
     /**
      * @var Collection<int, ValeurParametre>
      */
     #[ORM\OneToMany(mappedBy: 'fichier', targetEntity: ValeurParametre::class)]
+    #[Map(if: false)]
     private Collection $valeurParametres;
 
     #[ORM\OneToOne(mappedBy: 'fichier', cascade: ['persist', 'remove'])]
+    #[Map(if: false)]
     private ?Bilan $bilan = null;
 
     public function __construct()
