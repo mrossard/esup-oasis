@@ -29,9 +29,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI, uriVariables: [
-            'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
-        ]),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            uriVariables: [
+                'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
+            ],
+            map: false,
+        ),
         new Post(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: [
@@ -66,7 +70,14 @@ class Entretien
     public const string GROUP_IN = 'entretien:in';
     public const string GROUP_OUT = 'entretien:out';
 
-    public Utilisateur $utilisateur;
+    public ?Utilisateur $utilisateur = null {
+        get {
+            if ($this->utilisateur === null && $this->entity !== null && null !== $this->entity->getUtilisateur()) {
+                $this->utilisateur = new Utilisateur($this->entity->getUtilisateur());
+            }
+            return $this->utilisateur ?? null;
+        }
+    }
 
     #[Groups([self::GROUP_OUT])]
     public ?int $id = null {

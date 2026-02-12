@@ -154,10 +154,14 @@ final class Evenement
     public array $beneficiaires {
         get {
             if (!isset($this->beneficiaires) && $this->entity !== null) {
-                $this->beneficiaires = array_map(
-                    fn($b) => new Utilisateur($b->getUtilisateur()),
+                $utilisateursBeneficiaires = array_unique(array_map(
+                    fn($b) => $b->getUtilisateur(),
                     $this->entity->getBeneficiaires()->toArray(),
-                );
+                ));
+                $this->beneficiaires = array_values(array_map(
+                    fn($b) => new Utilisateur($b),
+                    $utilisateursBeneficiaires,
+                ));
             }
             return $this->beneficiaires ?? [];
         }
