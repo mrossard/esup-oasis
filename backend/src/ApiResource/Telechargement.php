@@ -48,6 +48,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             ]))),
             security: "is_granted('ROLE_GESTIONNAIRE') or is_granted('ROLE_RENFORT_DEMANDES') or is_granted('ROLE_DEMANDEUR')",
             deserialize: false,
+            map: false,
         ),
         new Get(uriTemplate: self::ITEM_URI, security: "is_granted('" . Fichier::VOIR_FICHIER . "', object)"),
     ],
