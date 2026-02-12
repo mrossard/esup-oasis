@@ -28,9 +28,13 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI, uriVariables: [
-            'demandeId' => new Link(fromProperty: 'id', toProperty: 'demande', fromClass: Demande::class),
-        ]),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            uriVariables: [
+                'demandeId' => new Link(fromProperty: 'id', toProperty: 'demande', fromClass: Demande::class),
+            ],
+            map: false,
+        ),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: [
             'demandeId' => new Link(fromProperty: 'id', toProperty: 'demande', fromClass: Demande::class),
             'id',
