@@ -460,7 +460,7 @@ final class Utilisateur
     public array $tags {
         get {
             if (!isset($this->tags) && $this->entity !== null) {
-                $this->tags = array_map(fn($t) => new Tag($t), $this->entity->getTagsActifs());
+                $this->tags = array_values(array_map(fn($t) => new Tag($t), $this->entity->getTagsActifs()));
             }
             return $this->tags ?? [];
         }
