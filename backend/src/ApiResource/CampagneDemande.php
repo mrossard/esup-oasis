@@ -80,7 +80,7 @@ class CampagneDemande
             if ($this->libelle === null && $this->entity !== null) {
                 $this->libelle = $this->entity->getLibelle();
             }
-            return $this->id ?? null;
+            return $this->libelle ?? null;
         }
     }
 
