@@ -22,7 +22,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: BilanRepository::class)]
-//#[Map(target: BilanActivite::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
+#[Map(target: BilanActivite::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
 class Bilan
 {
     #[ORM\Id]

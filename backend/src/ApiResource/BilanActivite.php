@@ -37,10 +37,12 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
             security: "is_granted('" . \App\Entity\Utilisateur::ROLE_GESTIONNAIRE . "')",
+            map: false,
         ),
         new Post(
             uriTemplate: self::COLLECTION_URI,
             security: "is_granted('" . \App\Entity\Utilisateur::ROLE_GESTIONNAIRE . "')",
+            map: false,
         ),
         new Get(
             uriTemplate: self::ITEM_URI,
@@ -56,6 +58,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     denormalizationContext: ['groups' => [self::GROUP_IN]],
     openapi: new Operation(tags: ['Suivis'], description: 'Bilan activite'),
     provider: BilanActiviteProvider::class,
+    processor: BilanActiviteProcessor::class,
     stateOptions: new Options(entityClass: Bilan::class),
 )]
 #[ApiFilter(OrderFilter::class, properties: ['dateDemande'])]
@@ -132,7 +135,7 @@ class BilanActivite
     #[Groups([self::GROUP_OUT])]
     public ?Telechargement $fichier = null {
         get {
-            if ($this->fichier === null && $this->entity !== null) {
+            if ($this->fichier === null && $this->entity !== null && null !== $this->entity->getFichier()) {
                 $this->fichier = new Telechargement($this->entity->getFichier());
             }
             return $this->fichier ?? null;

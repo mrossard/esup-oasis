@@ -63,16 +63,16 @@ readonly class BilanActiviteProcessor implements ProcessorInterface
         $bilan->setParametres([
             'gestionnaires' => array_map(fn(Utilisateur $gest) => $this->iriConverter->getIriFromResource(
                 $gest,
-            ), $data->gestionnaires),
+            ), $data->gestionnaires ?? []),
             'composantes' => array_map(fn(Composante $cmp) => $this->iriConverter->getIriFromResource(
                 $cmp,
-            ), $data->composantes),
+            ), $data->composantes ?? []),
             'formations' => array_map(fn(Formation $form) => $this->iriConverter->getIriFromResource(
                 $form,
-            ), $data->formations),
+            ), $data->formations ?? []),
             'profils' => array_map(fn(ProfilBeneficiaire $profil) => $this->iriConverter->getIriFromResource(
                 $profil,
-            ), $data->profils),
+            ), $data->profils ?? []),
         ]);
 
         $this->bilanRepository->save($bilan, true);
