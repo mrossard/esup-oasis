@@ -24,8 +24,6 @@ use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
-use App\State\SportfHautNiveau\SportifHautNiveauProcessor;
-use App\State\SportfHautNiveau\SportifHautNiveauProvider;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
@@ -118,6 +116,5 @@ class SportifHautNiveau
 
     public function __construct(
         private readonly ?\App\Entity\SportifHautNiveau $entity = null,
-    ) {
-    }
+    ) {}
 }

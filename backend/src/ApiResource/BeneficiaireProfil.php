@@ -29,7 +29,6 @@ use App\Validator\BeneficiaireDifferentGestionnaireContraint;
 use App\Validator\BeneficiaireSupprimableConstraint;
 use App\Validator\ProfilAvecTypologieConstraint;
 use DateTimeInterface;
-use Symfony\Component\ObjectMapper\Attribute\Map;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -48,6 +47,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('" . self::VOIR_PROFILS . "')",
             validationContext: ['groups' => [self::GROUP_VALIDATION_IN]],
             read: false,
+            map: false,
         ),
         new Delete(
             uriTemplate: self::ITEM_URI,

@@ -16,7 +16,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\OpenApi\Model\Operation;
-use App\State\SportfHautNiveau\SportifHautNiveauUploadProcessor;
+use App\State\SportifHautNiveau\SportifHautNiveauUploadProcessor;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Serializer\Attribute\Ignore;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -31,7 +31,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             extraProperties: ['standard_put' => true],
             allowCreate: true,
         ),
-        new Get(uriTemplate: '/liste_sportifs_haut_niveau'),
+        new Get(uriTemplate: '/liste_sportifs_haut_niveau', openapi: false),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
     openapi: new Operation(tags: ['Referentiel']),
