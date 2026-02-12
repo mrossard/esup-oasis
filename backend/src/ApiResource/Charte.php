@@ -29,16 +29,17 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, map: false),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
-        new Post(uriTemplate: self::COLLECTION_URI),
+        new Post(uriTemplate: self::COLLECTION_URI, map: false),
         new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
         new Delete(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
     ],
     openapi: new Operation(tags: ['Referentiel']),
+    provider: CharteProvider::class,
+    processor: CharteProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\Charte::class),
 )]
-#[Map(target: \App\Entity\Charte::class)]
 class Charte
 {
     public const string COLLECTION_URI = '/chartes';
@@ -73,20 +74,19 @@ class Charte
         }
     }
 
-    /***
-     * TODO: revoir ça pour mapping collections!
-     */
-
     /**
      * @var ProfilBeneficiaire[]
      */
-    #[Map(transform: new MapCollection())]
     public array $profilsAssocies {
         get {
-            if (!isset($this->profilsAssocies) && $this->entity !== null) {
+            if (
+                !isset($this->profilsAssocies)
+                && $this->entity !== null
+                && $this->entity->getProfilsAssocies() !== null
+            ) {
                 $this->profilsAssocies = array_map(
                     fn($p) => new ProfilBeneficiaire($p),
-                    $this->entity->getProfilsAssocies()->toArray()
+                    $this->entity->getProfilsAssocies()->toArray(),
                 );
             }
             return $this->profilsAssocies ?? [];
@@ -95,6 +95,5 @@ class Charte
 
     public function __construct(
         private readonly ?\App\Entity\Charte $entity = null,
-    ) {
-    }
+    ) {}
 }
