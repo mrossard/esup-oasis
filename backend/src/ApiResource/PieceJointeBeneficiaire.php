@@ -31,7 +31,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     operations: [
         new GetCollection(uriTemplate: self::COLLECTION_URI, uriVariables: ['uid']),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['uid', 'id']),
-        new Post(uriTemplate: self::COLLECTION_URI, uriVariables: ['uid'], read: false),
+        new Post(uriTemplate: self::COLLECTION_URI, uriVariables: ['uid'], read: false, map: false),
         new Delete(uriTemplate: self::ITEM_URI, uriVariables: ['uid', 'id']),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
