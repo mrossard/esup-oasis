@@ -19,6 +19,7 @@ use App\ApiResource\Reponse;
 use App\ApiResource\Utilisateur;
 use App\Repository\DemandeRepository;
 use App\Repository\QuestionRepository;
+use App\State\Demande\DemandeProvider;
 use Override;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
@@ -29,6 +30,7 @@ readonly class ReponseDenormalizer implements DenormalizerInterface
         private AbstractItemNormalizer $itemNormalizer,
         private QuestionRepository $questionRepository,
         private DemandeRepository $demandeRepository,
+        private DemandeProvider $demandeProvider,
     ) {}
 
     #[Override]
@@ -48,7 +50,7 @@ readonly class ReponseDenormalizer implements DenormalizerInterface
             throw new NotFoundHttpException('Demande / question inexistante');
         }
 
-        $reponse->demande = new Demande($demande);
+        $reponse->demande = $this->demandeProvider->transform($demande); //on veut garantir le remplissage complet
         $reponse->question = new Question($question);
         $reponse->repondant = new Utilisateur($demande->getDemandeur());
 
