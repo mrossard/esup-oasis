@@ -49,7 +49,7 @@ class OptionReponse
             if ($this->questionId === null && $this->entity !== null) {
                 $this->questionId = $this->entity->getQuestion()->getId();
             }
-            return $this->id ?? null;
+            return $this->questionId ?? null;
         }
     }
 
