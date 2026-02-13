@@ -66,27 +66,32 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: self::COLLECTION_URI,
             name: self::COLLECTION_URI,
             provider: UtilisateurProvider::class,
+            map: false,
         ),
         new GetCollection(
             uriTemplate: self::BENEFICIAIRE_COLLECTION_URI,
             name: self::BENEFICIAIRE_COLLECTION_URI,
             provider: BeneficiaireProvider::class,
+            map: false,
         ),
         new GetCollection(
             uriTemplate: self::INTERVENANT_COLLECTION_URI,
             name: self::INTERVENANT_COLLECTION_URI,
             provider: IntervenantProvider::class,
+            map: false,
         ),
         new GetCollection(
             uriTemplate: self::RENFORT_COLLECTION_URI,
             name: self::RENFORT_COLLECTION_URI,
             provider: RenfortProvider::class,
+            map: false,
         ),
         new GetCollection(
             uriTemplate: '/roles/{roleId}/utilisateurs',
             uriVariables: ['roleId'],
             security: "is_granted('" . self::LIST_BY_ROLE . "', request)",
             provider: UtilisateurRoleProvider::class,
+            map: false,
         ),
         new GetCollection(
             uriTemplate: '/amenagements/utilisateurs',
@@ -99,6 +104,7 @@ use Symfony\Component\Validator\Constraints as Assert;
                 DomaineAmenagementEnCoursFilter::class,
             ],
             provider: AmenagementsParUtilisateurProvider::class,
+            map: false,
         ),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['uid'], provider: UtilisateurProvider::class),
         new Patch(
