@@ -71,12 +71,6 @@ readonly class MembreCommissionPutProcessor implements ProcessorInterface
 
         $this->messageBus->dispatch(new ModificationUtilisateurMessage($utilisateur));
 
-        $resource = new MembreCommission($entity);
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-        return $resource;
+        return new MembreCommission($entity);
     }
 }

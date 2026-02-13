@@ -67,7 +67,7 @@ final readonly class BeneficiaireProfilProcessor implements ProcessorInterface
 
             try {
                 $this->utilisateurManager->supprimerBeneficiaire($utilisateur, $data->id);
-                $this->messageBus->dispatch(new RessourceModifieeMessage($data));
+                //                $this->messageBus->dispatch(new RessourceModifieeMessage($data));
                 return null;
             } catch (BeneficiaireInconnuException $exception) {
                 //todo: remplacer ça par une contrainte en amont
@@ -88,13 +88,7 @@ final readonly class BeneficiaireProfilProcessor implements ProcessorInterface
                     ),
                     $data->avecAccompagnement,
                 );
-                $resource = new BeneficiaireProfil($beneficiaireEntity); //, BeneficiaireProfil::class);
-                if (null !== $data->id) {
-                    $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-                } else {
-                    $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-                }
-                return $resource;
+                return new BeneficiaireProfil($beneficiaireEntity);
             } catch (BeneficiaireInconnuException $exception) {
                 //todo: remplacer ça par une contrainte en amont
                 throw new UnprocessableEntityHttpException($exception->getMessage());

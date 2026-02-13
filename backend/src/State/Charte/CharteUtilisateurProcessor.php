@@ -49,10 +49,6 @@ readonly class CharteUtilisateurProcessor implements ProcessorInterface
             $this->messageBus->dispatch(new CharteValideeMessage($charte));
         }
 
-        $resource = new CharteUtilisateur($charte);
-
-        $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-
-        return $resource;
+        return new CharteUtilisateur($charte);
     }
 }

@@ -66,14 +66,6 @@ readonly class CharteProcessor implements ProcessorInterface
 
         $this->charteRepository->save($entity, true);
 
-        $resource = new Charte($entity);
-
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-
-        return $resource;
+        return new Charte($entity);
     }
 }

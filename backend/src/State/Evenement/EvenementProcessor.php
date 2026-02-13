@@ -47,15 +47,10 @@ readonly class EvenementProcessor implements ProcessorInterface
                 throw new ConflictHttpException($errors->get(0)->getMessage());
             }
             $this->evenementManager->delete($data);
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
+
             return null;
         } else {
             $resource = new Evenement($this->evenementManager->maj($data));
-            if (null !== $data->id) {
-                $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-            } else {
-                $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-            }
             return $resource;
         }
     }

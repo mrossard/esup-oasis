@@ -33,8 +33,6 @@ readonly class CampagneDemandeProvider implements ProviderInterface
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        //todo: vérifier adéquation type demande <=> campagne?
-
         unset($uriVariables['typeId']);
         unset($context['uri_variables']['typeId']);
 
@@ -42,6 +40,7 @@ readonly class CampagneDemandeProvider implements ProviderInterface
         $operationUriVariables = [$operation->getUriVariables()['id'] ?? null];
 
         if ($operation instanceof GetCollection) {
+            //todo: filtrage sur type demande!!
             $results = $this->collectionProvider->provide(
                 $operation->withUriVariables($operationUriVariables),
                 $uriVariables,

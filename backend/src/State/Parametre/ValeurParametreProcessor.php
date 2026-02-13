@@ -67,13 +67,6 @@ readonly class ValeurParametreProcessor implements ProcessorInterface
 
         $this->parametreRepository->save($parametre, true);
 
-        $resource = new ValeurParametre($entity);
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-
-        return $resource;
+        return new ValeurParametre($entity);
     }
 }

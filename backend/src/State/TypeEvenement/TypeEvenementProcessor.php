@@ -70,11 +70,6 @@ readonly class TypeEvenementProcessor implements ProcessorInterface
 
         $this->typeEvenementRepository->save($entity, true);
 
-        if ($data->id !== null) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($data));
-        }
-        $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
-
         return new \App\ApiResource\TypeEvenement($entity);
     }
 }

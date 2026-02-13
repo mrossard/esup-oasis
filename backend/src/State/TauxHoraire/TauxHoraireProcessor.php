@@ -77,14 +77,7 @@ readonly class TauxHoraireProcessor implements ProcessorInterface
 
         $this->tauxHoraireRepository->save($tauxHoraire, true);
 
-        $resource = new TauxHoraire($tauxHoraire);
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-
-        return $resource;
+        return new TauxHoraire($tauxHoraire);
     }
 
     /**

@@ -72,17 +72,10 @@ readonly class CampagneDemandeProcessor implements ProcessorInterface
 
         $this->campagneDemandeRepository->save($entity, true);
 
-        $resource = new CampagneDemande($entity);
+        //il faut invalider le type de resource aussi
         $typeDemandeResource = new TypeDemande($typeDemande);
-
-        if (null === $data->id) {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        }
-
         $this->messageBus->dispatch(new RessourceModifieeMessage($typeDemandeResource));
 
-        return $resource;
+        return new CampagneDemande($entity);
     }
 }

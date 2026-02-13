@@ -75,14 +75,6 @@ readonly class EntretienProcessor implements ProcessorInterface
 
         $this->entretienRepository->save($entity, true);
 
-        $resource = new Entretien($entity);
-
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-
-        return $resource;
+        return new Entretien($entity);
     }
 }

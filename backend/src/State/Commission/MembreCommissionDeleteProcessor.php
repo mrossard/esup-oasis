@@ -23,11 +23,10 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class MembreCommissionDeleteProcessor implements ProcessorInterface
 {
-
-    public function __construct(private MembreCommissionRepository $membreCommissionRepository,
-                                private MessageBusInterface        $messageBus)
-    {
-    }
+    public function __construct(
+        private MembreCommissionRepository $membreCommissionRepository,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param MembreCommission $data
@@ -37,10 +36,10 @@ readonly class MembreCommissionDeleteProcessor implements ProcessorInterface
      * @return void
      * @throws ExceptionInterface
      */
-    #[Override] public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
+    #[Override]
+    public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): void
     {
         $this->membreCommissionRepository->remove($this->membreCommissionRepository->find($data->id), true);
-        $this->messageBus->dispatch(new RessourceModifieeMessage($data));
         $this->messageBus->dispatch(new RessourceModifieeMessage($data->utilisateur));
     }
 }

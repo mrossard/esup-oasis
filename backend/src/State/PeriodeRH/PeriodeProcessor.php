@@ -38,14 +38,6 @@ readonly class PeriodeProcessor implements ProcessorInterface
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): mixed
     {
         //on n'a que POST et PATCH
-        $resource = new PeriodeRH($this->manager->save($data));
-
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-
-        return $resource;
+        return new PeriodeRH($this->manager->save($data));
     }
 }

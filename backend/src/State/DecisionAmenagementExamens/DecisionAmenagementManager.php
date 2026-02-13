@@ -103,8 +103,6 @@ class DecisionAmenagementManager
 
         $this->messageBus->dispatch(new ModificationUtilisateurMessage($beneficiaire));
         //ici on veut aussi rafraichir le cache de l'utilisateur et de la decision elle-même
-        $decisionResource = new \App\ApiResource\DecisionAmenagementExamens($decision);
-        $this->messageBus->dispatch(new RessourceModifieeMessage($decisionResource));
         $utilisateurResource = new \App\ApiResource\Utilisateur($beneficiaire);
         $this->messageBus->dispatch(new RessourceModifieeMessage($utilisateurResource));
     }

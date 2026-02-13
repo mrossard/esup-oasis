@@ -85,12 +85,6 @@ class InterventionForfaitProcessor implements ProcessorInterface
 
         $this->repository->save($entity, true);
 
-        $resource = new InterventionForfait($entity);
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-        return $resource;
+        return new InterventionForfait($entity);
     }
 }

@@ -53,7 +53,7 @@ readonly class AvisEsePatchProcessor implements ProcessorInterface
         $this->avisEseRepository->save($entity, true);
 
         $this->messageBus->dispatch(new AvisEseModifieMessage($entity));
-        $this->messageBus->dispatch(new RessourceModifieeMessage($data));
+        //        $this->messageBus->dispatch(new RessourceModifieeMessage($data));
 
         return new AvisEse($entity);
     }

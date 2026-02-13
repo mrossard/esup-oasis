@@ -152,13 +152,6 @@ class ReponseProcessor implements ProcessorInterface
         //la demande doit être invalidée dans tous les cas - recalcul du champ 'complete"
         $this->messageBus->dispatch(new RessourceModifieeMessage($demandeResource));
 
-        $resource = new Reponse($reponse);
-        if ($new) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-
-        return $resource;
+        return new Reponse($reponse);
     }
 }

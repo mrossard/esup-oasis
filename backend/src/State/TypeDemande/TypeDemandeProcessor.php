@@ -67,13 +67,6 @@ readonly class TypeDemandeProcessor implements ProcessorInterface
 
         $this->typeDemandeRepository->save($entity, true);
 
-        $resource = new TypeDemande($entity);
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
-
-        return $resource;
+        return new TypeDemande($entity);
     }
 }

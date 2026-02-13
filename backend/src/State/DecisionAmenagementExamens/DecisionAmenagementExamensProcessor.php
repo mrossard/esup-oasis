@@ -24,12 +24,11 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 readonly class DecisionAmenagementExamensProcessor implements ProcessorInterface
 {
-    public function __construct(private DecisionAmenagementExamensRepository $decisionAmenagementExamensRepository,
-                                private Security                             $security,
-                                private MessageBusInterface                  $messageBus)
-    {
-
-    }
+    public function __construct(
+        private DecisionAmenagementExamensRepository $decisionAmenagementExamensRepository,
+        private Security $security,
+        private MessageBusInterface $messageBus,
+    ) {}
 
     /**
      * @param DecisionAmenagementExamens $data
@@ -52,8 +51,6 @@ readonly class DecisionAmenagementExamensProcessor implements ProcessorInterface
 
             $this->messageBus->dispatch(new DecisionEditionDemandeeMessage($entity->getId(), $user->getUid()));
         }
-
-        $this->messageBus->dispatch(new RessourceModifieeMessage($data));
 
         return $data;
     }

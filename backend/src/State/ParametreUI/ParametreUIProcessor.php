@@ -72,11 +72,6 @@ readonly class ParametreUIProcessor implements ProcessorInterface
 
         $this->parametreUIRepository->save($param, true);
 
-        $resource = new ParametreUI($param);
-
-        $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-
-        return $resource;
+        return new ParametreUI($param);
     }
 }

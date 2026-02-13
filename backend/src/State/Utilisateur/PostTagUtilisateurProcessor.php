@@ -64,8 +64,6 @@ readonly class PostTagUtilisateurProcessor implements ProcessorInterface
         $data->uid = $utilisateur->getUid();
         //la ressource utilisateur contient la liste des Tags (!= TagUtilisateur) qui lui sont associés
         $this->messageBus->dispatch(new RessourceModifieeMessage($utilisateurResource));
-        $this->messageBus->dispatch(new RessourceModifieeMessage($data));
-        $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
 
         return $data;
     }

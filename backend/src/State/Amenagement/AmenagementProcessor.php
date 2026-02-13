@@ -108,11 +108,11 @@ class AmenagementProcessor implements ProcessorInterface
         $this->messageBus->dispatch(new AmenagementModifieMessage($entity));
 
         $resource = new Amenagement($entity);
-        if (null !== $data->id) {
-            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        } else {
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        }
+        //        if (null !== $data->id) {
+        //            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
+        //        } else {
+        //            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
+        //        }
 
         return $resource;
     }
