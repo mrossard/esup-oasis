@@ -32,9 +32,13 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI, uriVariables: [
-            'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
-        ]),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            uriVariables: [
+                'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
+            ],
+            map: false,
+        ),
         new Post(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: [
