@@ -18,6 +18,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\DecisionAmenagementExamens;
 use App\ApiResource\Utilisateur;
 use App\Service\ErreurLdapException;
 use App\State\DecisionAmenagementExamens\DecisionAmenagementManager;
@@ -79,7 +80,7 @@ class UtilisateurProvider implements ProviderInterface
 
         $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
         assert($results instanceof PaginatorInterface);
-        return new MappedCollectionPaginator($results, fn($utilisateur) => new Utilisateur($utilisateur));
+        return new MappedCollectionPaginator($results, $this->transformWithDecision(...));
     }
 
     /**
@@ -100,7 +101,7 @@ class UtilisateurProvider implements ProviderInterface
                 if (isset($context['filters']['recherche'])) {
                     $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
                     assert($results instanceof PaginatorInterface);
-                    return new MappedCollectionPaginator($results, fn($utilisateur) => new Utilisateur($utilisateur));
+                    return new MappedCollectionPaginator($results, $this->transformWithDecision(...));
                 }
                 throw new RuntimeException('Paramètre "term" ou "recherche" manquant.');
             }
@@ -119,5 +120,17 @@ class UtilisateurProvider implements ProviderInterface
         } catch (UserNotFoundException) {
             throw new ItemNotFoundException('Utilisateur inconnu');
         }
+    }
+
+    public function transformWithDecision(\App\Entity\Utilisateur $entity): Utilisateur
+    {
+        $utilisateur = new Utilisateur($entity);
+        $decisionEnCours = $this->decisionAmenagementManager->getDecisionCourante($entity);
+        $utilisateur->decisionAmenagementAnneeEnCours = match ($decisionEnCours) {
+            null => null,
+            default => new DecisionAmenagementExamens($decisionEnCours),
+        };
+
+        return $utilisateur;
     }
 }
