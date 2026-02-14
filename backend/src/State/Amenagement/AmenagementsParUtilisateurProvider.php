@@ -13,12 +13,15 @@
 namespace App\State\Amenagement;
 
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Composante;
 use App\ApiResource\Inscription;
 use App\ApiResource\Utilisateur;
 use App\Entity\Amenagement;
 use App\Filter\BeneficiaireAvecAmenagementEnCoursFilter;
+use App\State\MappedCollectionPaginator;
+use App\State\Utilisateur\UtilisateurProvider;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -31,6 +34,7 @@ class AmenagementsParUtilisateurProvider implements ProviderInterface
         private readonly Security $security,
         #[Autowire(service: 'api_platform.doctrine.orm.state.collection_provider')]
         private readonly ProviderInterface $collectionProvider,
+        private readonly UtilisateurProvider $utilisateurProvider,
     ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
@@ -61,10 +65,14 @@ class AmenagementsParUtilisateurProvider implements ProviderInterface
         /**
          * TODO: filtrer les données qui remontent avec les règles de transform()
          */
-        $paginator = $this->collectionProvider->provide($operation, $uriVariables, $context);
-        return $paginator;
+        //        $paginator = $this->collectionProvider->provide($operation, $uriVariables, $context);
+        $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+        assert($results instanceof PaginatorInterface);
+        return new MappedCollectionPaginator($results, fn($entity) => $this->transform($this->utilisateurProvider->transformWithDecision(
+            $entity,
+        )));
 
-        //        return array_map(fn($resource) => $this->transform($resource), $resources);
+        //        return $paginator;
     }
 
     public function transform(Utilisateur $resource): Utilisateur
@@ -82,14 +90,14 @@ class AmenagementsParUtilisateurProvider implements ProviderInterface
             $resource->amenagements = array_values(array_filter(
                 $resource->amenagements,
                 fn(Amenagement $amenagement) => (
-                    $amenagement->typeAmenagement->examens || $amenagement->getType()->isPedagogique()
+                    $amenagement->typeAmenagement->examens || $amenagement->typeAmenagement->pedagogique
                 ),
             ));
         }
 
-        $resource->amenagements = array_values(array_map(function (Amenagement $amenagement) {
-            return new \App\ApiResource\Amenagement($amenagement);
-        }, $resource->amenagements));
+        //        $resource->amenagements = array_values(array_map(function (Amenagement $amenagement) {
+        //            return new \App\ApiResource\Amenagement($amenagement);
+        //        }, $resource->amenagements));
 
         //on ne veut que la dernière inscription
         $inscriptions = $resource->inscriptions;
@@ -98,26 +106,6 @@ class AmenagementsParUtilisateurProvider implements ProviderInterface
         });
         $resource->inscriptions = empty($inscriptions) ? [] : [array_shift($inscriptions)];
 
-        /***
-         *TODO : ce qui est commenté en-dessous
-         */
-        //Ajouts infos manquantes pour export
-        //        $resource->etatAvisEse = $entity->getEtatAvisEse();
-        //
-        //        $resource->tags = array_values(array_unique(
-        //            array_map(
-        //                fn($tag) => new Tag($tag),
-        //                array_reduce(
-        //                    $entity->getBeneficiairesActifs(),
-        //                    fn(array $carry, Beneficiaire $beneficiaire) => [...$carry, ...$beneficiaire->getTags()],
-        //                    [],
-        //                ),
-        //            ),
-        //            SORT_REGULAR,
-        //        ));
-
         return $resource;
     }
-
-    public function registerTransformations(): void {}
 }
