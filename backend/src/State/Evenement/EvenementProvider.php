@@ -58,6 +58,10 @@ readonly class EvenementProvider implements ProviderInterface
                     'sourceEntity' => 'beneficiaires',
                     'relationName' => 'utilisateur',
                 ],
+                'beneficiaireIntervenant' => [
+                    'sourceEntity' => 'beneficiaireUtilisateur',
+                    'relationName' => 'intervenant',
+                ],
                 'profil' => [
                     'sourceEntity' => 'beneficiaires',
                     'relationName' => 'profil',
@@ -81,6 +85,22 @@ readonly class EvenementProvider implements ProviderInterface
                 'typeEquipement' => [
                     'sourceEntity' => 'root',
                     'relationName' => 'equipements',
+                ],
+                'enseignants' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'enseignants',
+                ],
+                'intervenantEnseignant' => [
+                    'sourceEntity' => 'enseignants',
+                    'relationName' => 'intervenant',
+                ],
+                'utilisateurCreation' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'utilisateurCreation',
+                ],
+                'utilisateurCreationIntervenant' => [
+                    'sourceEntity' => 'utilisateurCreation',
+                    'relationName' => 'intervenant',
                 ],
             ];
 
