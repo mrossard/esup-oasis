@@ -19,6 +19,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\CampagneDemande;
 use App\ApiResource\Charte;
 use App\ApiResource\TypeDemande;
+use App\Filter\PreloadAssociationsFilter;
 use App\State\MappedCollectionPaginator;
 use Exception;
 use Symfony\Component\Clock\ClockAwareTrait;
@@ -38,6 +39,29 @@ class TypeDemandeProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
+            /**
+             * préchargement des profils liés, des campagnes et des étapes/questions
+             */
+
+            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+                'campagnes' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'campagnes',
+                ],
+                'etapes' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'etapes',
+                ],
+                'questions' => [
+                    'sourceEntity' => 'etapes',
+                    'relationName' => 'questionsEtape',
+                ],
+                'profils' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'profilsAssocies',
+                ],
+            ];
+
             $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
             assert($results instanceof PaginatorInterface);
             return new MappedCollectionPaginator($results, $this->transform(...));
