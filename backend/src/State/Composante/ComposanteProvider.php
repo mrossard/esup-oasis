@@ -18,6 +18,7 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Charte;
 use App\ApiResource\Composante;
+use App\Filter\PreloadAssociationsFilter;
 use App\State\MappedCollectionPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -33,6 +34,20 @@ readonly class ComposanteProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
+            /**
+             * préchargement des référents
+             */
+            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+                'referents' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'referents',
+                ],
+                'intervenant' => [
+                    'sourceEntity' => 'referents',
+                    'relationName' => 'intervenant',
+                ],
+            ];
+
             $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
             assert($results instanceof PaginatorInterface);
             return new MappedCollectionPaginator($results, fn($entity) => new Composante($entity));

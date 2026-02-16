@@ -21,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
+use App\Filter\PreloadAssociationsFilter;
 use App\State\Composante\ComposanteProvider;
 use App\State\Composante\PatchComposanteProcessor;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -39,6 +40,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     stateOptions: new Options(entityClass: \App\Entity\Composante::class),
 )]
 #[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
+#[ApiFilter(PreloadAssociationsFilter::class)]
 final class Composante
 {
     public const string COLLECTION_URI = '/composantes';
