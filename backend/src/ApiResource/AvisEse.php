@@ -49,10 +49,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
             processor: AvisEsePostProcessor::class,
             map: false,
         ),
-        new Get(uriTemplate: self::ITEM_URI, uriVariables: [
-            'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
-            'id',
-        ]),
+        new Get(
+            uriTemplate: self::ITEM_URI,
+            uriVariables: [
+                'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
+                'id',
+            ],
+            map: false,
+        ),
         new Patch(
             uriTemplate: self::ITEM_URI,
             uriVariables: [
