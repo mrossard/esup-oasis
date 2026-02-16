@@ -60,7 +60,7 @@ class InscriptionEnCoursFilter extends AbstractFilter
                 'type' => TypeIdentifier::BOOL,
                 'required' => false,
                 'openapi' => new Parameter(
-                    name: 'aValider',
+                    name: 'avecInscriptions',
                     in: 'query',
                     description: 'uniquement les formations avec inscription',
                 ),

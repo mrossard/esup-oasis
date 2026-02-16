@@ -17,8 +17,10 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 
 #[ORM\Entity(repositoryClass: InscriptionRepository::class)]
+#[Index(name: 'IDX_INSCRIPTION_FIN', columns: ['fin'])]
 class Inscription
 {
     #[ORM\Id]
@@ -39,7 +41,6 @@ class Inscription
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?DateTimeInterface $fin = null;
-
 
     public function getId(): ?int
     {
@@ -93,5 +94,4 @@ class Inscription
 
         return $this;
     }
-
 }

@@ -20,10 +20,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\Index;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 #[Map(target: \App\ApiResource\Evenement::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
+#[Index(name: 'IDX_EVENEMENT_DEBUT', columns: ['debut'])]
+#[Index(name: 'IDX_EVENEMENT_FIN', columns: ['fin'])]
 class Evenement implements BeneficiairesManagerInterface
 {
     #[ORM\Id]
