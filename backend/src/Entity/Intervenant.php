@@ -35,7 +35,7 @@ class Intervenant
     #[ORM\JoinColumn(nullable: false)]
     private ?Utilisateur $utilisateur = null;
 
-    #[ORM\OneToMany(mappedBy: 'intervenant', targetEntity: Evenement::class)]
+    #[ORM\OneToMany(targetEntity: Evenement::class, mappedBy: 'intervenant')]
     private Collection $interventions;
 
     #[ORM\ManyToMany(targetEntity: Evenement::class, mappedBy: 'suppleants')]
@@ -147,7 +147,6 @@ class Intervenant
     {
         return $this->now() >= $this->getFin();
     }
-
 
     /**
      * @return Collection<int, Competence>
@@ -325,6 +324,4 @@ class Intervenant
 
         return $this;
     }
-
-
 }
