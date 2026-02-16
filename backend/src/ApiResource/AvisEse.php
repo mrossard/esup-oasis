@@ -154,7 +154,7 @@ class AvisEse
     public ?Telechargement $fichier = null {
         get {
             if ($this->fichier === null && $this->entity !== null && $this->entity->getFichier() !== null) {
-                $this->fichier = $this->entity->getFichier();
+                $this->fichier = new Telechargement($this->entity->getFichier());
             }
             return $this->fichier ?? null;
         }
