@@ -25,6 +25,7 @@ use App\ApiResource\Utilisateur;
 use App\Entity\OptionReponse;
 use App\Entity\Question;
 use App\Entity\Reponse;
+use App\Filter\PreloadAssociationsFilter;
 use App\Repository\QuestionRepository;
 use App\Repository\ReponseRepository;
 use App\Repository\TypeDemandeRepository;
@@ -82,6 +83,48 @@ class DemandeProvider implements ResetInterface, ProviderInterface
      */
     private function addFilters(array $context): array
     {
+        /**
+         * préchargement de relations utilisées dans tous les cas : inscription, beneficiaire, type de demande
+         */
+        $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+            'demandeur' => [
+                'sourceEntity' => 'root',
+                'relationName' => 'demandeur',
+            ],
+            'beneficiaire' => [
+                'sourceEntity' => 'root',
+                'relationName' => 'beneficiaire',
+            ],
+            'campagne' => [
+                'sourceEntity' => 'root',
+                'relationName' => 'campagne',
+            ],
+            'typeDemande' => [
+                'sourceEntity' => 'campagne',
+                'relationName' => 'typeDemande',
+            ],
+            'inscriptions' => [
+                'sourceEntity' => 'demandeur',
+                'relationName' => 'inscriptions',
+            ],
+            'formation' => [
+                'sourceEntity' => 'inscriptions',
+                'relationName' => 'formation',
+            ],
+            'intervenant' => [
+                'sourceEntity' => 'demandeur',
+                'relationName' => 'intervenant',
+            ],
+            'beneficiaires' => [
+                'sourceEntity' => 'demandeur',
+                'relationName' => 'beneficiaires',
+            ],
+            'profilBeneficiaire' => [
+                'sourceEntity' => 'beneficiaires',
+                'relationName' => 'profil',
+            ],
+        ];
+
         if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_GESTIONNAIRE)) {
             return $context;
         }
@@ -120,6 +163,7 @@ class DemandeProvider implements ResetInterface, ProviderInterface
                     $context['filters']['campagne'] = $campagnesAccessibles;
                 }
             }
+
             return $context;
         }
 

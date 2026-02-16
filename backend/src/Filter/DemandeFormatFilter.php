@@ -27,7 +27,7 @@ class DemandeFormatFilter implements FilterInterface
                 'type' => TypeIdentifier::BOOL,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => new Parameter(name: 'format', in: 'query', description: 'format simplifié'),
+                'openapi' => new Parameter(name: 'format_simple', in: 'query', description: 'format simplifié'),
             ],
         ];
     }
