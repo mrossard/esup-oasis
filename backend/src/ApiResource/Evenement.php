@@ -28,6 +28,7 @@ use App\Entity\Beneficiaire;
 use App\Filter\EvenementsAValiderFilter;
 use App\Filter\NestedUtilisateurFilter;
 use App\Filter\NomIntervenantFilter;
+use App\Filter\PreloadAssociationsFilter;
 use App\Filter\UtilisateurConcerneParEvenementFilter;
 use App\State\Evenement\EvenementProcessor;
 use App\State\Evenement\EvenementProvider;
@@ -100,6 +101,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[PeriodeNonBloqueeConstraint(groups: ['deleteValidation'])]
 #[BeneficiaireNonNullConstraint]
 #[Assert\Expression(expression: 'this.type.forfait == false', message: "Type d'événement incompatible")]
+#[ApiFilter(PreloadAssociationsFilter::class)]
 final class Evenement
 {
     public const string COLLECTION_URI = '/evenements';

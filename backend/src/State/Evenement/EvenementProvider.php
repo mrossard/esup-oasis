@@ -19,13 +19,10 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Evenement;
 use App\ApiResource\Utilisateur;
 use App\Entity\ApplicationCliente;
-use App\Entity\Service;
+use App\Filter\PreloadAssociationsFilter;
 use App\State\MappedCollectionPaginator;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Clock\DatePoint;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 readonly class EvenementProvider implements ProviderInterface
 {
@@ -48,9 +45,45 @@ readonly class EvenementProvider implements ProviderInterface
                 $context['filters']['utilisateurConcerne'] =
                     Utilisateur::COLLECTION_URI . '/' . $user->getUserIdentifier();
             }
-        }
 
-        if ($operation instanceof GetCollection) {
+            /**
+             * préchargements intervenant, bénéficiaires/profils, type équipement
+             */
+            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+                'beneficiaires' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'beneficiaires',
+                ],
+                'beneficiaireUtilisateur' => [
+                    'sourceEntity' => 'beneficiaires',
+                    'relationName' => 'utilisateur',
+                ],
+                'profil' => [
+                    'sourceEntity' => 'beneficiaires',
+                    'relationName' => 'profil',
+                ],
+                'intervenant' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'intervenant',
+                ],
+                'utilisateurIntervenant' => [
+                    'sourceEntity' => 'intervenant',
+                    'relationName' => 'utilisateur',
+                ],
+                'suppleants' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'suppleants',
+                ],
+                'utilisateurSuppleant' => [
+                    'sourceEntity' => 'suppleants',
+                    'relationName' => 'utilisateur',
+                ],
+                'typeEquipement' => [
+                    'sourceEntity' => 'root',
+                    'relationName' => 'equipements',
+                ],
+            ];
+
             $result = $this->collectionProvider->provide($operation, $uriVariables, $context);
             assert($result instanceof PaginatorInterface);
             return new MappedCollectionPaginator($result, fn($utilisateur) => new Evenement($utilisateur));
