@@ -158,7 +158,15 @@ class EvenementRepository extends ServiceEntityRepository
     {
         if (null !== $utilisateur && !in_array(\App\Entity\Utilisateur::ROLE_ADMIN, $utilisateur->roles)) {
             //where evenement.beneficiaire.gestionnaire.service = utilisateur.service or evenement.intervenant.utilisateur = utilisateur!
-            $qb->join('e.beneficiaires', 'b')->join('b.gestionnaire', 'g')->join('g.services', 's')->join('s.utilisateurs', 'u')->leftJoin('e.intervenant', 'intervenant')->leftJoin('intervenant.utilisateur', 'u2')->andWhere('u.uid = :uid or u2.uid = :uid')->setParameter('uid', $utilisateur->uid); //null par défaut pour les admins - voir s'il faut changer la logique un jour... //intervenant est nullable
+            $qb
+                ->join('e.beneficiaires', 'b')
+                ->join('b.gestionnaire', 'g')
+                ->join('g.services', 's')
+                ->join('s.utilisateurs', 'u')
+                ->leftJoin('e.intervenant', 'intervenant')
+                ->leftJoin('intervenant.utilisateur', 'u2')
+                ->andWhere('u.uid = :uid or u2.uid = :uid')
+                ->setParameter('uid', $utilisateur->uid); //null par défaut pour les admins - voir s'il faut changer la logique un jour... //intervenant est nullable
         }
     }
 
@@ -272,5 +280,10 @@ class EvenementRepository extends ServiceEntityRepository
             ->setParameter('id', $id);
 
         return $qb->getQuery()->getOneOrNullResult()['nb'];
+    }
+
+    public function countEvenementsDuJour(DateTimeInterface $now, ?Utilisateur $utilisateur, bool $nonAffectes = false)
+    {
+        return $this->countByDateInterval($now, $now, $nonAffectes, $utilisateur);
     }
 }

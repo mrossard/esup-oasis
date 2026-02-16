@@ -1,4 +1,5 @@
 <?php /** @noinspection PhpMultipleClassDeclarationsInspection */
+
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
 /** @noinspection PhpMultipleClassDeclarationsInspection */
@@ -59,11 +60,24 @@ class AmenagementRepository extends ServiceEntityRepository
      */
     public function findEnCours(DateTimeInterface $now): array
     {
-        return $this->createQueryBuilder('a')
+        return $this
+            ->createQueryBuilder('a')
             ->andWhere('a.debut <= :now')
             ->andWhere('a.fin is null or a.fin > :now')
             ->setParameter('now', $now)
             ->getQuery()
             ->getResult();
+    }
+
+    public function countEnCours(DateTimeInterface $now): int
+    {
+        $qb = $this
+            ->createQueryBuilder('a')
+            ->select('count(a) as nb')
+            ->andWhere('a.debut <= :now')
+            ->andWhere('a.fin is null or a.fin > :now')
+            ->setParameter('now', $now);
+
+        return $qb->getQuery()->getOneOrNullResult()['nb'];
     }
 }

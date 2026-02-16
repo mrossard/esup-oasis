@@ -236,19 +236,23 @@ class EvenementManager
         $finMoisPrec = new DatePoint('last day of last month');
         $ilyaDeuxMois = (clone $now)->modify('-2 months');
 
-        $evenementsDuJour = $this->evenementRepository->evenementsDuJour($now, $utilisateur);
-        $evenementsJourPrec = $this->evenementRepository->evenementsDuJour($jourPrecedent, $utilisateur);
-        $evenementsSemaine = $this->evenementRepository->evenementsIntervalle($debutSemaine, $finSemaine, $utilisateur);
-        $evenementsSemainePrec = $this->evenementRepository->evenementsIntervalle(
-            $debutSemainePrec,
-            $finSemainePrec,
-            $utilisateur,
-        );
+        //todo: uniquement des count()
 
-        $tdb->evenementsJour = count($evenementsDuJour);
-        $tdb->evolutionJour = $tdb->evenementsJour - count($evenementsJourPrec);
-        $tdb->evenementsSemaine = count($evenementsSemaine);
-        $tdb->evolutionSemaine = $tdb->evenementsSemaine - count($evenementsSemainePrec);
+        $tdb->evenementsJour = $this->evenementRepository->countEvenementsDuJour($now, $utilisateur);
+        $tdb->evolutionJour =
+            $tdb->evenementsJour - $this->evenementRepository->countEvenementsDuJour($jourPrecedent, $utilisateur);
+        $tdb->evenementsSemaine = $this->evenementRepository->countByDateInterval(
+            debut: $debutSemaine,
+            fin: $finSemaine,
+            utilisateur: $utilisateur,
+        );
+        $tdb->evolutionSemaine =
+            $tdb->evenementsSemaine
+            - $this->evenementRepository->countByDateInterval(
+                debut: $debutSemainePrec,
+                fin: $finSemainePrec,
+                utilisateur: $utilisateur,
+            );
         $tdb->evenementsMois = $this->evenementRepository->countByDateInterval(
             debut: $debutMois,
             fin: $finMois,
@@ -265,10 +269,7 @@ class EvenementManager
         $jPlus7 = $now->modify('+7 day');
         $jPlus30 = $now->modify('+30 day');
 
-        $tdb->evenementsNonAffectesJour = count(array_filter(
-            $evenementsDuJour,
-            fn(Evenement $evenement) => $evenement->getIntervenant() === null,
-        ));
+        $tdb->evenementsNonAffectesJour = $this->evenementRepository->countEvenementsDuJour($now, $utilisateur, true);
         $tdb->evenementsNonAffectesSemaine = $this->evenementRepository->countByDateInterval(
             debut: $now,
             fin: $jPlus7,
@@ -295,59 +296,43 @@ class EvenementManager
             sansBeneficiaire: true,
         );
 
-        $beneficiairesActifs = $this->beneficiaireRepository->actifs($now);
+        /**
+         * TODO: requêtes dédiées pour chaque item
+         */
 
         //bénéficiaires sans profil
-        $tdb->nbBeneficiairesIncomplets = count(array_filter(
-            array: $beneficiairesActifs,
-            callback: fn(Beneficiaire $beneficiaire) => (
-                $beneficiaire->getProfil()->getId() === ProfilBeneficiaire::A_DETERMINER
-            ),
-        ));
+        $tdb->nbBeneficiaires = $this->beneficiaireRepository->countActifs($now);
 
         /**
          * Ajouts 2024 : nb bénéficiaires, nb intervenants en cours,
          * aménagements saisis sur benefs en cours, états avis / décisions
          */
-        $tdb->nbBeneficiaires = count(array_unique(array_map(fn(Beneficiaire $benef) => $benef
-            ->getUtilisateur()
-            ->getId(), $beneficiairesActifs)));
 
+        $tdb->nbBeneficiairesIncomplets = $this->beneficiaireRepository->countActifsParProfil(
+            $now,
+            ProfilBeneficiaire::A_DETERMINER,
+        );
         $tdb->nbAvisEseEnAttente = $this->utilisateurRepository->count([
             'etatAvisEse' => AvisEse::ETAT_EN_ATTENTE,
         ]);
 
         //décisions
         $bornesAnnee = $this->bornesAnneeDuJour($now);
-        $tdb->nbDecisionsAttenteValidation = count(array_filter($beneficiairesActifs, function ($beneficiaire) use (
+        $tdb->nbDecisionsAttenteValidation = $this->beneficiaireRepository->countActifsParEtatDecisionAnneeU(
+            $now,
             $bornesAnnee,
-        ) {
-            $decisionAmenagementExamens = $beneficiaire->getUtilisateur()->getDecisionAmenagementExamens(
-                $bornesAnnee['debut'],
-                $bornesAnnee['fin'],
-            );
-            return $decisionAmenagementExamens?->getEtat() === DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS;
-        }));
+            DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS,
+        );
 
-        //        $this->decisionAmenagementExamensRepository->count([
-        //            'etat' => DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS,
-        //        ]);
-
-        $tdb->nbDecisionsAEditer = count(array_filter($beneficiairesActifs, function ($beneficiaire) use (
+        $tdb->nbDecisionsAEditer = $this->beneficiaireRepository->countActifsParEtatDecisionAnneeU(
+            $now,
             $bornesAnnee,
-        ) {
-            $decisionAmenagementExamens = $beneficiaire->getUtilisateur()->getDecisionAmenagementExamens(
-                $bornesAnnee['debut'],
-                $bornesAnnee['fin'],
-            );
-            return $decisionAmenagementExamens?->getEtat() === DecisionAmenagementExamens::ETAT_VALIDE;
-        }));
-        //        $this->decisionAmenagementExamensRepository->count([
-        //            'etat' => DecisionAmenagementExamens::ETAT_VALIDE,
-        //        ]);
+            DecisionAmenagementExamens::ETAT_VALIDE,
+        );
 
         //aménagements
-        $tdb->nbAmenagementsEnCours = count($this->amenagementRepository->findEnCours($now));
+        $tdb->nbAmenagementsEnCours = $this->amenagementRepository->countEnCours($now);
+        //        $tdb->nbAmenagementsEnCours = count($this->amenagementRepository->findEnCours($now));
 
         //intervenants
         $tdb->nbIntervenants = $this->utilisateurRepository->countIntervenantsActifs();

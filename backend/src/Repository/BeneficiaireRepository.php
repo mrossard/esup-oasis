@@ -56,7 +56,8 @@ class BeneficiaireRepository extends ServiceEntityRepository
      */
     public function profilsIncomplets(): array
     {
-        $qb = $this->createQueryBuilder('b')
+        $qb = $this
+            ->createQueryBuilder('b')
             ->join('b.profil', 'p')
             ->andWhere('p.id = :id')
             ->setParameter('id', ProfilBeneficiaire::A_DETERMINER);
@@ -64,13 +65,13 @@ class BeneficiaireRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-
     /**
      * @return Beneficiaire[]
      */
     public function actifs(DateTimeInterface $now): array
     {
-        $qb = $this->createQueryBuilder('b')
+        $qb = $this
+            ->createQueryBuilder('b')
             ->addSelect('u')
             ->addSelect('d')
             ->addSelect('i')
@@ -83,4 +84,49 @@ class BeneficiaireRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
+    public function countActifs(DateTimeInterface $now): int
+    {
+        $qb = $this
+            ->createQueryBuilder('b')
+            ->select('count(distinct u.id) as nb')
+            ->join('b.utilisateur', 'u')
+            ->andWhere(':now >= b.debut and (b.fin is null or :now < b.fin)')
+            ->setParameter('now', $now);
+
+        return $qb->getQuery()->getOneOrNullResult()['nb'];
+    }
+
+    public function countActifsParProfil(DateTimeInterface $now, int $profilId): int
+    {
+        $qb = $this
+            ->createQueryBuilder('b')
+            ->select('count(distinct u.id) as nb')
+            ->join('b.utilisateur', 'u')
+            ->join('b.profil', 'p')
+            ->andWhere(':now >= b.debut and (b.fin is null or :now < b.fin)')
+            ->andWhere('p.id = :profilId')
+            ->setParameter('now', $now)
+            ->setParameter('profilId', $profilId);
+
+        return $qb->getQuery()->getOneOrNullResult()['nb'];
+    }
+
+    public function countActifsParEtatDecisionAnneeU(DateTimeInterface $now, array $bornesAnnee, string $etatId): int
+    {
+        $qb = $this
+            ->createQueryBuilder('b')
+            ->select('count(distinct u.id) as nb')
+            ->join('b.utilisateur', 'u')
+            ->join('u.decisionsAmenagementExamens', 'd')
+            ->andWhere(':now >= b.debut and (b.fin is null or :now < b.fin)')
+            ->andWhere('d.etat = :etatId')
+            ->andWhere('d.debut = :debut')
+            ->andWhere('d.fin = :fin')
+            ->setParameter('now', $now)
+            ->setParameter('debut', $bornesAnnee['debut'])
+            ->setParameter('fin', $bornesAnnee['fin'])
+            ->setParameter('etatId', $etatId);
+
+        return $qb->getQuery()->getOneOrNullResult()['nb'];
+    }
 }
