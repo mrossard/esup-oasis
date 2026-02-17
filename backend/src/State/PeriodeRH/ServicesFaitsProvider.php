@@ -25,8 +25,15 @@ use App\Entity\InterventionForfait;
 use App\Entity\TauxHoraire;
 use App\Entity\TypeEvenement as TypeEvenementEntity;
 use App\Entity\Utilisateur;
+use App\Repository\EvenementRepository;
+use App\Repository\InterventionForfaitRepository;
 use App\Repository\PeriodeRHRepository;
 use Exception;
+
+use function array_key_exists;
+use function array_walk;
+use function bcadd;
+use function usort;
 
 class ServicesFaitsProvider implements ProviderInterface
 {
@@ -34,6 +41,8 @@ class ServicesFaitsProvider implements ProviderInterface
 
     public function __construct(
         private readonly PeriodeRHRepository $periodeRHRepository,
+        private readonly EvenementRepository $evenementRepository,
+        private readonly InterventionForfaitRepository $interventionForfaitRepository,
     ) {
         $this->cachedResources = [
             TypeEvenementEntity::class => [],
@@ -58,7 +67,7 @@ class ServicesFaitsProvider implements ProviderInterface
         }
 
         //on construit l'objet
-        $servicesFaits = $this->init($periode, $uriVariables['uid'] ?? null);
+        $servicesFaits = $this->init(new PeriodeRH($periode), $uriVariables['uid'] ?? null);
 
         $evenements = $this->getEvenements($periode, $uriVariables['uid'] ?? null);
         return $this->traiterEvenements($evenements, $servicesFaits);
@@ -70,13 +79,11 @@ class ServicesFaitsProvider implements ProviderInterface
      * @return ServicesFaits
      * @throws Exception
      */
-    public function init(\App\Entity\PeriodeRH $periode, $uid): ServicesFaits
+    public function init(PeriodeRH $periode, $uid): ServicesFaits
     {
-        $periodeResource = new PeriodeRH($periode);
-
         $servicesFaits = new ServicesFaits();
-        $servicesFaits->id = $periodeResource->id;
-        $servicesFaits->periode = $periodeResource;
+        $servicesFaits->id = $periode->id;
+        $servicesFaits->periode = $periode;
         $servicesFaits->structure = 'Service Phase Pôle FIPVU'; //todo: param de conf quelque part...table parametre?
         $servicesFaits->lignes = [];
         $servicesFaits->uid = $uid ?? null;
@@ -90,15 +97,10 @@ class ServicesFaitsProvider implements ProviderInterface
      */
     public function getEvenements(\App\Entity\PeriodeRH $periode, ?string $uid): array
     {
-        return array_filter(array: [
-            ...$periode->getEvenements()->toArray(),
-            ...$periode->getInterventionsForfait(),
-        ], callback: function (Evenement|InterventionForfait $evenement) use ($uid) {
-            if (null !== $uid) {
-                return $evenement->getIntervenant()->getUtilisateur()->getUid() === $uid;
-            }
-            return !$evenement->getIntervenant()->getUtilisateur()->isGestionnaire();
-        });
+        $evenements = $this->evenementRepository->parPeriodeEtIntervenant($periode, $uid);
+        $interventions = $this->interventionForfaitRepository->parPeriodeEtIntervenant($periode, $uid);
+
+        return [...$evenements, ...$interventions];
     }
 
     /**
@@ -161,9 +163,9 @@ class ServicesFaitsProvider implements ProviderInterface
     ): LigneServiceFait {
         if (null == $ligne) {
             $ligne = new LigneServiceFait();
-            $ligne->type = $this->getTypeResource($evenement->getType());
-            $ligne->intervenant = $this->getUtilisateurResource($evenement->getIntervenant()->getUtilisateur());
-            $ligne->tauxHoraire = $this->getTauxHoraireResource($tauxHoraire);
+            $ligne->type = new TypeEvenement($evenement->getType());
+            $ligne->intervenant = new UtilisateurResource($evenement->getIntervenant()->getUtilisateur());
+            $ligne->tauxHoraire = new \App\ApiResource\TauxHoraire($tauxHoraire);
             $ligne->nbHeures = 0;
         }
 
@@ -172,46 +174,5 @@ class ServicesFaitsProvider implements ProviderInterface
         $ligne->nbHeures = bcadd($ligne->nbHeures, $duree);
 
         return $ligne;
-    }
-
-    /**
-     * @param TypeEvenementEntity $typeEntity
-     * @return TypeEvenement
-     * @throws Exception
-     */
-    public function getTypeResource(TypeEvenementEntity $typeEntity): TypeEvenement
-    {
-        if (!array_key_exists($typeEntity->getId(), $this->cachedResources[TypeEvenementEntity::class])) {
-            $this->cachedResources[TypeEvenementEntity::class][$typeEntity->getId()] = new TypeEvenement($typeEntity);
-        }
-        return $this->cachedResources[TypeEvenementEntity::class][$typeEntity->getId()];
-    }
-
-    /**
-     * @param Utilisateur $utilisateur
-     * @return UtilisateurResource
-     * @throws Exception
-     */
-    private function getUtilisateurResource(Utilisateur $utilisateur): UtilisateurResource
-    {
-        if (!array_key_exists($utilisateur->getId(), $this->cachedResources[Utilisateur::class])) {
-            $this->cachedResources[Utilisateur::class][$utilisateur->getId()] = new UtilisateurResource($utilisateur);
-        }
-        return $this->cachedResources[Utilisateur::class][$utilisateur->getId()];
-    }
-
-    /**
-     * @param TauxHoraire $tauxHoraire
-     * @return \App\ApiResource\TauxHoraire
-     * @throws Exception
-     */
-    private function getTauxHoraireResource(TauxHoraire $tauxHoraire): \App\ApiResource\TauxHoraire
-    {
-        if (!array_key_exists($tauxHoraire->getId(), $this->cachedResources[TauxHoraire::class])) {
-            $this->cachedResources[TauxHoraire::class][$tauxHoraire->getId()] = new \App\ApiResource\TauxHoraire(
-                $tauxHoraire,
-            );
-        }
-        return $this->cachedResources[TauxHoraire::class][$tauxHoraire->getId()];
     }
 }

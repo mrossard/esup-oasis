@@ -8,26 +8,57 @@ use ApiPlatform\State\Pagination\HasNextPagePaginatorInterface;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\Pagination\TraversablePaginator;
 use ArrayObject;
+use Iterator;
 use IteratorAggregate;
 use Traversable;
 
 class MappedCollectionPaginator implements IteratorAggregate, PaginatorInterface, HasNextPagePaginatorInterface
 {
-    private TraversablePaginator $decorated;
-
-    public function __construct(PaginatorInterface $entityPaginator, callable $mapping)
-    {
-        $this->decorated = new TraversablePaginator(
-            new ArrayObject(array_map($mapping, iterator_to_array($entityPaginator))),
-            $entityPaginator->getCurrentPage(),
-            $entityPaginator->getItemsPerPage(),
-            $entityPaginator->getTotalItems(),
-        );
-    }
+    public function __construct(
+        private PaginatorInterface $decorated,
+        private $mapping,
+    ) {}
 
     public function getIterator(): Traversable
     {
-        return $this->decorated->getIterator();
+        return new class($this->mapping, $this->decorated->getIterator()) implements Iterator {
+            private array $mappingCache = [];
+
+            public function __construct(
+                private $mapping,
+                private readonly Iterator $decorated,
+            ) {}
+
+            public function current(): mixed
+            {
+                $current = $this->decorated->current();
+                $key = spl_object_hash($current);
+
+                $this->mappingCache[$key] ??= ($this->mapping)($current);
+
+                return $this->mappingCache[$key];
+            }
+
+            public function next(): void
+            {
+                $this->decorated->next();
+            }
+
+            public function key(): mixed
+            {
+                return $this->decorated->key();
+            }
+
+            public function valid(): bool
+            {
+                return $this->decorated->valid();
+            }
+
+            public function rewind(): void
+            {
+                $this->decorated->rewind();
+            }
+        };
     }
 
     public function count(): int

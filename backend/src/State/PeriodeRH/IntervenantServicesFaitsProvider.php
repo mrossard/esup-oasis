@@ -19,16 +19,13 @@ use ApiPlatform\State\ProviderInterface;
 use App\Entity\PeriodeRH;
 use App\Filter\PeriodeEnvoyeeFilter;
 use App\Filter\PeriodeIntervenantFilter;
-use App\Repository\PeriodeRHRepository;
 use Exception;
 
 readonly class IntervenantServicesFaitsProvider implements ProviderInterface
 {
-
     function __construct(
         private ServicesFaitsProvider $servicesFaitsProvider,
         private PeriodeProvider $periodeProvider,
-        private PeriodeRHRepository $periodeRHRepository,
     ) {}
 
     /**
@@ -44,13 +41,15 @@ readonly class IntervenantServicesFaitsProvider implements ProviderInterface
         $periodeContext = $context;
         $periodeContext['filters'][PeriodeIntervenantFilter::PROPERTY] = $uriVariables['uid'];
         $periodeContext['filters'][PeriodeEnvoyeeFilter::PROPERTY] = true;
+        $periodeContext['filters']['page'] = $context['filters']['page'] ?? 1;
+        $periodeContext['filters']['itemsPerPage'] = $context['filters']['itemsPerPage'] ?? 30;
         if ($context['filters']['order'] ?? false) {
             $periodeContext['filters']['order'] = $context['filters']['order'];
         }
 
         $periodeRhOperation = new GetCollection()
-//            ->withClass(PeriodeRH::class)
-            ->withclass(PeriodeRH::class) //entité, on ajoute les filtres à la main
+            ->withclass(PeriodeRH::class)
+            ->withMap(false)
             ->withFilters([
                 'annotated_app_api_resource_periode_rh_api_platform_doctrine_orm_filter_order_filter',
                 PeriodeIntervenantFilter::class,
@@ -66,10 +65,9 @@ readonly class IntervenantServicesFaitsProvider implements ProviderInterface
         //on a les périodes filtrées...
         $result = [];
         foreach ($periodes as $periode) {
-            $periodeEntity = $this->periodeRHRepository->find($periode->id);
-            $servicesFaits = $this->servicesFaitsProvider->init($periodeEntity, $uriVariables['uid']);
+            $servicesFaits = $this->servicesFaitsProvider->init($periode, $uriVariables['uid']);
             $result[] = $this->servicesFaitsProvider->traiterEvenements(
-                evenements: $this->servicesFaitsProvider->getEvenements($periodeEntity, $uriVariables['uid']),
+                evenements: $this->servicesFaitsProvider->getEvenements($periode->entity, $uriVariables['uid']),
                 servicesFaits: $servicesFaits,
             );
         }

@@ -14,6 +14,7 @@ namespace App\Repository;
 
 use App\ApiResource\Utilisateur;
 use App\Entity\Evenement;
+use App\Entity\PeriodeRH;
 use App\Entity\TypeEvenement;
 use DateTime;
 use DateTimeImmutable;
@@ -285,5 +286,27 @@ class EvenementRepository extends ServiceEntityRepository
     public function countEvenementsDuJour(DateTimeInterface $now, ?Utilisateur $utilisateur, bool $nonAffectes = false)
     {
         return $this->countByDateInterval($now, $now, $nonAffectes, $utilisateur);
+    }
+
+    public function parPeriodeEtIntervenant(PeriodeRH $periode, ?string $uid = null)
+    {
+        if ($uid) {
+            $qb = $this
+                ->createQueryBuilder('e')
+                ->join('e.intervenant', 'i')
+                ->join('i.utilisateur', 'u', JOIN::WITH, 'u.uid = :uid')
+                ->andWhere('e.periodePriseEnCompteRH = :periode')
+                ->setParameter('periode', $periode)
+                ->setParameter('uid', $uid);
+        } else {
+            $qb = $this
+                ->createQueryBuilder('e')
+                ->andWhere('e.periodePriseEnCompteRH = :periode')
+                ->join('e.intervenant', 'i')
+                ->join('i.utilisateur', 'u', JOIN::WITH, 'u.gestionnaire = false')
+                ->setParameter('periode', $periode);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 }
