@@ -30,6 +30,7 @@ use App\Filter\BeneficiaireActifTagFilter;
 use App\Filter\CaseInsensitiveSearchFilter;
 use App\Filter\ComposanteFormationFilter;
 use App\Filter\NestedFieldSearchFilter;
+use App\Filter\PreloadAssociationsFilter;
 use App\State\Amenagement\AmenagementProcessor;
 use App\State\Amenagement\AmenagementProvider;
 use App\State\Amenagement\AmenagementSansFiltreProvider;
@@ -46,11 +47,13 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: self::COLLECTION_URI,
             uriVariables: ['uid'],
             security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.attributes.get('uid'))",
+            map: false,
         ),
         new GetCollection(
             uriTemplate: '/amenagements',
             security: "is_granted('" . self::VOIR_AMENAGEMENTS . "')",
             provider: AmenagementSansFiltreProvider::class,
+            map: false,
         ),
         new Post(uriTemplate: self::COLLECTION_URI, uriVariables: ['uid'], read: false, map: false),
         new Get(
@@ -110,8 +113,8 @@ use Symfony\Component\Validator\Constraints as Assert;
         'desc' => "gestionnaire du bénéficiaire de l'aménagement",
     ],
 ])]
+#[ApiFilter(PreloadAssociationsFilter::class)]
 #[AmenagementDatesConstraint]
-//#[Map(target: \App\Entity\Amenagement::class, transform: [self::class, 'toEntity'])]
 class Amenagement
 {
     public const string COLLECTION_URI = '/utilisateurs/{uid}/amenagements';
@@ -129,7 +132,7 @@ class Amenagement
             if ($this->id === null && $this->entity !== null) {
                 $this->id = $this->entity->getId();
             }
-            return $this->id ?? null;
+            return $this->id;
         }
     }
 
@@ -137,38 +140,22 @@ class Amenagement
     public ?string $uid = null {
         get {
             if (!isset($this->uid) && $this->entity !== null) {
-                // Logic from Provider
-                $beneficiaires = $this->entity->getBeneficiaires();
-                if ($beneficiaires->count() > 0) {
-                    $firstBenef = $beneficiaires->current();
-                    if ($firstBenef) {
-                        $this->uid = $firstBenef->getUtilisateur()->getUid();
-                    }
-                }
+                $this->uid = $this->beneficiaire->uid;
             }
-            return $this->uid ?? null;
+            return $this->uid;
         }
     }
 
     #[Groups([self::GROUP_OUT])]
     public Utilisateur $beneficiaire {
         get {
-            if (!isset($this->beneficiaire) && $this->entity !== null) {
-                $beneficiaires = $this->entity->getBeneficiaires();
-                if ($beneficiaires->count() > 0) {
-                    $firstBenef = $beneficiaires->current();
-                    if ($firstBenef) {
-                        $user = $firstBenef->getUtilisateur();
-                        $this->beneficiaire = new Utilisateur($user);
-
-                        $derniereInscription = $user->getDerniereInscription();
-                        if ($derniereInscription) {
-                            $this->beneficiaire->inscriptions = [new Inscription($derniereInscription)];
-                        } else {
-                            $this->beneficiaire->inscriptions = [];
-                        }
-                    }
-                }
+            if (
+                !isset($this->beneficiaire)
+                && $this->entity !== null
+                && !$this->entity->getBeneficiaires()->isEmpty()
+            ) {
+                $firstBenef = $this->entity->getBeneficiaires()->current();
+                $this->beneficiaire = new Utilisateur($firstBenef->getUtilisateur());
             }
             return $this->beneficiaire;
         }
@@ -186,21 +173,21 @@ class Amenagement
     }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $semestre1 = false {
+    public ?bool $semestre1 = null {
         get {
-            if ($this->entity !== null) {
-                return $this->entity->isSemestre1() ?? false;
+            if (null == $this->semestre1 && $this->entity !== null) {
+                $this->semestre1 = $this->entity->isSemestre1();
             }
-            return $this->semestre1;
+            return $this->semestre1 ?? false;
         }
     }
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $semestre2 = false {
+    public ?bool $semestre2 = null {
         get {
-            if ($this->entity !== null) {
-                return $this->entity->isSemestre2() ?? false;
+            if (null == $this->semestre2 && $this->entity !== null) {
+                $this->semestre2 = $this->entity->isSemestre2();
             }
-            return $this->semestre2;
+            return $this->semestre2 ?? false;
         }
     }
 
@@ -210,7 +197,7 @@ class Amenagement
             if (!isset($this->debut) && $this->entity !== null) {
                 $this->debut = $this->entity->getDebut();
             }
-            return $this->debut ?? null;
+            return $this->debut;
         }
     }
     #[Assert\GreaterThan(propertyPath: 'debut', message: 'fin doit être postérieur à debut')]
@@ -220,7 +207,7 @@ class Amenagement
             if (!isset($this->fin) && $this->entity !== null) {
                 $this->fin = $this->entity->getFin();
             }
-            return $this->fin ?? null;
+            return $this->fin;
         }
     }
 
@@ -230,7 +217,7 @@ class Amenagement
             if (!isset($this->commentaire) && $this->entity !== null) {
                 $this->commentaire = $this->entity->getCommentaire();
             }
-            return $this->commentaire ?? null;
+            return $this->commentaire;
         }
     }
 
@@ -240,7 +227,7 @@ class Amenagement
             if (!isset($this->suivi) && $this->entity !== null && $this->entity->getSuivi()) {
                 $this->suivi = new TypeSuiviAmenagement($this->entity->getSuivi());
             }
-            return $this->suivi ?? null;
+            return $this->suivi;
         }
     }
 

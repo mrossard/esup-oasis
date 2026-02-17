@@ -14,10 +14,14 @@ namespace App\State\Amenagement;
 
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
+use App\ApiResource\Amenagement;
 use App\ApiResource\Composante;
 use App\Entity\Utilisateur;
 use App\Filter\AmenagementBeneficiaireActifFilter;
+use App\Filter\PreloadAssociationsFilter;
+use App\State\MappedCollectionPaginator;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -39,7 +43,14 @@ class AmenagementSansFiltreProvider implements ProviderInterface
             //on ne veut que les aménagements sur les bénéficiaires actifs
             $context['filters'][AmenagementBeneficiaireActifFilter::PROPERTY] = true;
 
-            // les renforts ne voient que les aménagements aide humaine!
+            //preload
+            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+                'beneficiaires' => ['sourceEntity' => 'root', 'relationName' => 'beneficiaires'],
+                'beneficiaireUtilisateur' => ['sourceEntity' => 'beneficiaires', 'relationName' => 'utilisateur'],
+                'intervenant' => ['sourceEntity' => 'beneficiaireUtilisateur', 'relationName' => 'intervenant'],
+            ];
+
+            // les renforts ne voient que les aménagements d'aide humaine !
             if ($this->security->isGranted(Utilisateur::ROLE_RENFORT)) {
                 $context['filters']['type.examens'] = false;
                 $context['filters']['type.pedagogique'] = false;
@@ -60,7 +71,9 @@ class AmenagementSansFiltreProvider implements ProviderInterface
                     );
                 }
             }
-            return $this->collectionProvider->provide($operation, $uriVariables, $context);
+            $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
+            assert($results instanceof PaginatorInterface);
+            return new MappedCollectionPaginator($results, fn($entity) => new Amenagement($entity));
         }
 
         return $this->itemProvider->provide($operation, $uriVariables, $context);
