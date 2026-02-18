@@ -24,7 +24,6 @@ use Doctrine\Persistence\ManagerRegistry;
 use Exception;
 use Override;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 

@@ -10,7 +10,6 @@ use DateTime;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class TauxHoraireDateFilter extends AbstractFilter

@@ -15,10 +15,10 @@ namespace App\Filter;
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\OpenApi\Model\Parameter;
 use App\Entity\DecisionAmenagementExamens;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class EtatDecisionAmenagementFilter extends AbstractFilter
@@ -74,11 +74,9 @@ class EtatDecisionAmenagementFilter extends AbstractFilter
                 'property' => self::PROPERTY,
                 'type' => TypeIdentifier::STRING,
                 'required' => false,
-                'openapi' => [
-                    'description' => 'Etat avis ESE',
-                    'name' => self::PROPERTY,
+                'openapi' => new Parameter(name: self::PROPERTY, in: 'query', description: 'Etat avis ESE', schema: [
                     'type' => 'string',
-                ],
+                ]),
             ],
         ];
     }

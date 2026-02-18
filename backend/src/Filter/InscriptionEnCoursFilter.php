@@ -19,7 +19,6 @@ use ApiPlatform\OpenApi\Model\Parameter;
 use App\Entity\Formation;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Clock\ClockAwareTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class InscriptionEnCoursFilter extends AbstractFilter
@@ -63,6 +62,7 @@ class InscriptionEnCoursFilter extends AbstractFilter
                     name: 'avecInscriptions',
                     in: 'query',
                     description: 'uniquement les formations avec inscription',
+                    schema: ['type' => 'bool'],
                 ),
             ],
         ];
