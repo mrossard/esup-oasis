@@ -58,7 +58,7 @@ readonly class IntervenantServicesFaitsProvider implements ProviderInterface
         }
 
         //on reconstruit la pagination !
-        $totalPeriodes = $this->periodeRHRepository->count();
+        $totalPeriodes = $this->periodeRHRepository->countParIntervenant(uid: $uriVariables['uid']);
 
         $paginator = new TraversablePaginator(
             traversable: new ArrayObject($result),

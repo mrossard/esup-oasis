@@ -134,4 +134,21 @@ class PeriodeRHRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
+
+    public function countParIntervenant(mixed $uid)
+    {
+        $qb = $this
+            ->createQueryBuilder('p')
+            ->select('count(distinct p.id) as nb')
+            ->leftJoin('p.evenements', 'e')
+            ->leftJoin('e.intervenant', 'i')
+            ->leftJoin('i.utilisateur', 'ui', Join::WITH, 'ui.uid = :uid')
+            ->leftJoin('p.interventionsForfait', 'in')
+            ->leftJoin('in.intervenant', 'i2')
+            ->leftJoin('i2.utilisateur', 'ui2', Join::WITH, 'ui2.uid = :uid')
+            ->andWhere('ui.uid = :uid or ui2.uid = :uid')
+            ->setParameter('uid', $uid);
+
+        return $qb->getQuery()->getSingleScalarResult();
+    }
 }
