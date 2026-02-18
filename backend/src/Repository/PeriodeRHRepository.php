@@ -17,6 +17,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Clock\ClockAwareTrait;
 
@@ -60,9 +61,7 @@ class PeriodeRHRepository extends ServiceEntityRepository
      */
     public function locked(): array
     {
-        $qb = $this->createQueryBuilder('p')
-            ->andWhere('p.dateButoir <= :now')
-            ->setParameter('now', $this->now());
+        $qb = $this->createQueryBuilder('p')->andWhere('p.dateButoir <= :now')->setParameter('now', $this->now());
 
         return $qb->getQuery()->getResult();
     }
@@ -76,7 +75,8 @@ class PeriodeRHRepository extends ServiceEntityRepository
     {
         $debut = new DateTime($debut->format('Y-m-d'));
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->andWhere('p.debut <= :debut')
             ->andWhere('p.fin >= :debut')
             ->setParameter('debut', $debut);
@@ -90,9 +90,7 @@ class PeriodeRHRepository extends ServiceEntityRepository
      */
     public function periodeExisteApres(DateTimeInterface $debut): bool
     {
-        $qb = $this->createQueryBuilder('p')
-            ->where('p.debut > :debut')
-            ->setParameter('debut', $debut);
+        $qb = $this->createQueryBuilder('p')->where('p.debut > :debut')->setParameter('debut', $debut);
 
         return !empty($qb->getQuery()->getResult());
     }
@@ -104,11 +102,34 @@ class PeriodeRHRepository extends ServiceEntityRepository
      */
     public function chevauchements(?DateTimeInterface $debut, ?DateTimeInterface $fin): array
     {
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->where('p.debut between :debut and :fin')
             ->orWhere(':debut between p.debut and p.fin')
             ->setParameter('debut', $debut)
             ->setParameter('fin', $fin);
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function parIntervenant(mixed $uid, mixed $page, mixed $itemsPerPage, ?string $order, ?string $direction)
+    {
+        $qb = $this
+            ->createQueryBuilder('p')
+            ->leftJoin('p.evenements', 'e')
+            ->leftJoin('e.intervenant', 'i')
+            ->leftJoin('i.utilisateur', 'ui', Join::WITH, 'ui.uid = :uid')
+            ->leftJoin('p.interventionsForfait', 'in')
+            ->leftJoin('in.intervenant', 'i2')
+            ->leftJoin('i2.utilisateur', 'ui2', Join::WITH, 'ui2.uid = :uid')
+            ->andWhere('ui.uid = :uid or ui2.uid = :uid')
+            ->setParameter('uid', $uid)
+            ->setFirstResult(($page - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage);
+
+        if ($order) {
+            $qb->orderBy('p.' . $order, $direction);
+        }
 
         return $qb->getQuery()->getResult();
     }

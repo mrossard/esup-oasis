@@ -136,6 +136,6 @@ final class PeriodeRH
     }
 
     public function __construct(
-        private(set) readonly ?\App\Entity\PeriodeRH $entity = null,
+        private readonly ?\App\Entity\PeriodeRH $entity = null,
     ) {}
 }
