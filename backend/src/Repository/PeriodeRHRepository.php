@@ -112,10 +112,11 @@ class PeriodeRHRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function parIntervenant(mixed $uid, mixed $page, mixed $itemsPerPage, ?string $order, ?string $direction)
+    public function parIntervenant(string $uid, int $page, int $itemsPerPage, ?string $order, ?string $direction)
     {
         $qb = $this
             ->createQueryBuilder('p')
+            ->distinct()
             ->leftJoin('p.evenements', 'e')
             ->leftJoin('e.intervenant', 'i')
             ->leftJoin('i.utilisateur', 'ui', Join::WITH, 'ui.uid = :uid')
