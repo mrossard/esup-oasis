@@ -21,10 +21,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class BeneficiaireSupprimableConstraintValidator extends ConstraintValidator
 {
-
-    public function __construct(private readonly EvenementRepository $evenementRepository)
-    {
-    }
+    public function __construct(
+        private readonly EvenementRepository $evenementRepository,
+    ) {}
 
     public function validate(mixed $value, Constraint $constraint): void
     {

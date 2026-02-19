@@ -23,13 +23,12 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class NoVirusConstraintValidator extends ConstraintValidator
 {
+    public function __construct(
+        private readonly AntivirusService $antivirusService,
+    ) {}
 
-    public function __construct(private readonly AntivirusService $antivirusService)
-    {
-
-    }
-
-    #[Override] public function validate(mixed $value, Constraint $constraint): void
+    #[Override]
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof NoVirusConstraint) {
             throw new UnexpectedTypeException($constraint, NoVirusConstraint::class);

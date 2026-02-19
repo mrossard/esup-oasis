@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class BeneficiaireDifferentGestionnaireContraint extends Constraint
 {
-    public string $message = "Un bénéficiaire ne peut pas être son propre gestionnaire";
+    public string $message = 'Un bénéficiaire ne peut pas être son propre gestionnaire';
 
     public function getTargets(): string
     {

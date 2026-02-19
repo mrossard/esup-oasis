@@ -191,13 +191,17 @@ class InterventionForfait implements BeneficiairesManagerInterface
 
     public function canHaveBeneficiaire(Beneficiaire $beneficiaire): bool
     {
-        if ($beneficiaire->getDebut() >= $this->getPeriode()->getDebut() &&
-            $beneficiaire->getDebut() < $this->getPeriode()->getFin()) {
+        if (
+            $beneficiaire->getDebut() >= $this->getPeriode()->getDebut()
+            && $beneficiaire->getDebut() < $this->getPeriode()->getFin()
+        ) {
             return true;
         }
 
-        if ($this->getPeriode()->getDebut() >= $beneficiaire->getDebut() &&
-            ($this->getPeriode()->getDebut() < $beneficiaire->getFin() || null == $beneficiaire->getFin())) {
+        if (
+            $this->getPeriode()->getDebut() >= $beneficiaire->getDebut()
+            && ($this->getPeriode()->getDebut() < $beneficiaire->getFin() || null == $beneficiaire->getFin())
+        ) {
             return true;
         }
 

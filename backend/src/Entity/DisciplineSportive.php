@@ -12,15 +12,18 @@
 
 namespace App\Entity;
 
-use App\State\EntityToResourceTransformer;
 use App\Repository\DisciplineSportiveRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: DisciplineSportiveRepository::class)]
-#[Map(target: \App\ApiResource\DisciplineSportive::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
+#[Map(target: \App\ApiResource\DisciplineSportive::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class DisciplineSportive
 {
     #[ORM\Id]

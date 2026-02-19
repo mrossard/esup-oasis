@@ -50,9 +50,10 @@ class ReponseRepository extends ServiceEntityRepository
      */
     public function getReponsesARecuperer(Demande $demande): array
     {
-        $qb = $this->createQueryBuilder('r')
+        $qb = $this
+            ->createQueryBuilder('r')
             ->join('r.question', 'q')
-            ->andWhere("q.champCible is not null or q.typeReponse = :type_fichier")
+            ->andWhere('q.champCible is not null or q.typeReponse = :type_fichier')
             ->andWhere('r.repondant = :demandeur')
             ->andWhere('r.campagne = :campagne')
             ->setParameter('demandeur', $demande->getDemandeur())

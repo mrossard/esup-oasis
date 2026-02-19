@@ -16,17 +16,18 @@ use Exception;
 
 class ErreurTechniqueMessage
 {
-
     private array $trace;
     private string $exceptionMessage;
 
-    public function __construct(Exception               $exception,
-                                private readonly string $message)
-    {
-        $this->trace = array_map(
-            fn(array $ligne) => array_filter($ligne, fn($key) => $key !== 'args', ARRAY_FILTER_USE_KEY),
-            $exception->getTrace()
-        );
+    public function __construct(
+        Exception $exception,
+        private readonly string $message,
+    ) {
+        $this->trace = array_map(fn(array $ligne) => array_filter(
+            $ligne,
+            fn($key) => $key !== 'args',
+            ARRAY_FILTER_USE_KEY,
+        ), $exception->getTrace());
         $this->exceptionMessage = $exception->getMessage();
     }
 
@@ -47,5 +48,4 @@ class ErreurTechniqueMessage
     {
         return $this->trace;
     }
-
 }

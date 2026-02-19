@@ -36,7 +36,9 @@ class AvisEseModifieMessage
          * On veut la date de début d'année universitaire pour laquelle le dernierBenef est valide
          */
 
-        return $this->bornesAnneeDuJour($this->getDebutAnneeUniversitairePourBeneficiaires($this->beneficiaire->getBeneficiaires()->toArray()));
+        return $this->bornesAnneeDuJour(
+            $this->getDebutAnneeUniversitairePourBeneficiaires($this->beneficiaire->getBeneficiaires()->toArray()),
+        );
     }
 
     public function getBeneficiaire(): Utilisateur

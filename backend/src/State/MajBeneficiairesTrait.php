@@ -51,8 +51,6 @@ trait MajBeneficiairesTrait
         /**
          * Péter une erreur
          */
-
-
         /**
          * A tester un jour pour s'amuser :
          *
@@ -60,6 +58,4 @@ trait MajBeneficiairesTrait
          *    $entity->removeBeneficiaire($absent);
          * }*/
     }
-
-
 }

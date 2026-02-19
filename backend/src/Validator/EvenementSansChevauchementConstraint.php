@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class EvenementSansChevauchementConstraint extends Constraint
 {
-    public string $message = "{{ string }} a déjà un événement sur ce créneau.";
+    public string $message = '{{ string }} a déjà un événement sur ce créneau.';
 
     public function getTargets(): string
     {

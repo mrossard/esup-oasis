@@ -20,7 +20,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: DisciplineArtistiqueRepository::class)]
-#[Map(target: \App\ApiResource\DisciplineArtistique::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
+#[Map(target: \App\ApiResource\DisciplineArtistique::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class DisciplineArtistique
 {
     #[ORM\Id]

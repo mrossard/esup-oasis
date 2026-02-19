@@ -29,17 +29,15 @@ use Symfony\Component\Messenger\MessageBusInterface;
 )]
 class CalculRolesCommand extends Command
 {
-    public function __construct(private readonly UtilisateurRepository $utilisateurRepository,
-                                private readonly ParametreRepository   $parametreRepository,
-                                private readonly MessageBusInterface   $messageBus)
-    {
+    public function __construct(
+        private readonly UtilisateurRepository $utilisateurRepository,
+        private readonly ParametreRepository $parametreRepository,
+        private readonly MessageBusInterface $messageBus,
+    ) {
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-
-    }
+    protected function configure(): void {}
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {

@@ -20,17 +20,29 @@ use Override;
 
 class CaseInsensitiveSearchFilter extends NestedFieldSearchFilter
 {
-
     use PropertyHelperTrait;
 
     protected array $joins = [];
 
-    #[Override] protected function doFilter(string $alias, string $currentResourceClass, string $targetField, array $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation, array $context): void
-    {
+    #[Override]
+    protected function doFilter(
+        string $alias,
+        string $currentResourceClass,
+        string $targetField,
+        array $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation,
+        array $context,
+    ): void {
         $exprs = [];
         foreach ($value as $val) {
             $param = $queryNameGenerator->generateParameterName($targetField);
-            $exprs[] = $queryBuilder->expr()->like("lower(unaccent(" . $alias . '.' . $targetField . '))', 'unaccent(:' . $param . ')');
+            $exprs[] = $queryBuilder->expr()->like(
+                'lower(unaccent(' . $alias . '.' . $targetField . '))',
+                'unaccent(:' . $param . ')',
+            );
             $queryBuilder->setParameter($param, '%' . strtolower($val) . '%');
         }
 

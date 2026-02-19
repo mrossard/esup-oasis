@@ -26,18 +26,17 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class ValidationDemandePossibleConstraintValidator extends ConstraintValidator
 {
-
-    public function __construct(private readonly OptionReponseRepository $optionReponseRepository)
-    {
-
-    }
+    public function __construct(
+        private readonly OptionReponseRepository $optionReponseRepository,
+    ) {}
 
     /**
      * @param mixed $value
      * @param ValidationDemandePossibleConstraint $constraint
      * @return void
      */
-    #[Override] public function validate(mixed $value, Constraint $constraint): void
+    #[Override]
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof ValidationDemandePossibleConstraint) {
             throw new UnexpectedTypeException($constraint, ValidationDemandePossibleConstraint::class);
@@ -63,7 +62,8 @@ class ValidationDemandePossibleConstraintValidator extends ConstraintValidator
                 try {
                     $this->validerQuestion($value->demande, $question, $constraint);
                 } catch (Exception) {
-                    $this->context->buildViolation($constraint->message)
+                    $this->context
+                        ->buildViolation($constraint->message)
                         ->setParameter('{{ question }}', $question->libelle)
                         ->addViolation();
                 }
@@ -78,19 +78,22 @@ class ValidationDemandePossibleConstraintValidator extends ConstraintValidator
      * @return void
      * @throws Exception
      */
-    private function validerQuestion(Demande                             $demande,
-                                     QuestionDemande                     $question,
-                                     ValidationDemandePossibleConstraint $constraint): void
-    {
+    private function validerQuestion(
+        Demande $demande,
+        QuestionDemande $question,
+        ValidationDemandePossibleConstraint $constraint,
+    ): void {
         if ($question->obligatoire) {
             //obligatoire...on a une réponse?
             $reponseManquante = match ($question->typeReponse) {
                 Question::TYPE_TEXT, Question::TYPE_TEXTAREA => trim($question->reponse?->commentaire ?? '') == '',
-                Question::TYPE_SELECT, Question::TYPE_CHECKBOX => count($question->reponse?->optionsReponses ?? []) === 0,
-                default => false
+                Question::TYPE_SELECT, Question::TYPE_CHECKBOX => count($question->reponse?->optionsReponses ?? [])
+                    === 0,
+                default => false,
             };
             if ($reponseManquante) {
-                $this->context->buildViolation($constraint->message)
+                $this->context
+                    ->buildViolation($constraint->message)
                     ->setParameter('{{ question }}', $question->libelle)
                     ->addViolation();
             }
@@ -111,13 +114,12 @@ class ValidationDemandePossibleConstraintValidator extends ConstraintValidator
                 try {
                     $this->validerQuestion($demande, $demande->getQuestionDemande($questionsLiee), $constraint);
                 } catch (Exception) {
-                    $this->context->buildViolation($constraint->message)
+                    $this->context
+                        ->buildViolation($constraint->message)
                         ->setParameter('{{ question }}', $questionsLiee->getLibelle())
                         ->addViolation();
                 }
             }
         }
-
     }
-
 }

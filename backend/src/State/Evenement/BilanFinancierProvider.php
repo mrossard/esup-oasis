@@ -100,8 +100,9 @@ class BilanFinancierProvider implements ProviderInterface
              * @var Evenement|InterventionForfait $item
              */
             if (!array_key_exists($item->getIntervenant()->getUtilisateur()->getId(), $intervenants)) {
-                $intervenants[$item->getIntervenant()->getUtilisateur()->getId()] =
-                    new IntervenantBilanFinancier(intervenant: $this->getUtilisateurResource($item->getIntervenant()->getUtilisateur()));
+                $intervenants[$item->getIntervenant()->getUtilisateur()->getId()] = new IntervenantBilanFinancier(
+                    intervenant: $this->getUtilisateurResource($item->getIntervenant()->getUtilisateur()),
+                );
             }
             $dateItem = $item instanceof Evenement ? $item->getDebut() : $item->getPeriode()->getFin();
             $periode = $this->getPeriodeResource(

@@ -22,11 +22,12 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class DemandeUniqueParCampagneConstraintValidator extends ConstraintValidator
 {
-    public function __construct(private readonly DemandeRepository $demandeRepository)
-    {
-    }
+    public function __construct(
+        private readonly DemandeRepository $demandeRepository,
+    ) {}
 
-    #[Override] public function validate(mixed $value, Constraint $constraint): void
+    #[Override]
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof DemandeUniqueParCampagneConstraint) {
             throw new UnexpectedTypeException($constraint, DemandeUniqueParCampagneConstraint::class);
@@ -44,8 +45,10 @@ class DemandeUniqueParCampagneConstraintValidator extends ConstraintValidator
             return; //modification d'une existante, RAS
         }
 
-        $existante = $this->demandeRepository->findDemandeEnCoursPourUtilisateurEtCampagne($value->demandeur->uid,
-            $value->typeDemande->campagneEnCours->id);
+        $existante = $this->demandeRepository->findDemandeEnCoursPourUtilisateurEtCampagne(
+            $value->demandeur->uid,
+            $value->typeDemande->campagneEnCours->id,
+        );
 
         if (null !== $existante) {
             $this->context->buildViolation($constraint->message)->addViolation();

@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class BeneficiaireSupprimableConstraint extends Constraint
 {
-    public string $message = "Impossible de supprimer ce profil, il est associé à au moins un événement";
+    public string $message = 'Impossible de supprimer ce profil, il est associé à au moins un événement';
 
     public function getTargets(): string
     {

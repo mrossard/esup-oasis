@@ -122,6 +122,5 @@ final class Formation
 
     public function __construct(
         private readonly ?\App\Entity\Formation $entity = null,
-    ) {
-    }
+    ) {}
 }

@@ -38,7 +38,5 @@ class TypeSuiviAmenagementRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
-
     }
-
 }

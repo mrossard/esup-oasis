@@ -21,12 +21,12 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 readonly class HtmlToPdfConverter
 {
-    public function __construct(private HttpClientInterface $client,
-                                private string              $apiUri,
-                                private string              $appId,
-                                private string              $apiKey)
-    {
-    }
+    public function __construct(
+        private HttpClientInterface $client,
+        private string $apiUri,
+        private string $appId,
+        private string $apiKey,
+    ) {}
 
     /**
      * @param string $htmlContent
@@ -42,16 +42,18 @@ readonly class HtmlToPdfConverter
      * @throws ServerExceptionInterface
      * @throws TransportExceptionInterface
      */
-    public function convert(string $htmlContent, ?string $header = null, ?string $footer = null,
-                            int    $marginTop = 0, int $marginBottom = 0, int $marginLeft = 0, int $marginRight = 0): string
-    {
-        $response = $this->client->request(
-            method: 'POST',
-            url: $this->apiUri . '/connect',
-            options: [
-                'json' => ['appId' => $this->appId, 'apiKey' => $this->apiKey],
-            ]
-        );
+    public function convert(
+        string $htmlContent,
+        ?string $header = null,
+        ?string $footer = null,
+        int $marginTop = 0,
+        int $marginBottom = 0,
+        int $marginLeft = 0,
+        int $marginRight = 0,
+    ): string {
+        $response = $this->client->request(method: 'POST', url: $this->apiUri . '/connect', options: [
+            'json' => ['appId' => $this->appId, 'apiKey' => $this->apiKey],
+        ]);
         if ($response->getStatusCode() !== 200) {
             throw new RuntimeException('Service de génération de PDF indisponible');
         }
@@ -73,18 +75,14 @@ readonly class HtmlToPdfConverter
             $json['footer'] = $footer;
         }
 
-        $response = $this->client->request(
-            method: 'POST',
-            url: $this->apiUri . '/conversions',
-            options: [
-                'json' => $json,
-                'headers' => [
-                    'Authorization' => 'Bearer ' . $jwt,
-                    'accept' => 'application/pdf',
-                    'Content-Type' => 'application/ld+json',
-                ],
-            ]
-        );
+        $response = $this->client->request(method: 'POST', url: $this->apiUri . '/conversions', options: [
+            'json' => $json,
+            'headers' => [
+                'Authorization' => 'Bearer ' . $jwt,
+                'accept' => 'application/pdf',
+                'Content-Type' => 'application/ld+json',
+            ],
+        ]);
 
         return $response->getContent();
     }

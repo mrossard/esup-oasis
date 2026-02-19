@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class NonEnvoyeRHConstraintValidator extends ConstraintValidator
 {
-
     /**
      * @param Evenement  $value
      * @param Constraint $constraint
@@ -41,11 +40,11 @@ class NonEnvoyeRHConstraintValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, Evenement::class . ' / ' . InterventionForfait::class);
         }
 
-        if (($value instanceof Evenement && null !== $value->dateEnvoiRH) ||
-            ($value instanceof InterventionForfait && $value->periode->envoyee)) {
-
-            $this->context->buildViolation($constraint->message)
-                ->addViolation();
+        if (
+            $value instanceof Evenement && null !== $value->dateEnvoiRH
+            || $value instanceof InterventionForfait && $value->periode->envoyee
+        ) {
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
 }

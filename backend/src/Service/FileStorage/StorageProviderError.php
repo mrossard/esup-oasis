@@ -14,7 +14,4 @@ namespace App\Service\FileStorage;
 
 use Exception;
 
-class StorageProviderError extends Exception
-{
-
-}
+class StorageProviderError extends Exception {}

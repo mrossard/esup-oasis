@@ -12,8 +12,8 @@
 
 namespace App\Entity;
 
-use App\State\EntityToResourceTransformer;
 use App\Repository\TypeEvenementRepository;
+use App\State\EntityToResourceTransformer;
 use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,7 +21,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: TypeEvenementRepository::class)]
-#[Map(target: \App\ApiResource\TypeEvenement::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
+#[Map(target: \App\ApiResource\TypeEvenement::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class TypeEvenement
 {
     public const int TYPE_RENFORT = -1;
@@ -265,8 +268,10 @@ class TypeEvenement
     public function getTauxHoraireActifPourDate(?DateTimeInterface $date): ?TauxHoraire
     {
         foreach ($this->getTauxHoraires() as $tauxHoraire) {
-            if ($tauxHoraire->getDebut() <= $date &&
-                (null === $tauxHoraire->getFin() || $date <= $tauxHoraire->getFin())) {
+            if (
+                $tauxHoraire->getDebut() <= $date
+                && (null === $tauxHoraire->getFin() || $date <= $tauxHoraire->getFin())
+            ) {
                 return $tauxHoraire;
             }
         }

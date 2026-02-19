@@ -17,13 +17,14 @@ use Exception;
 
 class BeneficiaireInconnuException extends Exception
 {
-
     /**
      * @param Utilisateur $utilisateur
      * @param int         $idBeneficiaire
      */
-    public function __construct(protected Utilisateur $utilisateur, protected int $idBeneficiaire)
-    {
+    public function __construct(
+        protected Utilisateur $utilisateur,
+        protected int $idBeneficiaire,
+    ) {
         parent::__construct($utilisateur->getUid() . " n'a pas de beneficiaire d'id " . $idBeneficiaire);
     }
 }

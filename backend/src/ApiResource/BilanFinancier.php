@@ -24,20 +24,18 @@ use App\Filter\PeriodeDansIntervalleFilter;
 use App\State\Evenement\BilanFinancierProvider;
 use DateTimeInterface;
 
-#[ApiResource(
-    operations: [
-        new GetCollection(
-            uriTemplate      : '/suivis/financiers/debut/{debut}/fin/{fin}',
-            formats          : ['jsonld', 'customcsv' => 'text/csv'],
-            uriVariables     : ['debut', 'fin'],
-            openapi          : new Operation(tags: ['Suivis'], description: 'Bilan financier'),
-            paginationEnabled: false,
-            security         : "is_granted('ROLE_GESTIONNAIRE')",
-            provider         : BilanFinancierProvider::class,
-            stateOptions     : new Options(entityClass: \App\Entity\Evenement::class)
-        ),
-    ]
-)]
+#[ApiResource(operations: [
+    new GetCollection(
+        uriTemplate: '/suivis/financiers/debut/{debut}/fin/{fin}',
+        formats: ['jsonld', 'customcsv' => 'text/csv'],
+        uriVariables: ['debut', 'fin'],
+        openapi: new Operation(tags: ['Suivis'], description: 'Bilan financier'),
+        paginationEnabled: false,
+        security: "is_granted('ROLE_GESTIONNAIRE')",
+        provider: BilanFinancierProvider::class,
+        stateOptions: new Options(entityClass: \App\Entity\Evenement::class),
+    ),
+])]
 #[ApiFilter(PeriodeDansIntervalleFilter::class, properties: ['intervalle'])]
 #[ApiFilter(BilanFinancierProfilBeneficiairesFilter::class)]
 #[ApiFilter(ExistsFilter::class, properties: ['dateAnnulation'])]

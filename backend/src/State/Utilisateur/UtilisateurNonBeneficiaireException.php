@@ -14,6 +14,4 @@ namespace App\State\Utilisateur;
 
 use Exception;
 
-class UtilisateurNonBeneficiaireException extends Exception
-{
-}
+class UtilisateurNonBeneficiaireException extends Exception {}

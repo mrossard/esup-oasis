@@ -18,10 +18,10 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 readonly class TestMailerHandler
 {
-    public function __construct(private MailService $mailService, private string $envoyer)
-    {
-    }
-
+    public function __construct(
+        private MailService $mailService,
+        private string $envoyer,
+    ) {}
 
     public function __invoke(TestMailerMessage $message): void
     {

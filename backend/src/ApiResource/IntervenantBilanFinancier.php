@@ -17,14 +17,19 @@ class IntervenantBilanFinancier
     public string $uid;
 
     public function __construct(
-        public Utilisateur                                $intervenant,
-        /** @var ActiviteBilanFinancier[] */ public array $activitesParPeriode = [])
-    {
+        public Utilisateur $intervenant,
+        /** @var ActiviteBilanFinancier[] */ public array $activitesParPeriode = [],
+    ) {
         $this->uid = $this->intervenant->uid;
     }
 
-    public function ajoutActivite(PeriodeRH $periode, TypeEvenement $type, ?TauxHoraire $tauxHoraire, string $nbHeures, string $coeffCharge): void
-    {
+    public function ajoutActivite(
+        PeriodeRH $periode,
+        TypeEvenement $type,
+        ?TauxHoraire $tauxHoraire,
+        string $nbHeures,
+        string $coeffCharge,
+    ): void {
         /**
          * Pour chaque période, on sépare les activités par (type, taux, coeff charges) !
          */
@@ -38,9 +43,6 @@ class IntervenantBilanFinancier
             $this->activitesParPeriode[$key]->periode = $periode;
             $this->activitesParPeriode[$key]->coeffCharges = $coeffCharge;
         }
-        $this->activitesParPeriode[$key]->nbHeures = bcadd(
-            $this->activitesParPeriode[$key]?->nbHeures ?? 0,
-            $nbHeures
-        );
+        $this->activitesParPeriode[$key]->nbHeures = bcadd($this->activitesParPeriode[$key]?->nbHeures ?? 0, $nbHeures);
     }
 }

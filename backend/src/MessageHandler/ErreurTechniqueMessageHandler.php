@@ -19,15 +19,12 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(handles: ErreurTechniqueMessage::class)]
 readonly class ErreurTechniqueMessageHandler
 {
-
-    public function __construct(private MailService $mailService)
-    {
-
-    }
+    public function __construct(
+        private MailService $mailService,
+    ) {}
 
     public function __invoke(ErreurTechniqueMessage $message): void
     {
         $this->mailService->envoyerMailErreurTechnique($message);
     }
-
 }

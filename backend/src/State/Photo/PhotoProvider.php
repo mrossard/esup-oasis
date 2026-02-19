@@ -22,14 +22,13 @@ use Override;
 
 readonly class PhotoProvider implements ProviderInterface
 {
+    public function __construct(
+        private PhotoProviderInterface $photoProvider,
+        private UtilisateurManager $utilisateurManager,
+    ) {}
 
-    public function __construct(private PhotoProviderInterface $photoProvider,
-                                private UtilisateurManager     $utilisateurManager)
-    {
-
-    }
-
-    #[Override] public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    #[Override]
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         //GET sur un item seulement, uid de l'utilisateur dans $uriVariables
         $utilisateur = $this->utilisateurManager->parUid($uriVariables['uid']);

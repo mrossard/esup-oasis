@@ -14,7 +14,5 @@ namespace App\Scheduler\RappelEnvoiRH;
 
 class RappelEnvoiRHMessage
 {
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 }

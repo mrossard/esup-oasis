@@ -82,6 +82,5 @@ class TypologieHandicap
 
     public function __construct(
         private readonly ?\App\Entity\TypologieHandicap $entity = null,
-    ) {
-    }
+    ) {}
 }

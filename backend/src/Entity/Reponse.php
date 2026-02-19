@@ -407,7 +407,7 @@ class Reponse
             'amenagement_examens', 'amenagement_pedagogique' => $this->getTypesAmenagement(),
             'clubs_professionnels', 'clubs_centre_formation' => $this->getClubs(),
             'etablissement_artistique' => $this->getEtablissementsEnseignementArtistique(),
-            default => $this->getOptionsChoisies()
+            default => $this->getOptionsChoisies(),
         })->toArray();
     }
 
@@ -596,5 +596,4 @@ class Reponse
         }
         return $this;
     }
-
 }

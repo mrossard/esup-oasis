@@ -107,6 +107,5 @@ final class Service
 
     public function __construct(
         private readonly ?\App\Entity\Service $entity = null,
-    ) {
-    }
+    ) {}
 }

@@ -18,12 +18,10 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class AmenagementDatesConstraint extends Constraint
 {
-
-    public string $message = "Un aménagement doit au moins avoir une date de début ou être lié à un semestre.";
+    public string $message = 'Un aménagement doit au moins avoir une date de début ou être lié à un semestre.';
 
     public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }
-
 }

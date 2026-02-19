@@ -21,10 +21,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class PeriodesSansChevauchementConstraintValidator extends ConstraintValidator
 {
-
-    public function __construct(private readonly PeriodeManager $periodeManager)
-    {
-    }
+    public function __construct(
+        private readonly PeriodeManager $periodeManager,
+    ) {}
 
     /**
      * @inheritDoc
@@ -44,7 +43,8 @@ class PeriodesSansChevauchementConstraintValidator extends ConstraintValidator
             if ($chevauchement->getId() === $value->id) {
                 continue;
             }
-            $this->context->buildViolation(message: $constraint->message)
+            $this->context
+                ->buildViolation(message: $constraint->message)
                 ->setParameter('{{ debut }}', $chevauchement->getDebut()->format('d/m/Y'))
                 ->setParameter('{{ fin }}', $chevauchement->getFin()->format('d/m/Y'))
                 ->addViolation();

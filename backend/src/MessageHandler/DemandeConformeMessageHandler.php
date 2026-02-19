@@ -20,10 +20,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(handles: DemandeConformeMessage::class, priority: 20)]
 readonly class DemandeConformeMessageHandler
 {
-
-    function __construct(private DemandeManager $demandeManager)
-    {
-    }
+    function __construct(
+        private DemandeManager $demandeManager,
+    ) {}
 
     public function __invoke(DemandeConformeMessage $message): void
     {
@@ -34,14 +33,12 @@ readonly class DemandeConformeMessageHandler
         $profilsAssocies = $message->getTypeDemande()->getProfilsAssocies();
         if (count($profilsAssocies) == 1 && null == $demande->getCampagne()->getCommission()) {
             $this->demandeManager->modifierDemande(
-                demande    : $demande,
-                idEtat     : EtatDemande::PROFIL_VALIDE,
+                demande: $demande,
+                idEtat: EtatDemande::PROFIL_VALIDE,
                 commentaire: $message->getCommentaire(),
-                profilId   : $profilsAssocies->current()->getId(),
-                user       : $message->getUidUtilisateur()
+                profilId: $profilsAssocies->current()->getId(),
+                user: $message->getUidUtilisateur(),
             );
         }
-
     }
-
 }

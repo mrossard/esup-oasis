@@ -11,7 +11,7 @@ use Sensiolabs\GotenbergBundle\Processor\ProcessorInterface;
  */
 final class TempfileProcessor implements ProcessorInterface
 {
-    public function __invoke(string|null $fileName): Generator
+    public function __invoke(?string $fileName): Generator
     {
         $resource = tmpfile() ?: throw new ProcessorException('Unable to create a temporary file resource.');
 

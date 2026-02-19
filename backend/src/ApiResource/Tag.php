@@ -93,6 +93,5 @@ class Tag
 
     public function __construct(
         private readonly ?\App\Entity\Tag $entity = null,
-    ) {
-    }
+    ) {}
 }

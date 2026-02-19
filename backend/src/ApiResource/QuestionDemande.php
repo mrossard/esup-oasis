@@ -16,10 +16,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ApiResource(
-    operations: [new Get()],
-    openapi   : false
-)]
+#[ApiResource(operations: [new Get()], openapi: false)]
 class QuestionDemande
 {
     #[Groups([Demande::GROUP_OUT])]

@@ -24,10 +24,14 @@ class OAuthService
 {
     private array $options;
 
-
-    function __construct($clientId, $clientSecret, $redirectUri, $urlAuthorize, $urlAccessToken, $urlResourceOwnerDetails)
-    {
-
+    function __construct(
+        $clientId,
+        $clientSecret,
+        $redirectUri,
+        $urlAuthorize,
+        $urlAccessToken,
+        $urlResourceOwnerDetails,
+    ) {
         $this->options = [
             'clientId' => $clientId,
             'clientSecret' => $clientSecret,
@@ -36,7 +40,6 @@ class OAuthService
             'urlAccessToken' => $urlAccessToken,
             'urlResourceOwnerDetails' => $urlResourceOwnerDetails,
         ];
-
     }
 
     /**
@@ -66,7 +69,7 @@ class OAuthService
 
             // Redirect the user to the authorization URL.
             header('Location: ' . $authorizationUrl);
-            exit;
+            exit();
         } elseif (empty($_GET['state'])) {
             exit('Invalid state');
         } else {
@@ -77,10 +80,9 @@ class OAuthService
                 ]);
                 $accessToken->getExpires();
                 return $accessToken->getToken();
-
             } catch (IdentityProviderException|UnexpectedValueException $e) {
                 // Failed to get the access token or user details.
-                throw($e);
+                throw $e;
             }
         }
     }
@@ -97,10 +99,9 @@ class OAuthService
             if ($accessToken->hasExpired()) {
                 //try to refresh it
                 try {
-                    $newAccessToken = $this->getProvider($this->options)
-                        ->getAccessToken('refresh_token', [
-                            'refresh_token' => $accessToken->getRefreshToken(),
-                        ]);
+                    $newAccessToken = $this->getProvider($this->options)->getAccessToken('refresh_token', [
+                        'refresh_token' => $accessToken->getRefreshToken(),
+                    ]);
                     $accessToken = $newAccessToken;
                 } catch (IdentityProviderException) {
                     throw new ExpiredTokenException('OAuth AccessToken has expired and couldnt be refreshed');
@@ -112,5 +113,4 @@ class OAuthService
 
         return $this->getProvider($this->options)->getResourceOwner($accessToken);
     }
-
 }

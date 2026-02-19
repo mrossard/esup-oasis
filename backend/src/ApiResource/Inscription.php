@@ -73,6 +73,5 @@ final class Inscription
 
     public function __construct(
         private readonly ?\App\Entity\Inscription $entity = null,
-    ) {
-    }
+    ) {}
 }

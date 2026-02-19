@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class NonEnvoyeRHConstraint extends Constraint
 {
-    public string $message = "La période RH concernée est verrouillée.";
+    public string $message = 'La période RH concernée est verrouillée.';
 
     public function getTargets(): string
     {

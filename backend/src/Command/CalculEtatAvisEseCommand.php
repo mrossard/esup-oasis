@@ -21,20 +21,18 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
-    name       : 'app:calcul-etats-ese',
+    name: 'app:calcul-etats-ese',
     description: 'Initialisation de la version stockée du champ calculé etat avis ese des utilisateurs',
 )]
 class CalculEtatAvisEseCommand extends Command
 {
-    public function __construct(private readonly UtilisateurRepository $utilisateurRepository)
-    {
+    public function __construct(
+        private readonly UtilisateurRepository $utilisateurRepository,
+    ) {
         parent::__construct();
     }
 
-    protected function configure(): void
-    {
-
-    }
+    protected function configure(): void {}
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -43,7 +41,6 @@ class CalculEtatAvisEseCommand extends Command
         $existants = $this->utilisateurRepository->count([
             'etatAvisEse' => AvisEse::ETAT_AUCUN, //on a au moins ça sur les gestionnaires...
         ]);
-
 
         if ($existants > 0) {
             $io->info('Etats ESE déjà initialisés.');

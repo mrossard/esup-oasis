@@ -39,5 +39,4 @@ class TypeEngagementRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    
 }

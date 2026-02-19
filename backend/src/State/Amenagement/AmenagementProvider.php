@@ -21,7 +21,8 @@ use Override;
 
 class AmenagementProvider extends AmenagementSansFiltreProvider
 {
-    #[Override] public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
+    #[Override]
+    public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
             //ajout d'un filtre sur utilisateur!
@@ -35,14 +36,11 @@ class AmenagementProvider extends AmenagementSansFiltreProvider
         $relevantVariables = ['id' => $uriVariables['id']];
 
         $link = new Link(parameterName: 'id', fromClass: Amenagement::class, identifiers: ['id']);
-        $relevantOperation = (new (get_class($operation)))->withClass(Amenagement::class)
+        $relevantOperation = new (get_class($operation))()
+            ->withClass(Amenagement::class)
             ->withStateOptions($operation->getStateOptions())
             ->withUriVariables([$link]);
 
-        return parent::provide(
-            operation   : $relevantOperation,
-            uriVariables: $relevantVariables,
-            context     : $context
-        );
+        return parent::provide(operation: $relevantOperation, uriVariables: $relevantVariables, context: $context);
     }
 }

@@ -96,6 +96,5 @@ final class TypeEngagement
 
     public function __construct(
         private readonly ?\App\Entity\TypeEngagement $entity = null,
-    ) {
-    }
+    ) {}
 }

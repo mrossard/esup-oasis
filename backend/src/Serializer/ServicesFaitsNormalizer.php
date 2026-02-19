@@ -15,10 +15,8 @@ namespace App\Serializer;
 use App\ApiResource\ServicesFaits;
 use Symfony\Component\Serializer\Normalizer\NormalizerInterface;
 
-
 class ServicesFaitsNormalizer implements NormalizerInterface
 {
-
     /**
      * @param ServicesFaits $data
      * @param string|null $format
@@ -40,8 +38,11 @@ class ServicesFaitsNormalizer implements NormalizerInterface
         /**
          * Entêtes
          */
-        $data[] = ["TABLEAU SERVICES FAITS"];
-        $data[] = ["Période", "Du " . $object->periode->debut->format('d/m/Y') . " au " . $object->periode->fin->format('d/m/Y')];
+        $data[] = ['TABLEAU SERVICES FAITS'];
+        $data[] = [
+            'Période',
+            'Du ' . $object->periode->debut->format('d/m/Y') . ' au ' . $object->periode->fin->format('d/m/Y'),
+        ];
         $data[] = [$object->structure];
         $data[] = [];
         $data[] = ['Email', 'Nom', 'Prénom', 'Catégorie', 'Nombre heures', 'taux horaire'];

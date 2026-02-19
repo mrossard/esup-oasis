@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class DemandeUniqueParCampagneConstraint extends Constraint
 {
-    public string $message = "Une seule demande est autorisée par campagne.";
+    public string $message = 'Une seule demande est autorisée par campagne.';
 
     public function getTargets(): string
     {

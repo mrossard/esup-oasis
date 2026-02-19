@@ -39,5 +39,4 @@ class DisciplineSportiveRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }

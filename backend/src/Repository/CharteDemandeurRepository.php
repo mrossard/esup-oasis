@@ -39,5 +39,4 @@ class CharteDemandeurRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-    
 }

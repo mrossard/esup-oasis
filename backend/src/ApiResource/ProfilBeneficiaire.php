@@ -89,6 +89,5 @@ final class ProfilBeneficiaire
 
     public function __construct(
         private readonly ?\App\Entity\ProfilBeneficiaire $entity = null,
-    ) {
-    }
+    ) {}
 }

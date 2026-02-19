@@ -21,12 +21,11 @@ use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 #[AsPeriodicTask(frequency: '1 hour', schedule: 'maj_formations')]
 readonly class MajFormations
 {
-    public function __construct(private FormationRepository        $formationRepository,
-                                private AbstractSiScolDataProvider $scolProvider,
-                                private LoggerInterface            $logger)
-    {
-
-    }
+    public function __construct(
+        private FormationRepository $formationRepository,
+        private AbstractSiScolDataProvider $scolProvider,
+        private LoggerInterface $logger,
+    ) {}
 
     public function __invoke(): void
     {
@@ -38,9 +37,7 @@ readonly class MajFormations
                 $this->logger->warning('Backend scol indisponible - maj des formations abandonnée.');
                 return;
             }
-            $incomplete->setDiplome($data['diplome'])
-                ->setNiveau($data['niveau'])
-                ->setDiscipline($data['discipline']);
+            $incomplete->setDiplome($data['diplome'])->setNiveau($data['niveau'])->setDiscipline($data['discipline']);
             $this->formationRepository->save($incomplete);
             $nbMaj++;
         }
@@ -50,5 +47,4 @@ readonly class MajFormations
         }
         $this->logger->info($nbMaj . ' formations incomplètes mises à jour.');
     }
-
 }

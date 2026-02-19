@@ -23,11 +23,10 @@ class AvisEseModifieMessageHandler
 {
     use ClockAwareTrait;
 
-    public function __construct(private readonly DecisionAmenagementManager $decisionAmenagementManager,
-                                private readonly UtilisateurRepository      $utilisateurRepository)
-    {
-
-    }
+    public function __construct(
+        private readonly DecisionAmenagementManager $decisionAmenagementManager,
+        private readonly UtilisateurRepository $utilisateurRepository,
+    ) {}
 
     public function __invoke(AvisEseModifieMessage $message): void
     {
@@ -38,7 +37,11 @@ class AvisEseModifieMessageHandler
         $bornesAnneeConcernee = $message->getBornesAnnee();
         $beneficiaire = $message->getBeneficiaire();
 
-        $this->decisionAmenagementManager->majEtatDecision($beneficiaire, $bornesAnneeConcernee['debut'], $bornesAnneeConcernee['fin']);
+        $this->decisionAmenagementManager->majEtatDecision(
+            $beneficiaire,
+            $bornesAnneeConcernee['debut'],
+            $bornesAnneeConcernee['fin'],
+        );
 
         /**
          * On doit recalculer le champ etatAvisEse de l'utilisateur
@@ -46,5 +49,4 @@ class AvisEseModifieMessageHandler
         $beneficiaire->setEtatAvisEse($beneficiaire->getEtatAvisEseCalcule());
         $this->utilisateurRepository->save($beneficiaire, true);
     }
-
 }

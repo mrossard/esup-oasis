@@ -20,11 +20,10 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler]
 readonly class CreationIntervenantMessageHandler
 {
-    public function __construct(private MailService        $mailService,
-                                private UtilisateurManager $utilisateurManager)
-    {
-
-    }
+    public function __construct(
+        private MailService $mailService,
+        private UtilisateurManager $utilisateurManager,
+    ) {}
 
     public function __invoke(CreationIntervenantMessage $message): void
     {
@@ -38,5 +37,4 @@ readonly class CreationIntervenantMessageHandler
         $fin = $intervenant->getIntervenant()->getFin();
         $this->utilisateurManager->majInscriptionsEtIdentite($intervenant, $debut, $fin);
     }
-
 }

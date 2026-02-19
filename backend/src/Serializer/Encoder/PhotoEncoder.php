@@ -17,13 +17,14 @@ use Symfony\Component\Serializer\Encoder\EncoderInterface;
 
 class PhotoEncoder implements EncoderInterface
 {
-
-    #[Override] public function encode(mixed $data, string $format, array $context = []): string
+    #[Override]
+    public function encode(mixed $data, string $format, array $context = []): string
     {
         return current($data);
     }
 
-    #[Override] public function supportsEncoding(string $format): bool
+    #[Override]
+    public function supportsEncoding(string $format): bool
     {
         return 'jpeg' === $format;
     }

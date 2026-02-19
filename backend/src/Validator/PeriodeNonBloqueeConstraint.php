@@ -18,11 +18,10 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class PeriodeNonBloqueeConstraint extends Constraint
 {
-    public string $message = "La date butoir de cette période est passée";
+    public string $message = 'La date butoir de cette période est passée';
 
     public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }
-
 }

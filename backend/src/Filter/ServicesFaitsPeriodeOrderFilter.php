@@ -12,12 +12,11 @@
 
 namespace App\Filter;
 
-use ApiPlatform\Metadata\FilterInterface;
 use ApiPlatform\Doctrine\Common\Filter\OrderFilterInterface;
+use ApiPlatform\Metadata\FilterInterface;
 
 class ServicesFaitsPeriodeOrderFilter implements FilterInterface
 {
-
     public function getDescription(string $resourceClass): array
     {
         return [

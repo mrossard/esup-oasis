@@ -22,11 +22,10 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 #[AsMessageHandler]
 readonly class ModificationUtilisateurMessageHandler
 {
-    public function __construct(private TagAwareCacheInterface $cache,
-                                private UtilisateurManager     $utilisateurManager)
-    {
-
-    }
+    public function __construct(
+        private TagAwareCacheInterface $cache,
+        private UtilisateurManager $utilisateurManager,
+    ) {}
 
     /**
      * @throws InvalidArgumentException
@@ -43,5 +42,4 @@ readonly class ModificationUtilisateurMessageHandler
             $this->cache->invalidateTags(['utilisateurs_roles_' . $role]);
         }
     }
-
 }

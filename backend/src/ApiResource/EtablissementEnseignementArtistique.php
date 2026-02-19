@@ -81,6 +81,5 @@ class EtablissementEnseignementArtistique
 
     public function __construct(
         private readonly ?\App\Entity\EtablissementEnseignementArtistique $entity = null,
-    ) {
-    }
+    ) {}
 }

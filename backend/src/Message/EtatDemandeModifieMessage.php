@@ -14,16 +14,14 @@ namespace App\Message;
 
 readonly class EtatDemandeModifieMessage
 {
-
     public function __construct(
-        private int     $idDemande,
-        private int     $idEtatprecedent,
-        private int     $idEtat,
-        private string  $uidUtilisateurModif,
+        private int $idDemande,
+        private int $idEtatprecedent,
+        private int $idEtat,
+        private string $uidUtilisateurModif,
         private ?string $commentaire,
-        private ?int    $idProfil)
-    {
-    }
+        private ?int $idProfil,
+    ) {}
 
     public function getIdEtat(): int
     {
@@ -54,5 +52,4 @@ readonly class EtatDemandeModifieMessage
     {
         return $this->idProfil;
     }
-
 }

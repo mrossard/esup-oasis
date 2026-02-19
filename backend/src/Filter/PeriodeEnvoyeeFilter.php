@@ -9,7 +9,6 @@ use Doctrine\ORM\QueryBuilder;
 
 class PeriodeEnvoyeeFilter extends AbstractFilter
 {
-
     public const string PROPERTY = 'periodeEnvoyeeFilter';
 
     protected function filterProperty(
@@ -27,8 +26,7 @@ class PeriodeEnvoyeeFilter extends AbstractFilter
 
         $alias = $queryBuilder->getRootAliases()[0];
 
-        $queryBuilder
-            ->andWhere($alias.'.dateEnvoi is not null');
+        $queryBuilder->andWhere($alias . '.dateEnvoi is not null');
     }
 
     /**

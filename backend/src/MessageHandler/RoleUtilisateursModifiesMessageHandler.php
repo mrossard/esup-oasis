@@ -19,14 +19,12 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 #[AsMessageHandler(handles: RoleUtilisateursModifiesMessage::class)]
 readonly class RoleUtilisateursModifiesMessageHandler
 {
-    public function __construct(private TagAwareCacheInterface $cache)
-    {
-
-    }
+    public function __construct(
+        private TagAwareCacheInterface $cache,
+    ) {}
 
     public function __invoke(RoleUtilisateursModifiesMessage $message): void
     {
         $this->cache->invalidateTags(['utilisateurs_roles_' . $message->getRole()]);
     }
-
 }

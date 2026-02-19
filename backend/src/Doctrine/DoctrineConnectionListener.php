@@ -30,10 +30,11 @@ class DoctrineConnectionListener implements EventSubscriberInterface
     private int $lastChecked = 0;
 
     public function __construct(
-        #[Autowire(service: 'service_container')] private readonly ContainerInterface $container,
-        #[Autowire(env: 'DOCTRINE_CHECK_TIMING')] private readonly int                $checkTiming)
-    {
-    }
+        #[Autowire(service: 'service_container')]
+        private readonly ContainerInterface $container,
+        #[Autowire(env: 'DOCTRINE_CHECK_TIMING')]
+        private readonly int $checkTiming,
+    ) {}
 
     public function onKernelRequest(RequestEvent $event): void
     {
@@ -43,7 +44,7 @@ class DoctrineConnectionListener implements EventSubscriberInterface
             throw new RuntimeException(sprintf('Is not an instance of "%s".', Connection::class));
         }
 
-        if (time() - $this->lastChecked >= $this->checkTiming) {
+        if ((time() - $this->lastChecked) >= $this->checkTiming) {
             $connection->close();
             $this->lastChecked = time();
         }

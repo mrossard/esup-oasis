@@ -20,21 +20,26 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(handles: AmenagementModifieMessage::class)]
 readonly class AmenagementModifieMessageHandler
 {
-    public function __construct(private DecisionAmenagementManager $decisionAmenagementManager,
-                                private LoggerInterface            $logger)
-    {
-
-    }
+    public function __construct(
+        private DecisionAmenagementManager $decisionAmenagementManager,
+        private LoggerInterface $logger,
+    ) {}
 
     public function __invoke(AmenagementModifieMessage $message): void
     {
         $bornesAnneeConcernee = $message->getBornesAnnee();
-        $this->logger->info('Aménagement modifié pour  : ' . $message->getBeneficiaire()->getUid() . ', année : ' . json_encode($bornesAnneeConcernee));
+        $this->logger->info(
+            'Aménagement modifié pour  : ' . $message->getBeneficiaire()->getUid() . ', année : '
+                . json_encode($bornesAnneeConcernee),
+        );
         $beneficiaire = $message->getBeneficiaire();
 
         if ($message->isExamens()) {
-            $this->decisionAmenagementManager->majEtatDecision($beneficiaire, $bornesAnneeConcernee['debut'], $bornesAnneeConcernee['fin']);
+            $this->decisionAmenagementManager->majEtatDecision(
+                $beneficiaire,
+                $bornesAnneeConcernee['debut'],
+                $bornesAnneeConcernee['fin'],
+            );
         }
     }
-
 }

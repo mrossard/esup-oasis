@@ -44,7 +44,7 @@ class ParametreUIRepository extends ServiceEntityRepository
         }
     }
 
-//    /**
-//     * @return Parametre[] Returns an array of Parametre objects
-//     */
+    //    /**
+    //     * @return Parametre[] Returns an array of Parametre objects
+    //     */
 }

@@ -20,15 +20,13 @@ use Symfony\Component\Serializer\Normalizer\DenormalizerInterface;
 
 readonly class AmenagementDenormalizer implements DenormalizerInterface
 {
-
     public function __construct(
         #[Autowire(service: 'api_platform.jsonld.normalizer.item')]
         private AbstractItemNormalizer $itemNormalizer,
-    )
-    {
-    }
+    ) {}
 
-    #[Override] public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
+    #[Override]
+    public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
         /**
          * @var Amenagement $amenagement
@@ -39,12 +37,18 @@ readonly class AmenagementDenormalizer implements DenormalizerInterface
         return $amenagement;
     }
 
-    #[Override] public function supportsDenormalization(mixed $data, string $type, ?string $format = null, array $context = []): bool
-    {
+    #[Override]
+    public function supportsDenormalization(
+        mixed $data,
+        string $type,
+        ?string $format = null,
+        array $context = [],
+    ): bool {
         return $type === Amenagement::class;
     }
 
-    #[Override] public function getSupportedTypes(?string $format): array
+    #[Override]
+    public function getSupportedTypes(?string $format): array
     {
         return [
             Amenagement::class => true,

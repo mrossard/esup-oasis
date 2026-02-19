@@ -17,7 +17,6 @@ use DateTimeInterface;
 
 trait UtilisateurBeneficiaireValidatorTrait
 {
-
     protected function utilisateurValide(Utilisateur $utilisateur, DateTimeInterface $dateObservee): bool
     {
         foreach ($utilisateur->profils ?? [] as $profil) {
@@ -28,5 +27,4 @@ trait UtilisateurBeneficiaireValidatorTrait
         //pas de profil valide
         return false;
     }
-
 }

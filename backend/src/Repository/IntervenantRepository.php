@@ -48,5 +48,4 @@ class IntervenantRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }

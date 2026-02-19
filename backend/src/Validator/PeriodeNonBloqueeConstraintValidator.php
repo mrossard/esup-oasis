@@ -26,11 +26,10 @@ class PeriodeNonBloqueeConstraintValidator extends ConstraintValidator
 {
     use ClockAwareTrait;
 
-    public function __construct(private readonly PeriodeRHRepository $periodeRHRepository,
-                                private readonly Security            $security)
-    {
-
-    }
+    public function __construct(
+        private readonly PeriodeRHRepository $periodeRHRepository,
+        private readonly Security $security,
+    ) {}
 
     public function validate(mixed $value, Constraint $constraint): void
     {

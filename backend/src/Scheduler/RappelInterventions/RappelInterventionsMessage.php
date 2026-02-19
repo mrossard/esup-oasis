@@ -16,7 +16,8 @@ use DateTimeInterface;
 
 class RappelInterventionsMessage
 {
-    public function __construct(public DateTimeInterface $debut, public DateTimeInterface $fin)
-    {
-    }
+    public function __construct(
+        public DateTimeInterface $debut,
+        public DateTimeInterface $fin,
+    ) {}
 }

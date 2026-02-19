@@ -16,7 +16,6 @@ use App\Entity\Utilisateur;
 
 class CreationIntervenantMessage
 {
-
     private string $intervenantUid;
 
     public function __construct(Utilisateur $intervenant)
@@ -28,5 +27,4 @@ class CreationIntervenantMessage
     {
         return $this->intervenantUid;
     }
-
 }

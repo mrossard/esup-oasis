@@ -21,11 +21,10 @@ use Symfony\Contracts\Cache\TagAwareCacheInterface;
 #[AsMessageHandler(handles: ModificationEvenementMessage::class)]
 readonly class ModificationEvenementMessageHandler
 {
-    public function __construct(private TagAwareCacheInterface $cache,
-                                private EvenementRepository    $evenementRepository)
-    {
-
-    }
+    public function __construct(
+        private TagAwareCacheInterface $cache,
+        private EvenementRepository $evenementRepository,
+    ) {}
 
     /**
      * @throws InvalidArgumentException

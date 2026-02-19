@@ -18,11 +18,10 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class IdentifiantSportifHautNiveauValideConstraint extends Constraint
 {
-    public string $message = "Correspondance numéro PSQS / étudiant invalide.";
+    public string $message = 'Correspondance numéro PSQS / étudiant invalide.';
 
     public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }
-
 }

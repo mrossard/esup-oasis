@@ -39,5 +39,4 @@ class ModificationEtatDemandeRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }

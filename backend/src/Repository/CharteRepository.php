@@ -48,5 +48,4 @@ class CharteRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }

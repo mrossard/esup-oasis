@@ -12,8 +12,8 @@
 
 namespace App\Entity;
 
-use App\State\EntityToResourceTransformer;
 use App\Repository\CommissionRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;

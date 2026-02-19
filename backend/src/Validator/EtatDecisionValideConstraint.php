@@ -19,7 +19,8 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class EtatDecisionValideConstraint extends Constraint
 {
-    public string $message = "La seule modification autorisée est le passage à l'état " . DecisionAmenagementExamens::ETAT_EDITION_DEMANDEE;
+    public string $message =
+        "La seule modification autorisée est le passage à l'état " . DecisionAmenagementExamens::ETAT_EDITION_DEMANDEE;
 
     public function getTargets(): string
     {

@@ -58,7 +58,9 @@ class PostDemandeProcessor implements ProcessorInterface
 
         //On récupère la campagne en cours pour le type de demande passé
         if (
-            !($campagne = $this->typeDemandeRepository->find($data->typeDemande->id)->getCampagneEnCoursPourDate($this->now()))
+            !($campagne = $this->typeDemandeRepository->find($data->typeDemande->id)->getCampagneEnCoursPourDate(
+                $this->now(),
+            ))
         ) {
             throw new UnprocessableEntityHttpException('Aucune campagne en cours pour ce type de demandes');
         }

@@ -20,13 +20,12 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 readonly class FileSystemStorageProvider implements StorageProviderInterface
 {
+    function __construct(
+        private string $basePath,
+    ) {}
 
-    function __construct(private string $basePath)
-    {
-
-    }
-
-    #[Override] public function copy(UploadedFile $file): array
+    #[Override]
+    public function copy(UploadedFile $file): array
     {
         if (!file_exists($file->getRealPath())) {
             throw new FileNotFoundException();
@@ -35,7 +34,8 @@ readonly class FileSystemStorageProvider implements StorageProviderInterface
         return $this->store($file->getContent(), $file->getFilename(), $file->getMimeType());
     }
 
-    #[Override] public function get(array $metadata): File
+    #[Override]
+    public function get(array $metadata): File
     {
         return new File($metadata['cheminComplet']);
     }
@@ -55,8 +55,13 @@ readonly class FileSystemStorageProvider implements StorageProviderInterface
      * @return array
      * @throws Exception
      */
-    #[Override] public function store(mixed $contents, string $filename, string $mimeType, string $description = 'pj envoyée par appliphase'): array
-    {
+    #[Override]
+    public function store(
+        mixed $contents,
+        string $filename,
+        string $mimeType,
+        string $description = 'pj envoyée par appliphase',
+    ): array {
         $uniqId = uniqid($filename);
         $filepath = $this->basePath . '/' . $uniqId;
 
@@ -69,6 +74,5 @@ readonly class FileSystemStorageProvider implements StorageProviderInterface
             'nom' => $uniqId,
             'cheminComplet' => $filepath,
         ];
-
     }
 }

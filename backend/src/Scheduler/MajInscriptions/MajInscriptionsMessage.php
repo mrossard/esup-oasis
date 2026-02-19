@@ -14,8 +14,5 @@ namespace App\Scheduler\MajInscriptions;
 
 class MajInscriptionsMessage
 {
-
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 }

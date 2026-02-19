@@ -12,15 +12,18 @@
 
 namespace App\Entity;
 
-use App\State\EntityToResourceTransformer;
 use App\Repository\SportifHautNiveauRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: SportifHautNiveauRepository::class)]
 #[UniqueEntity('identifiantExterne')]
-#[Map(target: \App\ApiResource\SportifHautNiveau::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
+#[Map(target: \App\ApiResource\SportifHautNiveau::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class SportifHautNiveau
 {
     #[ORM\Id]

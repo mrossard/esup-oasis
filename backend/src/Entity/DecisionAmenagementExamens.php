@@ -21,7 +21,6 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: DecisionAmenagementExamensRepository::class)]
 class DecisionAmenagementExamens
 {
-
     public const string ETAT_ATTENTE_VALIDATION_CAS = 'ATTENTE_VALIDATION_CAS';
     public const string ETAT_VALIDE = 'VALIDE';
     public const string ETAT_EDITE = 'EDITE';

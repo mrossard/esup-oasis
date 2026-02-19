@@ -12,7 +12,4 @@
 
 namespace App\Message;
 
-class DemandeProfilValideMessage extends AbstractEtatDemandeMessage
-{
-
-}
+class DemandeProfilValideMessage extends AbstractEtatDemandeMessage {}

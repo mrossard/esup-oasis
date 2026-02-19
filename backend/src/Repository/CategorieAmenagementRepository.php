@@ -49,19 +49,15 @@ class CategorieAmenagementRepository extends ServiceEntityRepository
         $qb->join('c.typesAmenagement', 'types');
 
         if (null !== $examens) {
-            $qb->andWhere('types.examens = :examens')
-                ->setParameter('examens', $examens);
+            $qb->andWhere('types.examens = :examens')->setParameter('examens', $examens);
         }
         if (null !== $aideHumaine) {
-            $qb->andWhere('types.aideHumaine = :aidehumaine')
-                ->setParameter('aidehumaine', $aideHumaine);
+            $qb->andWhere('types.aideHumaine = :aidehumaine')->setParameter('aidehumaine', $aideHumaine);
         }
         if (null !== $pedagogique) {
-            $qb->andWhere('types.pedagogique = :pedagogique')
-                ->setParameter('pedagogique', $pedagogique);
+            $qb->andWhere('types.pedagogique = :pedagogique')->setParameter('pedagogique', $pedagogique);
         }
 
         return $qb->getQuery()->getResult();
-
     }
 }

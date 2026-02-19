@@ -12,7 +12,4 @@
 
 namespace App\Message;
 
-class DemandeReceptionneeMessage extends AbstractEtatDemandeMessage
-{
-    
-}
+class DemandeReceptionneeMessage extends AbstractEtatDemandeMessage {}

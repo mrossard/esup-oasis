@@ -18,11 +18,9 @@ use App\Filter\RenfortFilter;
 
 readonly class RenfortProvider implements ProviderInterface
 {
-
-    public function __construct(private UtilisateurProvider $utilisateurProvider)
-    {
-
-    }
+    public function __construct(
+        private UtilisateurProvider $utilisateurProvider,
+    ) {}
 
     /**
      * @param Operation $operation
@@ -40,5 +38,4 @@ readonly class RenfortProvider implements ProviderInterface
 
         return $this->utilisateurProvider->provide($operation, $uriVariables, $context);
     }
-
 }

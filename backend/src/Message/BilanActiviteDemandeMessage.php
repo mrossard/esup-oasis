@@ -14,14 +14,12 @@ namespace App\Message;
 
 readonly class BilanActiviteDemandeMessage
 {
-    public function __construct(private int $idBilan)
-    {
-
-    }
+    public function __construct(
+        private int $idBilan,
+    ) {}
 
     public function getIdBilan(): int
     {
         return $this->idBilan;
     }
-
 }

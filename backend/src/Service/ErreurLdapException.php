@@ -14,7 +14,4 @@ namespace App\Service;
 
 use Exception;
 
-class ErreurLdapException extends Exception
-{
-
-}
+class ErreurLdapException extends Exception {}

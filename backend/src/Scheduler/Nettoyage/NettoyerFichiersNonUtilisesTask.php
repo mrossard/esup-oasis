@@ -22,13 +22,12 @@ use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 #[AsPeriodicTask(frequency: '1 day', from: '01:30', jitter: 300, schedule: 'nettoyage')]
 readonly class NettoyerFichiersNonUtilisesTask
 {
-    public function __construct(private StorageProviderInterface $storageProvider,
-                                private FichierRepository        $fichierRepository,
-                                private LoggerInterface          $logger,
-                                private MailService              $mailService)
-    {
-
-    }
+    public function __construct(
+        private StorageProviderInterface $storageProvider,
+        private FichierRepository $fichierRepository,
+        private LoggerInterface $logger,
+        private MailService $mailService,
+    ) {}
 
     public function __invoke(): void
     {
@@ -51,7 +50,5 @@ readonly class NettoyerFichiersNonUtilisesTask
         if ($errors > 0) {
             $this->mailService->envoyerRapportNettoyage(count($obsoleteFiles), $removed, $errors);
         }
-
     }
-
 }

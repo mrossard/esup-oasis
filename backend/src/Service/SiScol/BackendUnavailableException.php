@@ -14,6 +14,4 @@ namespace App\Service\SiScol;
 
 use Exception;
 
-class BackendUnavailableException extends Exception
-{
-}
+class BackendUnavailableException extends Exception {}

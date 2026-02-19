@@ -31,9 +31,7 @@ class AmenagementDatesConstraintValidator extends ConstraintValidator
         }
 
         if (null == $value->debut && !$value->semestre1 && !$value->semestre2) {
-            $this->context->buildViolation($constraint->message)
-                ->addViolation();
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
-
     }
 }

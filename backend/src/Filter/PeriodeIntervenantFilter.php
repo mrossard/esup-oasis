@@ -19,22 +19,20 @@ use Doctrine\ORM\QueryBuilder;
 
 class PeriodeIntervenantFilter extends AbstractFilter
 {
-
     public const string PROPERTY = 'periodeIntervenantFilter';
 
     /**
      * @inheritDoc
      */
     protected function filterProperty(
-        string                      $property,
-                                    $value,
-        QueryBuilder                $queryBuilder,
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-        string                      $resourceClass,
-        ?Operation                  $operation = null,
-        array                       $context = [],
-    ): void
-    {
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== self::PROPERTY) {
             return;
         }

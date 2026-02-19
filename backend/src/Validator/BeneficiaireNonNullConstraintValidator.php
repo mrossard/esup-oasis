@@ -21,7 +21,6 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class BeneficiaireNonNullConstraintValidator extends ConstraintValidator
 {
-
     public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof BeneficiaireNonNullConstraint) {
@@ -37,9 +36,12 @@ class BeneficiaireNonNullConstraintValidator extends ConstraintValidator
         }
 
         //si type pas "au forfait", obligatoire!
-        if (empty($value->beneficiaires ?? []) && !$value->type->forfait && $value->type->id !== TypeEvenement::TYPE_RENFORT) {
+        if (
+            empty($value->beneficiaires ?? [])
+            && !$value->type->forfait
+            && $value->type->id !== TypeEvenement::TYPE_RENFORT
+        ) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
-
     }
 }

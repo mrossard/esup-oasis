@@ -19,12 +19,10 @@ use Symfony\Component\Scheduler\Attribute\AsPeriodicTask;
 #[AsPeriodicTask(frequency: '12 hours', from: '1:00', jitter: '300', schedule: 'calcul_roles')]
 readonly class CalculRoles
 {
-
-    public function __construct(private UtilisateurRepository $utilisateurRepository,
-                                private LoggerInterface       $logger)
-    {
-
-    }
+    public function __construct(
+        private UtilisateurRepository $utilisateurRepository,
+        private LoggerInterface $logger,
+    ) {}
 
     public function __invoke(): void
     {
@@ -37,5 +35,4 @@ readonly class CalculRoles
 
         $this->logger->info('Fin du traitement de maj des roles stockés');
     }
-
 }

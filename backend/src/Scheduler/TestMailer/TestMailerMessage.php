@@ -14,8 +14,5 @@ namespace App\Scheduler\TestMailer;
 
 class TestMailerMessage
 {
-
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 }

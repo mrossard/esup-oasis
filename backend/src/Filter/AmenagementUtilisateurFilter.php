@@ -27,15 +27,22 @@ class AmenagementUtilisateurFilter extends AbstractFilter
 
     public const string PROPERTY = 'uidUtilisateurBeneficiaire';
 
-    #[Override] public function getDescription(string $resourceClass): array
+    #[Override]
+    public function getDescription(string $resourceClass): array
     {
         return [];
     }
 
-    #[Override] protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                                  QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                                  ?Operation                  $operation = null, array $context = []): void
-    {
+    #[Override]
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection */
         if (!$operation->getClass() === Amenagement::class || $property !== self::PROPERTY) {
             return;
@@ -47,9 +54,21 @@ class AmenagementUtilisateurFilter extends AbstractFilter
         $uidParam = $queryNameGenerator->generateParameterName('uid');
 
         $nowParam = $queryNameGenerator->generateParameterName('now');
-        $withCondition = ':' . $nowParam . ' >= ' . $benefAlias . '.debut and (:' . $nowParam . ' < ' . $benefAlias . '.fin or ' . $benefAlias . '.fin is null)';
+        $withCondition =
+            ':'
+            . $nowParam
+            . ' >= '
+            . $benefAlias
+            . '.debut and (:'
+            . $nowParam
+            . ' < '
+            . $benefAlias
+            . '.fin or '
+            . $benefAlias
+            . '.fin is null)';
 
-        $queryBuilder->join($alias . '.beneficiaires', $benefAlias, Join::WITH, $withCondition)
+        $queryBuilder
+            ->join($alias . '.beneficiaires', $benefAlias, Join::WITH, $withCondition)
             ->innerJoin(sprintf('%s.utilisateur', $benefAlias), $utilisateurAlias)
             ->andWhere(sprintf('%s.uid = :%s', $utilisateurAlias, $uidParam))
             ->setParameter($uidParam, $value)

@@ -14,7 +14,4 @@ namespace App\State\PeriodeRH;
 
 use Exception;
 
-class ConfigurationIncompleteException extends Exception
-{
-
-}
+class ConfigurationIncompleteException extends Exception {}

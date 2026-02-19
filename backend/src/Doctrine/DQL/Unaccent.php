@@ -32,7 +32,7 @@ class Unaccent extends FunctionNode
 
     public function getSql(SqlWalker $sqlWalker): string
     {
-        return 'UNACCENT(' . $this->string->dispatch($sqlWalker) . ")";
+        return 'UNACCENT(' . $this->string->dispatch($sqlWalker) . ')';
     }
 
     public function parse(Parser $parser): void
@@ -44,5 +44,4 @@ class Unaccent extends FunctionNode
 
         $parser->match(TokenType::T_CLOSE_PARENTHESIS);
     }
-
 }

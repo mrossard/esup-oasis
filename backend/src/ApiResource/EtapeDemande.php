@@ -78,7 +78,9 @@ class EtapeDemande
         get {
             if ($this->questions === null && $this->entity !== null) {
                 $this->questions = array_map(
-                    callback: fn(QuestionEtapeDemande $questionEtapeDemande) => new Question($questionEtapeDemande->getQuestion()),
+                    callback: fn(QuestionEtapeDemande $questionEtapeDemande) => new Question(
+                        $questionEtapeDemande->getQuestion(),
+                    ),
                     array: $this->entity->getQuestionsEtape()->toArray(),
                 );
             }

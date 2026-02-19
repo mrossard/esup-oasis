@@ -28,14 +28,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:anonymizer', description: 'anonymisation des données')]
 class AnonymizerCommand extends Command
 {
-
-    public function __construct(private readonly UtilisateurRepository $utilisateurRepository,
-                                private readonly FichierRepository     $fichierRepository,
-                                private readonly AmenagementRepository $amenagementRepository,
-                                private readonly EntretienRepository   $entretienRepository,
-                                private readonly ReponseRepository     $reponseRepository,
-                                ?string                                $name = null)
-    {
+    public function __construct(
+        private readonly UtilisateurRepository $utilisateurRepository,
+        private readonly FichierRepository $fichierRepository,
+        private readonly AmenagementRepository $amenagementRepository,
+        private readonly EntretienRepository $entretienRepository,
+        private readonly ReponseRepository $reponseRepository,
+        ?string $name = null,
+    ) {
         parent::__construct($name);
     }
 
@@ -50,7 +50,9 @@ class AnonymizerCommand extends Command
                 $utilisateur->setPrenom($faker->firstName());
                 $utilisateur->setDateNaissance($faker->dateTimeThisCentury());
                 $utilisateur->setEmail($utilisateur->getPrenom() . '.' . $utilisateur->getNom() . '@etablissement.fr');
-                $utilisateur->setEmailPerso($utilisateur->getPrenom() . '.' . $utilisateur->getNom() . '@monmailperso.fr');
+                $utilisateur->setEmailPerso(
+                    $utilisateur->getPrenom() . '.' . $utilisateur->getNom() . '@monmailperso.fr',
+                );
                 $utilisateur->setTelPerso('123456789');
                 $utilisateur->setContactUrgence("un contact en cas d'urgence");
             }
@@ -71,7 +73,7 @@ class AnonymizerCommand extends Command
                 null !== $fichier->getDecisionAmenagementExamens() => 'decision' . '.' . $pathInfo['extension'],
                 null !== $fichier->getEntretien() => 'entretien' . '.' . $pathInfo['extension'],
                 null !== $fichier->getPieceJointeBeneficiaire() => 'piece' . '.' . $pathInfo['extension'],
-                default => $nom
+                default => $nom,
             });
             $this->fichierRepository->save($fichier);
         }
@@ -105,9 +107,9 @@ class AnonymizerCommand extends Command
             $reponse->setCommentaire(match ($reponse->getQuestion()->getTypeReponse()) {
                 'text' => $faker->text(80),
                 'date' => $faker->dateTimeThisCentury()->format('Y-m-d'),
-                'numeric' => (string)$faker->randomNumber(),
+                'numeric' => (string) $faker->randomNumber(),
                 'textarea' => $faker->text(500),
-                default => $reponse->getCommentaire()
+                default => $reponse->getCommentaire(),
             });
             $this->reponseRepository->save($reponse);
         }

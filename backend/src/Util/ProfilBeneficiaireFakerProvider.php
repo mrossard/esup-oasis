@@ -19,10 +19,10 @@ use Faker\Provider\Base as BaseProvider;
 
 class ProfilBeneficiaireFakerProvider extends BaseProvider
 {
-
-    public function __construct(Generator                                     $generator,
-                                private readonly ProfilBeneficiaireRepository $profilBeneficiaireRepository)
-    {
+    public function __construct(
+        Generator $generator,
+        private readonly ProfilBeneficiaireRepository $profilBeneficiaireRepository,
+    ) {
         parent::__construct($generator);
     }
 
@@ -30,5 +30,4 @@ class ProfilBeneficiaireFakerProvider extends BaseProvider
     {
         return $this->profilBeneficiaireRepository->find($id);
     }
-
 }

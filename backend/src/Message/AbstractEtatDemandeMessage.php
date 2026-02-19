@@ -21,11 +21,10 @@ abstract class AbstractEtatDemandeMessage
 {
     private ?Demande $demande = null;
 
-    public function __construct(protected readonly EtatDemandeModifieMessage $message,
-                                private readonly DemandeManager              $demandeManager)
-    {
-
-    }
+    public function __construct(
+        protected readonly EtatDemandeModifieMessage $message,
+        private readonly DemandeManager $demandeManager,
+    ) {}
 
     public function getDemande(): Demande
     {
@@ -59,5 +58,4 @@ abstract class AbstractEtatDemandeMessage
     {
         return $this->message->getUidUtilisateurModif();
     }
-
 }

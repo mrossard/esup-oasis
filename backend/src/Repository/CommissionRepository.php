@@ -38,7 +38,5 @@ class CommissionRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
-
     }
-
 }

@@ -20,7 +20,8 @@ use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
 class EtatDecisionValideConstraintValidator extends ConstraintValidator
 {
-    #[Override] public function validate(mixed $value, Constraint $constraint): void
+    #[Override]
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof EtatDecisionValideConstraint) {
             throw new UnexpectedTypeException($constraint, EtatDecisionValideConstraint::class);
@@ -28,9 +29,11 @@ class EtatDecisionValideConstraintValidator extends ConstraintValidator
 
         //les CAS peuvent passer à VALIDE, les admins à EDITION DEMANDEE
 
-        if (!in_array($value, [DecisionAmenagementExamens::ETAT_EDITION_DEMANDEE, DecisionAmenagementExamens::ETAT_VALIDE])) {
-            $this->context->buildViolation($constraint->message)
-                ->addViolation();
+        if (!in_array($value, [
+            DecisionAmenagementExamens::ETAT_EDITION_DEMANDEE,
+            DecisionAmenagementExamens::ETAT_VALIDE,
+        ])) {
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
     }
 }

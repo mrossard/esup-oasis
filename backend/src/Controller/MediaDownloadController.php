@@ -24,14 +24,15 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class MediaDownloadController extends AbstractController
 {
-
     #[Route('/fichiers/{fileId}')]
-    public function getFile(int                      $fileId, FichierRepository $fichierRepository,
-                            StorageProviderInterface $storageProvider): Response
-    {
+    public function getFile(
+        int $fileId,
+        FichierRepository $fichierRepository,
+        StorageProviderInterface $storageProvider,
+    ): Response {
         $fichier = $fichierRepository->find($fileId);
         if (null === $fichier) {
-            throw new FileNotFoundException("/fichiers/" . $fileId);
+            throw new FileNotFoundException('/fichiers/' . $fileId);
         }
 
         $this->denyAccessUnlessGranted(Fichier::VOIR_FICHIER, $fichier);
@@ -44,11 +45,10 @@ class MediaDownloadController extends AbstractController
         $disposition = HeaderUtils::makeDisposition(
             disposition: HeaderUtils::DISPOSITION_INLINE,
             filename: $fichier->getNom(),
-            filenameFallback: $fichier->getId()
+            filenameFallback: $fichier->getId(),
         );
         $response->headers->set('Content-Disposition', $disposition);
         $response->headers->set('Content-Type', $fichier->getTypeMime());
         return $response;
     }
-
 }

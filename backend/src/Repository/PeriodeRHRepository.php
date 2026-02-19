@@ -60,9 +60,7 @@ class PeriodeRHRepository extends ServiceEntityRepository
      */
     public function locked(): array
     {
-        $qb = $this->createQueryBuilder('p')
-            ->andWhere('p.dateButoir <= :now')
-            ->setParameter('now', $this->now());
+        $qb = $this->createQueryBuilder('p')->andWhere('p.dateButoir <= :now')->setParameter('now', $this->now());
 
         return $qb->getQuery()->getResult();
     }
@@ -76,7 +74,8 @@ class PeriodeRHRepository extends ServiceEntityRepository
     {
         $debut = new DateTime($debut->format('Y-m-d'));
 
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->andWhere('p.debut <= :debut')
             ->andWhere('p.fin >= :debut')
             ->setParameter('debut', $debut);
@@ -90,9 +89,7 @@ class PeriodeRHRepository extends ServiceEntityRepository
      */
     public function periodeExisteApres(DateTimeInterface $debut): bool
     {
-        $qb = $this->createQueryBuilder('p')
-            ->where('p.debut > :debut')
-            ->setParameter('debut', $debut);
+        $qb = $this->createQueryBuilder('p')->where('p.debut > :debut')->setParameter('debut', $debut);
 
         return !empty($qb->getQuery()->getResult());
     }
@@ -104,7 +101,8 @@ class PeriodeRHRepository extends ServiceEntityRepository
      */
     public function chevauchements(?DateTimeInterface $debut, ?DateTimeInterface $fin): array
     {
-        $qb = $this->createQueryBuilder('p')
+        $qb = $this
+            ->createQueryBuilder('p')
             ->where('p.debut between :debut and :fin')
             ->orWhere(':debut between p.debut and p.fin')
             ->setParameter('debut', $debut)

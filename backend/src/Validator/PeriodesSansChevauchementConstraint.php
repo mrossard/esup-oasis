@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class PeriodesSansChevauchementConstraint extends Constraint
 {
-    public string $message = "les dates saisies chevauchent la période du {{ debut }} au {{ fin }}.";
+    public string $message = 'les dates saisies chevauchent la période du {{ debut }} au {{ fin }}.';
 
     public function getTargets(): string
     {

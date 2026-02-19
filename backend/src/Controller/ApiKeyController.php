@@ -22,9 +22,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class ApiKeyController extends AbstractController
 {
-    public function __construct(private readonly JWTTokenManagerInterface $jwtTokenManager)
-    {
-    }
+    public function __construct(
+        private readonly JWTTokenManagerInterface $jwtTokenManager,
+    ) {}
 
     #[Route(path: '/connect/apikey', name: 'apikey_connect', methods: ['POST'])]
     public function getToken(Request $request, ClientAppUserProvider $appUserProvider): Response
@@ -47,5 +47,4 @@ class ApiKeyController extends AbstractController
 
         return new Response($this->jwtTokenManager->create($user));
     }
-
 }

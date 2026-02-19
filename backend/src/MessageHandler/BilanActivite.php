@@ -16,7 +16,6 @@ use DateTimeInterface;
 
 class BilanActivite
 {
-
     public DateTimeInterface $debut;
     public DateTimeInterface $fin;
 

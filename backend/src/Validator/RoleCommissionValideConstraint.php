@@ -18,5 +18,5 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class RoleCommissionValideConstraint extends Constraint
 {
-    public string $message = "Rôle commission {{ role }} non valide. Valeurs possibles : {{ valides }}";
+    public string $message = 'Rôle commission {{ role }} non valide. Valeurs possibles : {{ valides }}';
 }

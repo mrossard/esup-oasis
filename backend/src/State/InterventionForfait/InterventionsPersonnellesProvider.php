@@ -17,10 +17,9 @@ use ApiPlatform\State\ProviderInterface;
 
 readonly class InterventionsPersonnellesProvider implements ProviderInterface
 {
-
-    public function __construct(private InterventionForfaitProvider $provider)
-    {
-    }
+    public function __construct(
+        private InterventionForfaitProvider $provider,
+    ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {

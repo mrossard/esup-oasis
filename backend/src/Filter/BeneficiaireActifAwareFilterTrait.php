@@ -20,17 +20,31 @@ trait BeneficiaireActifAwareFilterTrait
 {
     use ClockAwareTrait;
 
-    protected function filterBeneficiairesActifs(QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $utilisateurAlias): string
-    {
+    protected function filterBeneficiairesActifs(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $utilisateurAlias,
+    ): string {
         $bAlias = $queryNameGenerator->generateJoinAlias('beneficiaires');
         $nowParam = $queryNameGenerator->generateParameterName('now');
-        $withCondition = ':' . $nowParam . ' >= ' . $bAlias . '.debut and (:' . $nowParam . ' < ' . $bAlias . '.fin or ' . $bAlias . '.fin is null)';
+        $withCondition =
+            ':'
+            . $nowParam
+            . ' >= '
+            . $bAlias
+            . '.debut and (:'
+            . $nowParam
+            . ' < '
+            . $bAlias
+            . '.fin or '
+            . $bAlias
+            . '.fin is null)';
 
-        $queryBuilder->join($utilisateurAlias . '.beneficiaires', $bAlias)
+        $queryBuilder
+            ->join($utilisateurAlias . '.beneficiaires', $bAlias)
             ->andWhere($withCondition)
             ->setParameter($nowParam, $this->now());
 
         return $bAlias;
     }
-
 }

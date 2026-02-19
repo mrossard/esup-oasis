@@ -19,14 +19,12 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(handles: DemandeAttenteValidationCharteMessage::class)]
 readonly class DemandeAttenteValidationCharteMessageHandler
 {
-    public function __construct(private MailService $mailService)
-    {
-
-    }
+    public function __construct(
+        private MailService $mailService,
+    ) {}
 
     public function __invoke(DemandeAttenteValidationCharteMessage $message): void
     {
         $this->mailService->envoyerCharteAValider($message->getDemandeur(), $message->getTypeDemande());
     }
-
 }

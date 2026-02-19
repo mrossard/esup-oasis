@@ -27,15 +27,22 @@ class AmenagementBeneficiaireActifFilter extends AbstractFilter
 
     public const string PROPERTY = 'amenagementBeneficiaireActif';
 
-    #[Override] public function getDescription(string $resourceClass): array
+    #[Override]
+    public function getDescription(string $resourceClass): array
     {
         return [];
     }
 
-    #[Override] protected function filterProperty(string                      $property, $value, QueryBuilder $queryBuilder,
-                                                  QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass,
-                                                  ?Operation                  $operation = null, array $context = []): void
-    {
+    #[Override]
+    protected function filterProperty(
+        string $property,
+        $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         /** @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection */
         if (!$operation->getClass() === Amenagement::class || $property !== self::PROPERTY) {
             return;
@@ -45,9 +52,21 @@ class AmenagementBeneficiaireActifFilter extends AbstractFilter
         $benefAlias = $queryNameGenerator->generateJoinAlias('beneficiaires');
         $nowParam = $queryNameGenerator->generateParameterName('now');
 
-        $withCondition = ':' . $nowParam . ' >= ' . $benefAlias . '.debut and (:' . $nowParam . ' < ' . $benefAlias . '.fin or ' . $benefAlias . '.fin is null)';
-        $queryBuilder->join($alias . '.beneficiaires', $benefAlias, Join::WITH, $withCondition)
-            ->setParameter($nowParam, $this->now());
-
+        $withCondition =
+            ':'
+            . $nowParam
+            . ' >= '
+            . $benefAlias
+            . '.debut and (:'
+            . $nowParam
+            . ' < '
+            . $benefAlias
+            . '.fin or '
+            . $benefAlias
+            . '.fin is null)';
+        $queryBuilder->join($alias . '.beneficiaires', $benefAlias, Join::WITH, $withCondition)->setParameter(
+            $nowParam,
+            $this->now(),
+        );
     }
 }

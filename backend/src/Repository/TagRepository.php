@@ -39,5 +39,4 @@ class TagRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
-
 }

@@ -50,10 +50,10 @@ class FormationRepository extends ServiceEntityRepository
         }
     }
 
-
     public function findByComposantes(Collection $composantes)
     {
-        $qb = $this->createQueryBuilder('f')
+        $qb = $this
+            ->createQueryBuilder('f')
             ->andWhere('f.composante in (:composantes)')
             ->setParameter('composantes', $composantes);
 
@@ -65,7 +65,8 @@ class FormationRepository extends ServiceEntityRepository
      */
     public function incompletes(): array
     {
-        return $this->createQueryBuilder('f')
+        return $this
+            ->createQueryBuilder('f')
             ->andWhere('f.diplome is null')
             ->getQuery()
             ->getResult();

@@ -14,10 +14,9 @@ namespace App\Message;
 
 class RessourceCollectionModifieeMessage
 {
-
-    public function __construct(private $resource)
-    {
-    }
+    public function __construct(
+        private $resource,
+    ) {}
 
     /**
      * @return mixed
@@ -26,5 +25,4 @@ class RessourceCollectionModifieeMessage
     {
         return $this->resource;
     }
-
 }

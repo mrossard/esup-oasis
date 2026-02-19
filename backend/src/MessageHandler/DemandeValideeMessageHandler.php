@@ -20,12 +20,10 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(handles: DemandeValideeMessage::class)]
 readonly class DemandeValideeMessageHandler
 {
-    public function __construct(private MailService        $mailService,
-                                private UtilisateurManager $utilisateurManager)
-    {
-
-    }
-
+    public function __construct(
+        private MailService $mailService,
+        private UtilisateurManager $utilisateurManager,
+    ) {}
 
     public function __invoke(DemandeValideeMessage $message): void
     {
@@ -33,7 +31,7 @@ readonly class DemandeValideeMessageHandler
         $this->utilisateurManager->creerBeneficiairePourDemande(
             $message->getDemande(),
             $message->getIdProfil(),
-            $message->getUidUtilisateur()
+            $message->getUidUtilisateur(),
         );
 
         //Envoi d'un mail "Vous avez gagné!"

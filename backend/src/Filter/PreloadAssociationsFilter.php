@@ -13,8 +13,15 @@ class PreloadAssociationsFilter extends AbstractFilter
 {
     public const string PROPERTY = 'preloadAssociations';
 
-    protected function filterProperty(string $property, mixed $value, QueryBuilder $queryBuilder, QueryNameGeneratorInterface $queryNameGenerator, string $resourceClass, ?Operation $operation = null, array $context = []): void
-    {
+    protected function filterProperty(
+        string $property,
+        mixed $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== self::PROPERTY) {
             return;
         }
@@ -30,16 +37,18 @@ class PreloadAssociationsFilter extends AbstractFilter
 
         foreach ($value as $associationName => $association) {
             $aliases[$associationName] = $queryNameGenerator->generateJoinAlias($associationName);
-            $queryBuilder->leftJoin($aliases[$association['sourceEntity']] . '.' . $association['relationName'], $aliases[$associationName]);
+            $queryBuilder->leftJoin(
+                $aliases[$association['sourceEntity']] . '.' . $association['relationName'],
+                $aliases[$associationName],
+            );
             $queryBuilder->addSelect($aliases[$associationName]);
         }
 
         return;
-
     }
 
     public function getDescription(string $resourceClass): array
     {
-        return [];//tambouille interne
+        return []; //tambouille interne
     }
 }

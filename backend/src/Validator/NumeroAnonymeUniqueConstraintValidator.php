@@ -22,13 +22,12 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class NumeroAnonymeUniqueConstraintValidator extends ConstraintValidator
 {
+    public function __construct(
+        private readonly UtilisateurRepository $utilisateurRepository,
+    ) {}
 
-    public function __construct(private readonly UtilisateurRepository $utilisateurRepository)
-    {
-    }
-
-
-    #[Override] public function validate(mixed $value, Constraint $constraint): void
+    #[Override]
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof NumeroAnonymeUniqueConstraint) {
             throw new UnexpectedTypeException($constraint, NumeroAnonymeUniqueConstraint::class);
@@ -48,17 +47,14 @@ class NumeroAnonymeUniqueConstraintValidator extends ConstraintValidator
 
         //on regarde si le numéro est déjà présent en base pour un autre utilisateur
         $existants = array_filter(
-            $this->utilisateurRepository->findBy(
-                [
-                    'numeroAnonyme' => $value->numeroAnonyme,
-                ]
-            ),
-            fn(\App\Entity\Utilisateur $user) => $user->getUid() !== $value->uid
+            $this->utilisateurRepository->findBy([
+                'numeroAnonyme' => $value->numeroAnonyme,
+            ]),
+            fn(\App\Entity\Utilisateur $user) => $user->getUid() !== $value->uid,
         );
 
         if (!empty($existants)) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
-
     }
 }

@@ -20,11 +20,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(handles: CharteValideeMessage::class)]
 readonly class CharteValideeMessageHandler
 {
-    public function __construct(private DemandeManager $demandeManager)
-    {
-
-    }
-
+    public function __construct(
+        private DemandeManager $demandeManager,
+    ) {}
 
     public function __invoke(CharteValideeMessage $message): void
     {
@@ -42,8 +40,7 @@ readonly class CharteValideeMessageHandler
             demande: $demande,
             idEtat: EtatDemande::ATTENTE_VALIDATION_ACCOMPAGNEMENT,
             commentaire: 'Chartes validées',
-            user: $demande->getDemandeur()
+            user: $demande->getDemandeur(),
         );
     }
-
 }

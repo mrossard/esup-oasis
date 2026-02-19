@@ -18,7 +18,6 @@ use DateTimeInterface;
 
 abstract class AbstractSiScolDataProvider
 {
-
     /**
      * Tableau listant les formations auxquelles est inscrit l'étudiant sur l'intervalle de temps donné
      * [[codeFormation, libFormation, codeComposante, libComposante, debut, fin], ...]
@@ -29,7 +28,11 @@ abstract class AbstractSiScolDataProvider
      * @return array
      * @throws BackendUnavailableException
      */
-    abstract public function getInscriptions(Utilisateur $etudiant, DateTimeInterface $debut, ?DateTimeInterface $fin): array;
+    abstract public function getInscriptions(
+        Utilisateur $etudiant,
+        DateTimeInterface $debut,
+        ?DateTimeInterface $fin,
+    ): array;
 
     /**
      * @param Formation $incomplete
@@ -37,5 +40,4 @@ abstract class AbstractSiScolDataProvider
      * @throws BackendUnavailableException
      */
     abstract public function getFormation(Formation $incomplete): array;
-
 }

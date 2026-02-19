@@ -17,11 +17,13 @@ use DateTimeInterface;
 
 class ModificationEvenementMessage
 {
-
     private int $id;
 
-    public function __construct(readonly Evenement $evenement, private readonly ?DateTimeInterface $dateOrigine = null, private readonly bool $creation = false)
-    {
+    public function __construct(
+        readonly Evenement $evenement,
+        private readonly ?DateTimeInterface $dateOrigine = null,
+        private readonly bool $creation = false,
+    ) {
         $this->id = $evenement->getId();
     }
 
@@ -39,5 +41,4 @@ class ModificationEvenementMessage
     {
         return $this->dateOrigine;
     }
-
 }

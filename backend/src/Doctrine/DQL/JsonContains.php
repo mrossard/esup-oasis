@@ -26,7 +26,13 @@ class JsonContains extends FunctionNode
     public function getSql(SqlWalker $sqlWalker): string
     {
         //$str = $this->string->dispatch($sqlWalker) . "::jsonb \? " . $this->string->dispatch($sqlWalker);
-        return 'jsonb_exists(' . $this->string1->dispatch($sqlWalker) . ', ' . $this->string2->dispatch($sqlWalker) . ')';
+        return (
+            'jsonb_exists('
+            . $this->string1->dispatch($sqlWalker)
+            . ', '
+            . $this->string2->dispatch($sqlWalker)
+            . ')'
+        );
     }
 
     public function parse(Parser $parser): void
@@ -41,5 +47,4 @@ class JsonContains extends FunctionNode
 
         $parser->match(TokenType::T_CLOSE_PARENTHESIS);
     }
-
 }

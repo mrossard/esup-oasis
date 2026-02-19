@@ -19,10 +19,9 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(handles: DemandeAttenteValidationAccompagnementMessage::class)]
 readonly class DemandeAttenteValidationAccompagnementMessageHandler
 {
-    public function __construct(private MailService $mailService)
-    {
-
-    }
+    public function __construct(
+        private MailService $mailService,
+    ) {}
 
     public function __invoke(DemandeAttenteValidationAccompagnementMessage $message): void
     {

@@ -54,7 +54,8 @@ class FichierRepository extends ServiceEntityRepository
      */
     public function fichiersObsoletes(): array
     {
-        $qb = $this->createQueryBuilder('fichier')
+        $qb = $this
+            ->createQueryBuilder('fichier')
             ->leftJoin('fichier.avisEse', 'avis')
             ->leftJoin('fichier.reponses', 'reponses')
             ->leftJoin('fichier.entretien', 'entretien')
@@ -72,5 +73,4 @@ class FichierRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getResult();
     }
-
 }

@@ -18,12 +18,10 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class NumeroAnonymeUniqueConstraint extends Constraint
 {
-
-    public string $message = "Ce numéro anonyme est déjà utilisé pour un autre bénéficiaire";
+    public string $message = 'Ce numéro anonyme est déjà utilisé pour un autre bénéficiaire';
 
     public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }
-
 }

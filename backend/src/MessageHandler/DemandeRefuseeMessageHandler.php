@@ -19,16 +19,17 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 #[AsMessageHandler(handles: DemandeRefuseeMessage::class)]
 readonly class DemandeRefuseeMessageHandler
 {
-    public function __construct(private MailService $mailService)
-    {
-
-    }
+    public function __construct(
+        private MailService $mailService,
+    ) {}
 
     public function __invoke(DemandeRefuseeMessage $message): void
     {
         //Envoi d'un mail "désolé, refusé"
-        $this->mailService->envoyerNotificationRefusDemande($message->getDemandeur(),
-            $message->getTypeDemande(), $message->getCommentaire());
+        $this->mailService->envoyerNotificationRefusDemande(
+            $message->getDemandeur(),
+            $message->getTypeDemande(),
+            $message->getCommentaire(),
+        );
     }
-
 }

@@ -18,12 +18,11 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class DemandeWorkflowConstraint extends Constraint
 {
-    public string $message = "Transition état impossible";
+    public string $message = 'Transition état impossible';
     public string $messageDemandeIncomplete = "La demande doit être complète pour passer à l'état '{{ etat }}'";
 
     public function getTargets(): string
     {
         return self::CLASS_CONSTRAINT;
     }
-
 }

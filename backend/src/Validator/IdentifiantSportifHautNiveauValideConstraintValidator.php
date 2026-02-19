@@ -21,11 +21,9 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class IdentifiantSportifHautNiveauValideConstraintValidator extends ConstraintValidator
 {
-
-    public function __construct(private readonly SportifHautNiveauRepository $sportifHautNiveauRepository)
-    {
-
-    }
+    public function __construct(
+        private readonly SportifHautNiveauRepository $sportifHautNiveauRepository,
+    ) {}
 
     public function validate(mixed $value, Constraint $constraint): void
     {
@@ -51,9 +49,7 @@ class IdentifiantSportifHautNiveauValideConstraintValidator extends ConstraintVa
         ]);
 
         if (null === $sportif || $sportif->getAnneeNaissance() != $value->repondant->dateNaissance->format('Y')) {
-            $this->context->buildViolation($constraint->message)
-                ->addViolation();
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
-
     }
 }

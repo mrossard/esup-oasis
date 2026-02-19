@@ -12,8 +12,8 @@
 
 namespace App\Entity;
 
-use App\State\EntityToResourceTransformer;
 use App\Repository\EtatDemandeRepository;
+use App\State\EntityToResourceTransformer;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 

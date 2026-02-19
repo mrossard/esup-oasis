@@ -22,11 +22,10 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 
 readonly class ClientAppUserProvider implements UserProviderInterface
 {
-
-    public function __construct(private ApplicationClienteRepository $applicationClienteRepository,
-                                private LoggerInterface              $logger)
-    {
-    }
+    public function __construct(
+        private ApplicationClienteRepository $applicationClienteRepository,
+        private LoggerInterface $logger,
+    ) {}
 
     public function refreshUser(UserInterface $user): UserInterface
     {
@@ -63,11 +62,11 @@ readonly class ClientAppUserProvider implements UserProviderInterface
             'identifiant' => $appId,
         ]);
         if (null == $app) {
-            $this->logger->error("Tentative de connection pour app " . $appId);
+            $this->logger->error('Tentative de connection pour app ' . $appId);
             throw new AccessDeniedException('App inconnue');
         }
         if ($app->getApiKey() !== $apiKey) {
-            $this->logger->error("ApiKey incorrecte pour app " . $appId);
+            $this->logger->error('ApiKey incorrecte pour app ' . $appId);
             throw new AccessDeniedException('ApiKey incorrecte');
         }
 

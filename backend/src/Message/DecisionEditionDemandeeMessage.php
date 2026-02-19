@@ -14,9 +14,10 @@ namespace App\Message;
 
 class DecisionEditionDemandeeMessage
 {
-    public function __construct(protected int $idDecision, protected string $uidDemandeur)
-    {
-    }
+    public function __construct(
+        protected int $idDecision,
+        protected string $uidDemandeur,
+    ) {}
 
     public function getIdDecision(): int
     {

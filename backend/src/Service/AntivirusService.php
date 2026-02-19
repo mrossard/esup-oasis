@@ -23,17 +23,17 @@ class AntivirusService
     protected Scanner $clamav;
     private bool $online = true;
 
-    public function __construct(readonly string                      $server,
-                                readonly int                         $port,
-                                private readonly MessageBusInterface $messageBus)
-    {
+    public function __construct(
+        readonly string $server,
+        readonly int $port,
+        private readonly MessageBusInterface $messageBus,
+    ) {
         try {
-            $this->clamav = ScannerFactory::create(
-                [
-                    'driver' => 'remote',
-                    'url' => $server,
-                    'port' => $this->port,
-                ]);
+            $this->clamav = ScannerFactory::create([
+                'driver' => 'remote',
+                'url' => $server,
+                'port' => $this->port,
+            ]);
         } catch (Exception $e) {
             $this->messageBus->dispatch(new ErreurTechniqueMessage($e, 'Antivirus indisponible'));
             $this->online = false;
@@ -64,5 +64,4 @@ class AntivirusService
             return false;
         }
     }
-
 }

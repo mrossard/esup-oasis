@@ -16,13 +16,12 @@ use App\Entity\CharteDemandeur;
 
 readonly class CharteValideeMessage
 {
-
     /**
      * @param CharteDemandeur $charte
      */
-    public function __construct(private CharteDemandeur $charte)
-    {
-    }
+    public function __construct(
+        private CharteDemandeur $charte,
+    ) {}
 
     public function getCharte(): CharteDemandeur
     {

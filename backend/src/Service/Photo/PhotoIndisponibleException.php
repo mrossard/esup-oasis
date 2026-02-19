@@ -14,6 +14,4 @@ namespace App\Service\Photo;
 
 use Exception;
 
-class PhotoIndisponibleException extends Exception
-{
-}
+class PhotoIndisponibleException extends Exception {}

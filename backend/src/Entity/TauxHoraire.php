@@ -12,8 +12,8 @@
 
 namespace App\Entity;
 
-use App\State\EntityToResourceTransformer;
 use App\Repository\TauxHoraireRepository;
+use App\State\EntityToResourceTransformer;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
@@ -88,7 +88,7 @@ class TauxHoraire
     {
         $this->fin = match ($fin) {
             null => null,
-            default => DateTime::createFromInterface($fin)
+            default => DateTime::createFromInterface($fin),
         };
 
         return $this;

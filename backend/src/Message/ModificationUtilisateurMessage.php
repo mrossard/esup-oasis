@@ -12,7 +12,6 @@
 
 namespace App\Message;
 
-
 use App\Entity\Utilisateur;
 
 readonly class ModificationUtilisateurMessage

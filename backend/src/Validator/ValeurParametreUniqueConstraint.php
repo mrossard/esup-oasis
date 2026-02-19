@@ -18,7 +18,7 @@ use Symfony\Component\Validator\Constraint;
 #[Attribute]
 class ValeurParametreUniqueConstraint extends Constraint
 {
-    public string $message = "{{ string }} a déjà une valeur active sur cet intervalle";
+    public string $message = '{{ string }} a déjà une valeur active sur cet intervalle';
 
     public function getTargets(): string
     {

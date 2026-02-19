@@ -19,7 +19,7 @@ use Symfony\Component\Validator\Constraint;
 class ProfilAvecTypologieConstraint extends Constraint
 {
     public string $message = "Ce profil n'attend pas de typologie";
-    public string $messageObligatoire = "Spécifier la typologie est obligatoire pour ce profil";
+    public string $messageObligatoire = 'Spécifier la typologie est obligatoire pour ce profil';
 
     public function getTargets(): string
     {

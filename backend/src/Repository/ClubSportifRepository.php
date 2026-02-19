@@ -38,6 +38,5 @@ class ClubSportifRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
-
     }
 }
