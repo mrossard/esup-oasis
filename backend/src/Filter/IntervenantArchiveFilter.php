@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Clock\ClockAwareTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class IntervenantArchiveFilter extends AbstractFilter
@@ -36,6 +35,7 @@ class IntervenantArchiveFilter extends AbstractFilter
                     name: 'intervenantArchive',
                     in: 'query',
                     description: "filtre sur l'état de l'intervenant à l'instant T",
+                    schema: ['type' => 'bool'],
                 ),
             ],
         ];

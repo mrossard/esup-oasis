@@ -17,6 +17,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Clock\ClockAwareTrait;
 
@@ -109,5 +110,45 @@ class PeriodeRHRepository extends ServiceEntityRepository
             ->setParameter('fin', $fin);
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function parIntervenant(string $uid, int $page, int $itemsPerPage, ?string $order, ?string $direction)
+    {
+        $qb = $this
+            ->createQueryBuilder('p')
+            ->distinct()
+            ->leftJoin('p.evenements', 'e')
+            ->leftJoin('e.intervenant', 'i')
+            ->leftJoin('i.utilisateur', 'ui', Join::WITH, 'ui.uid = :uid')
+            ->leftJoin('p.interventionsForfait', 'in')
+            ->leftJoin('in.intervenant', 'i2')
+            ->leftJoin('i2.utilisateur', 'ui2', Join::WITH, 'ui2.uid = :uid')
+            ->andWhere('ui.uid = :uid or ui2.uid = :uid')
+            ->setParameter('uid', $uid)
+            ->setFirstResult(($page - 1) * $itemsPerPage)
+            ->setMaxResults($itemsPerPage);
+
+        if ($order) {
+            $qb->orderBy('p.' . $order, $direction);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function countParIntervenant(mixed $uid)
+    {
+        $qb = $this
+            ->createQueryBuilder('p')
+            ->select('count(distinct p.id) as nb')
+            ->leftJoin('p.evenements', 'e')
+            ->leftJoin('e.intervenant', 'i')
+            ->leftJoin('i.utilisateur', 'ui', Join::WITH, 'ui.uid = :uid')
+            ->leftJoin('p.interventionsForfait', 'in')
+            ->leftJoin('in.intervenant', 'i2')
+            ->leftJoin('i2.utilisateur', 'ui2', Join::WITH, 'ui2.uid = :uid')
+            ->andWhere('ui.uid = :uid or ui2.uid = :uid')
+            ->setParameter('uid', $uid);
+
+        return $qb->getQuery()->getSingleScalarResult();
     }
 }

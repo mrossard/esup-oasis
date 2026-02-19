@@ -22,7 +22,6 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -49,6 +48,7 @@ class EvenementsAValiderFilter extends AbstractFilter
                     name: 'aValider',
                     in: 'query',
                     description: 'uniquement les événements à valider ?',
+                    schema: ['type' => 'bool'],
                 ),
             ],
         ];

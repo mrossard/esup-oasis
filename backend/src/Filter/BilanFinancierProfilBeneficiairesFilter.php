@@ -22,7 +22,6 @@ use App\Entity\Evenement;
 use App\Entity\InterventionForfait;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Contracts\Service\Attribute\Required;
 

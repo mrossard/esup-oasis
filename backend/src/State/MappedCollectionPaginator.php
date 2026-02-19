@@ -31,44 +31,9 @@ class MappedCollectionPaginator implements IteratorAggregate, PaginatorInterface
 
     public function getIterator(): Traversable
     {
-        return new class($this->mapping, $this->decorated->getIterator()) implements Iterator {
-            private array $mappingCache = [];
-
-            public function __construct(
-                private $mapping,
-                private readonly Iterator $decorated,
-            ) {}
-
-            public function current(): mixed
-            {
-                $current = $this->decorated->current();
-                $key = spl_object_hash($current);
-
-                $this->mappingCache[$key] ??= ($this->mapping)($current);
-
-                return $this->mappingCache[$key];
-            }
-
-            public function next(): void
-            {
-                $this->decorated->next();
-            }
-
-            public function key(): mixed
-            {
-                return $this->decorated->key();
-            }
-
-            public function valid(): bool
-            {
-                return $this->decorated->valid();
-            }
-
-            public function rewind(): void
-            {
-                $this->decorated->rewind();
-            }
-        };
+        foreach ($this->decorated as $item) {
+            yield ($this->mapping)($item);
+        }
     }
 
     public function count(): int

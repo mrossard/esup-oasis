@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class IntervenantDisponibleFilter extends AbstractFilter

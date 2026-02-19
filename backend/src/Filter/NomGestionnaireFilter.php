@@ -17,7 +17,6 @@ use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class NomGestionnaireFilter extends AbstractFilter

@@ -21,7 +21,6 @@ use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use RuntimeException;
 use Symfony\Component\Clock\ClockAwareTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class EtatAvisEseUtilisateurFilter extends AbstractFilter

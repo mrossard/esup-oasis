@@ -19,7 +19,6 @@ use ApiPlatform\OpenApi\Model\Parameter;
 use App\ApiResource\Utilisateur;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Clock\ClockAwareTrait;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
 class BeneficiaireAvecAmenagementEnCoursFilter extends AbstractFilter
@@ -73,7 +72,9 @@ class BeneficiaireAvecAmenagementEnCoursFilter extends AbstractFilter
                 'type' => TypeIdentifier::BOOL,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => new Parameter(name: self::class, in: 'query', description: self::class),
+                'openapi' => new Parameter(name: self::class, in: 'query', description: self::class, schema: [
+                    'type' => 'bool',
+                ]),
             ],
         ];
     }

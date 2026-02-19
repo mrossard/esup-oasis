@@ -19,7 +19,6 @@ use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
@@ -60,7 +59,9 @@ class DomaineAmenagementEnCoursFilter extends AbstractFilter
                 'type' => TypeIdentifier::BOOL,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => new Parameter(name: $property, in: 'query', description: $property),
+                'openapi' => new Parameter(name: $property, in: 'query', description: $property, schema: [
+                    'type' => 'bool',
+                ]),
             ];
         }
         return $description;
