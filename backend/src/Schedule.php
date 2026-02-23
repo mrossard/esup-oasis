@@ -1,5 +1,15 @@
 <?php
 
+/*
+ * Copyright (c) 2026. Esup - Université de Bordeaux.
+ *
+ * This file is part of the Esup-Oasis project (https://github.com/EsupPortail/esup-oasis).
+ *  For full copyright and license information please view the LICENSE file distributed with the source code.
+ *
+ *  @author Manuel Rossard <manuel.rossard@u-bordeaux.fr>
+ *
+ */
+
 namespace App;
 
 use Symfony\Component\Scheduler\Attribute\AsSchedule;
@@ -12,17 +22,14 @@ class Schedule implements ScheduleProviderInterface
 {
     public function __construct(
         private CacheInterface $cache,
-    ) {
-    }
+    ) {}
 
     public function getSchedule(): SymfonySchedule
     {
-        return (new SymfonySchedule())
+        return new SymfonySchedule()
             ->stateful($this->cache) // ensure missed tasks are executed
-            ->processOnlyLastMissedRun(true) // ensure only last missed task is run
-
-            // add your own tasks here
-            // see https://symfony.com/doc/current/scheduler.html#attaching-recurring-messages-to-a-schedule
+            ->processOnlyLastMissedRun(true)// add your own tasks here // ensure only last missed task is run
+        // see https://symfony.com/doc/current/scheduler.html#attaching-recurring-messages-to-a-schedule
         ;
     }
 }

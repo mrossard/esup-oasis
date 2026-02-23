@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2024. Esup - Université de Bordeaux.
+ * Copyright (c) 2024-2026. Esup - Université de Bordeaux.
  *
  * This file is part of the Esup-Oasis project (https://github.com/EsupPortail/esup-oasis).
  *  For full copyright and license information please view the LICENSE file distributed with the source code.
@@ -20,7 +20,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: DisciplineArtistiqueRepository::class)]
-#[Map(target: \App\ApiResource\DisciplineArtistique::class, transform: [EntityToResourceTransformer::class, 'entityToResource'])]
+#[Map(target: \App\ApiResource\DisciplineArtistique::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class DisciplineArtistique
 {
     #[ORM\Id]

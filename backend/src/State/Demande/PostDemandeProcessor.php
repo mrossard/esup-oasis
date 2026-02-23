@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2024. Esup - Université de Bordeaux.
+ * Copyright (c) 2024-2026. Esup - Université de Bordeaux.
  *
  * This file is part of the Esup-Oasis project (https://github.com/EsupPortail/esup-oasis).
  *  For full copyright and license information please view the LICENSE file distributed with the source code.
@@ -58,7 +58,9 @@ class PostDemandeProcessor implements ProcessorInterface
 
         //On récupère la campagne en cours pour le type de demande passé
         if (
-            !($campagne = $this->typeDemandeRepository->find($data->typeDemande->id)->getCampagneEnCoursPourDate($this->now()))
+            !($campagne = $this->typeDemandeRepository->find($data->typeDemande->id)->getCampagneEnCoursPourDate(
+                $this->now(),
+            ))
         ) {
             throw new UnprocessableEntityHttpException('Aucune campagne en cours pour ce type de demandes');
         }
