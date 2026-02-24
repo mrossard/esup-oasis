@@ -50,6 +50,7 @@ readonly class DecisionAmenagementExamensProcessor implements ProcessorInterface
             assert($user instanceof Utilisateur);
 
             $this->messageBus->dispatch(new DecisionEditionDemandeeMessage($entity->getId(), $user->getUid()));
+            $this->messageBus->dispatch(new RessourceModifieeMessage(new \App\ApiResource\Utilisateur($user))); //il faut mettre à jour le cache pour l'utilisateur
         }
 
         return $data;
