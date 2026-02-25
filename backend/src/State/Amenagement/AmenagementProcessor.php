@@ -56,8 +56,8 @@ class AmenagementProcessor implements ProcessorInterface
         if ($operation instanceof Delete) {
             $this->amenagementRepository->remove($entity, true);
             $this->messageBus->dispatch(new AmenagementModifieMessage($entity));
-            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
-            //todo : invalidation aménagements par utilisateur!
+            //liste des aménagements par utilisateurs impactée!
+            $this->messageBus->dispatch(new RessourceModifieeMessage($data->beneficiaire));
             return null;
         }
 
@@ -109,13 +109,9 @@ class AmenagementProcessor implements ProcessorInterface
         $this->messageBus->dispatch(new AmenagementModifieMessage($entity));
 
         $resource = new Amenagement($entity);
-        //        if (null !== $data->id) {
-        //            $this->messageBus->dispatch(new RessourceModifieeMessage($resource));
-        //        } else {
-        //            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
-        //        }
 
-        //todo : invalidation aménagements par utilisateur!
+        //liste des aménagements par utilisateurs impactée !
+        $this->messageBus->dispatch(new RessourceModifieeMessage($resource->beneficiaire));
 
         return $resource;
     }
