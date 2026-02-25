@@ -60,6 +60,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
             security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.attributes.get('uid'))",
+            map: false,
         ),
         new Patch(
             uriTemplate: self::ITEM_URI,
