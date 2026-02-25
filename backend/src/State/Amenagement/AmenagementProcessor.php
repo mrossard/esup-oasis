@@ -58,6 +58,7 @@ class AmenagementProcessor implements ProcessorInterface
             $this->messageBus->dispatch(new AmenagementModifieMessage($entity));
             //liste des aménagements par utilisateurs impactée!
             $this->messageBus->dispatch(new RessourceModifieeMessage($data->beneficiaire));
+            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data->beneficiaire));
             return null;
         }
 
@@ -112,6 +113,7 @@ class AmenagementProcessor implements ProcessorInterface
 
         //liste des aménagements par utilisateurs impactée !
         $this->messageBus->dispatch(new RessourceModifieeMessage($resource->beneficiaire));
+        $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource->beneficiaire));
 
         return $resource;
     }
