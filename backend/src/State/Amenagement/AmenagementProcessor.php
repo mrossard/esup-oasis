@@ -57,6 +57,7 @@ class AmenagementProcessor implements ProcessorInterface
             $this->amenagementRepository->remove($entity, true);
             $this->messageBus->dispatch(new AmenagementModifieMessage($entity));
             $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($data));
+            //todo : invalidation aménagements par utilisateur!
             return null;
         }
 
@@ -113,6 +114,8 @@ class AmenagementProcessor implements ProcessorInterface
         //        } else {
         //            $this->messageBus->dispatch(new RessourceCollectionModifieeMessage($resource));
         //        }
+
+        //todo : invalidation aménagements par utilisateur!
 
         return $resource;
     }
