@@ -66,7 +66,6 @@ readonly class DecisionEditionDemandeeMessageHandler
             $pdf = $this->pdfEncoder->encode($normalized, 'pdf');
             $this->mailService->envoyerDecision($decision, $pdf);
             $decision->setEtat(DecisionAmenagementExamens::ETAT_EDITE);
-            $this->messageBus->dispatch(new RessourceModifieeMessage(new DecisionResource($decision)));
             $this->messageBus->dispatch(new RessourceModifieeMessage(new Utilisateur($decision->getBeneficiaire())));
         } catch (RuntimeException $e) {
             $this->logger->error($e->getMessage());
@@ -105,7 +104,6 @@ readonly class DecisionEditionDemandeeMessageHandler
             $this->logger->error('Erreur d\'enregistrement de la copie pdf de la décision');
         }
 
-        $decision->setEtat(DecisionAmenagementExamens::ETAT_EDITE);
         $this->decisionAmenagementExamensRepository->save($decision, true);
     }
 }
