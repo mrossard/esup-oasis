@@ -12,10 +12,13 @@
 
 namespace App\MessageHandler;
 
+use App\ApiResource\DecisionAmenagementExamens as DecisionResource;
+use App\ApiResource\Utilisateur;
 use App\Entity\DecisionAmenagementExamens;
 use App\Entity\Fichier;
 use App\Entity\PieceJointeBeneficiaire;
 use App\Message\DecisionEditionDemandeeMessage;
+use App\Message\RessourceModifieeMessage;
 use App\Repository\DecisionAmenagementExamensRepository;
 use App\Repository\PieceJointeBeneficiaireRepository;
 use App\Serializer\DecisionAmenagementEditionNormalizer;
@@ -56,13 +59,15 @@ readonly class DecisionEditionDemandeeMessageHandler
             return;
         }
 
-        $resource = new \App\ApiResource\DecisionAmenagementExamens($decision);
+        $resource = new DecisionResource($decision);
 
         $normalized = $this->decisionAmenagementEditionNormalizer->normalize($resource);
         try {
             $pdf = $this->pdfEncoder->encode($normalized, 'pdf');
             $this->mailService->envoyerDecision($decision, $pdf);
             $decision->setEtat(DecisionAmenagementExamens::ETAT_EDITE);
+            $this->messageBus->dispatch(new RessourceModifieeMessage(new DecisionResource($decision)));
+            $this->messageBus->dispatch(new RessourceModifieeMessage(new Utilisateur($decision->getBeneficiaire())));
         } catch (RuntimeException $e) {
             $this->logger->error($e->getMessage());
             $this->logger->info($e->getTraceAsString());
