@@ -19,6 +19,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DecisionAmenagementExamensRepository::class)]
+#[ORM\Index(name: 'IDX_DECISION_AMENAGEMENT_EXAMENS_ETAT', columns: ['etat'])]
+#[ORM\Index(name: 'IDX_DECISION_AMENAGEMENT_EXAMENS_DEBUT_FIN', columns: ['debut', 'fin'])]
 class DecisionAmenagementExamens
 {
     public const string ETAT_ATTENTE_VALIDATION_CAS = 'ATTENTE_VALIDATION_CAS';
