@@ -35,7 +35,6 @@ final class Version20260303142515 extends AbstractMigration
             'CREATE INDEX IDX_DECISION_AMENAGEMENT_EXAMENS_DEBUT_FIN ON decision_amenagement_examens (debut, fin)',
         );
         $this->addSql('CREATE INDEX IDX_DECISION_AMENAGEMENT_EXAMENS_ETAT ON decision_amenagement_examens (etat)');
-        $this->addSql('DROP INDEX idx_evenement_debut_fin');
     }
 
     public function down(Schema $schema): void

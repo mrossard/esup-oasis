@@ -19,8 +19,10 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DecisionAmenagementExamensRepository::class)]
+#[ORM\Index(name: 'IDX_DECISION_BENEFICIAIRE_DEBUT', columns: ['beneficiaire_id', 'debut'])]
 #[ORM\Index(name: 'IDX_DECISION_AMENAGEMENT_EXAMENS_ETAT', columns: ['etat'])]
 #[ORM\Index(name: 'IDX_DECISION_BENEFICIAIRE_ETAT_DEBUT', columns: ['beneficiaire_id', 'etat', 'debut'])]
+#[ORM\Index(name: 'IDX_DECISION_BENEFICIAIRE_ETAT', columns: ['beneficiaire_id', 'etat'])]
 #[ORM\Index(name: 'IDX_DECISION_AMENAGEMENT_EXAMENS_DEBUT_FIN', columns: ['debut', 'fin'])]
 class DecisionAmenagementExamens
 {

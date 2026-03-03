@@ -23,8 +23,6 @@ final class Version20260303145728 extends AbstractMigration
         $this->addSql(
             'CREATE INDEX IDX_BENEFICIAIRE_UTILISATEUR_INTERVALLE ON beneficiaire (utilisateur_id, debut, fin)',
         );
-        $this->addSql('DROP INDEX idx_72b433e455caf762');
-        $this->addSql('DROP INDEX decision_amenagement_examens_debut_index');
         $this->addSql(
             'CREATE INDEX IDX_DECISION_BENEFICIAIRE_ETAT_DEBUT ON decision_amenagement_examens (beneficiaire_id, etat, debut)',
         );
