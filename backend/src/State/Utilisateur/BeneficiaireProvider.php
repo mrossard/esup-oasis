@@ -14,25 +14,28 @@ namespace App\State\Utilisateur;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Filter\PreloadAssociationsFilter;
+use App\Filter\EtatDecisionAmenagementFilter;
+use App\Repository\UtilisateurRepository;
 
 readonly class BeneficiaireProvider implements ProviderInterface
 {
     public function __construct(
         private UtilisateurProvider $utilisateurProvider,
+        private UtilisateurRepository $utilisateurRepository,
     ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
-        $context['filters']['exists']['beneficiaire'] = $context['filters']['exists']['beneficiaire'] ?? true;
-
-        /**
-         * On veut toujours les inscriptions, les tags, les profils...on les charge dès la première requête
-         */
-        $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+        $context['filters']['beneficiairefilter'] = true;
+        //        /**
+        //         * On veut toujours les inscriptions, les tags, les profils...on les charge dès la première requête
+        //         */
+        //                $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+        $associations = [
             'beneficiaires' => [
                 'sourceEntity' => 'root',
                 'relationName' => 'beneficiaires',
+                'joinType' => 'INNER',
             ],
             'tags_beneficiaires' => [
                 'sourceEntity' => 'beneficiaires',
@@ -50,6 +53,7 @@ readonly class BeneficiaireProvider implements ProviderInterface
             'decisionsAmenagementExamens' => [
                 'sourceEntity' => 'root',
                 'relationName' => 'decisionsAmenagementExamens',
+                'joinType' => $context['filters'][EtatDecisionAmenagementFilter::PROPERTY] ?? false ? 'INNER' : 'LEFT',
             ],
             'inscriptions' => [
                 'sourceEntity' => 'root',
@@ -76,6 +80,15 @@ readonly class BeneficiaireProvider implements ProviderInterface
             ],
         ];
 
-        return $this->utilisateurProvider->provide($operation, $uriVariables, $context);
+        $paginator = $this->utilisateurProvider->provide($operation, $uriVariables, $context);
+
+        $userIds = [];
+        foreach ($paginator as $resource) {
+            $userIds[] = $resource->uid;
+        }
+
+        $this->utilisateurRepository->preload($userIds, $associations);
+
+        return $paginator;
     }
 }
