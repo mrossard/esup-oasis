@@ -51,18 +51,17 @@ class EtatDecisionAmenagementFilter extends AbstractFilter
 
         $rootAlias = $queryBuilder->getRootAliases()[0];
         $decisionAlias = $queryNameGenerator->generateJoinAlias('decision');
-        $decisionPlusRecenteAlias = $queryNameGenerator->generateJoinAlias('decision');
         $etatParam = $queryNameGenerator->generateParameterName('etat');
+
+        $subQb = $queryBuilder->getEntityManager()->createQueryBuilder();
+        $subQb
+            ->select('MAX(decMax.debut)')
+            ->from(DecisionAmenagementExamens::class, 'decMax')
+            ->andWhere(sprintf('decMax MEMBER OF %s.decisionsAmenagementExamens', $rootAlias));
 
         $queryBuilder
             ->join(sprintf('%s.decisionsAmenagementExamens', $rootAlias), $decisionAlias)
-            ->leftJoin(
-                sprintf('%s.decisionsAmenagementExamens', $rootAlias),
-                $decisionPlusRecenteAlias,
-                Join::WITH,
-                sprintf('%s.debut > %s.debut', $decisionPlusRecenteAlias, $decisionAlias),
-            )
-            ->andWhere(sprintf('%s.id is null', $decisionPlusRecenteAlias))
+            ->andWhere(sprintf('%s.debut = (%s)', $decisionAlias, $subQb->getDQL()))
             ->andWhere(sprintf('%s.etat = :%s', $decisionAlias, $etatParam))
             ->setParameter($etatParam, $value);
     }
