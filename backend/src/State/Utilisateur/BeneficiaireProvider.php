@@ -45,7 +45,7 @@ readonly class BeneficiaireProvider implements ProviderInterface
             'profilBeneficiaire' => [
                 'sourceEntity' => 'beneficiaires',
                 'relationName' => 'profil',
-                'type' => 'INNER',
+                'joinType' => 'INNER',
             ],
             'decisionsAmenagementExamens' => [
                 'sourceEntity' => 'root',
@@ -54,17 +54,21 @@ readonly class BeneficiaireProvider implements ProviderInterface
             'inscriptions' => [
                 'sourceEntity' => 'root',
                 'relationName' => 'inscriptions',
-                'type' => 'INNER',
+                'joinType' => 'INNER',
             ],
             'formation' => [
                 'sourceEntity' => 'inscriptions',
                 'relationName' => 'formation',
-                'type' => 'INNER',
+                'joinType' => 'INNER',
             ],
             'composante' => [
                 'sourceEntity' => 'formation',
                 'relationName' => 'composante',
-                'type' => 'INNER',
+                'joinType' => 'INNER',
+            ],
+            'services' => [
+                'sourceEntity' => 'root',
+                'relationName' => 'services',
             ],
             'intervenant' => [
                 'sourceEntity' => 'root',
