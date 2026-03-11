@@ -66,6 +66,26 @@ class ServicesFaitsTest extends ApiTestCaseCustom
             '@context' => '/contexts/ServicesFaits',
             'id' => 1,
         ]);
+
+        $data = $client->getResponse()->toArray();
+        $this->assertCount(2, $data['lignes']);
+        
+        // On vérifie les deux intervenants (triés par nom)
+        // intervenant (intervenant1) et intervenant2
+        $this->assertJsonContains([
+            'lignes' => [
+                [
+                    'intervenant' => '/utilisateurs/intervenant',
+                    'nbHeures' => '2.50',
+                    'type' => '/types_evenements/7',
+                ],
+                [
+                    'intervenant' => '/utilisateurs/intervenant2',
+                    'nbHeures' => '4.00',
+                    'type' => '/types_evenements/1',
+                ],
+            ],
+        ]);
     }
 
     public function testCannotGetServiceFaitForNotSentPeriod(): void

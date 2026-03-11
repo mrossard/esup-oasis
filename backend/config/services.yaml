@@ -80,12 +80,6 @@ services:
     arguments:
       $envoyer: '%env(resolve:APP_ENVOYER_MAILS_TEST)%'
 
-  App\Service\HtmlToPdfConverter:
-    arguments:
-      $apiUri: '%env(resolve:HTMLTOPDFAPI_URL)%'
-      $appId: '%env(resolve:HTMLTOPDFAPI_APPID)%'
-      $apiKey: '%env(resolve:HTMLTOPDFAPI_APIKEY)%'
-
   App\Serializer\DemandeDenormalizer:
     arguments:
       $itemNormalizer: '@api_platform.jsonld.normalizer.item'
