@@ -172,4 +172,51 @@ class UtilisateursTest extends ApiTestCaseCustom
         $this->assertArrayHasKey('profils', $data['hydra:member'][0]);
         $this->assertArrayHasKey('gestionnairesActifs', $data['hydra:member'][0]);
     }
+
+    public function testAdminCanAddTagToUser(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('POST', '/utilisateurs/beneficiaire/tags', [
+            'json' => [
+                'tag' => '/tags/1',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(201);
+        $this->assertJsonContains([
+            'tag' => '/tags/1',
+        ]);
+    }
+
+    public function testAdminCanListUserTags(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        // On s'assure qu'il y a un tag
+        $client->request('POST', '/utilisateurs/beneficiaire/tags', [
+            'json' => [
+                'tag' => '/tags/1',
+            ],
+        ]);
+
+        $client->request('GET', '/utilisateurs/beneficiaire/tags');
+
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        $this->assertGreaterThanOrEqual(1, count($data['hydra:member']));
+    }
+
+    public function testAdminCanDeleteUserTag(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        // On s'assure qu'il y a un tag
+        $client->request('POST', '/utilisateurs/beneficiaire/tags', [
+            'json' => [
+                'tag' => '/tags/1',
+            ],
+        ]);
+
+        $client->request('DELETE', '/utilisateurs/beneficiaire/tags/1');
+
+        $this->assertResponseStatusCodeSame(204);
+    }
 }

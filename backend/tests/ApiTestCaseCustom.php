@@ -143,6 +143,7 @@ abstract class ApiTestCaseCustom extends ApiTestCase
             __DIR__ . '/../fixtures/tests/questions.yaml',
             __DIR__ . '/../fixtures/tests/questions_etapes_demandes.yaml',
             __DIR__ . '/../fixtures/tests/services.yaml',
+            __DIR__ . '/../fixtures/tests/tags.yaml',
             __DIR__ . '/../fixtures/tests/taux_horaires.yaml',
             __DIR__ . '/../fixtures/tests/types_demandes.yaml',
             __DIR__ . '/../fixtures/tests/types_equipements.yaml',
