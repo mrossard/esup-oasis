@@ -47,7 +47,7 @@ jobs:
       - name: Run Migrations
         working-directory: backend
         env:
-          DATABASE_URL: postgresql://postgres:password@127.0.0.1:5432/app_env?serverVersion=15&charset=utf8
+          DATABASE_URL: postgresql://postgres:password@127.0.0.1:5432/app_test?serverVersion=15&charset=utf8
           SOUIN_API_URL: http://localhost:2019/souin-api/souin
         run: php bin/console doctrine:migrations:migrate --no-interaction
 
