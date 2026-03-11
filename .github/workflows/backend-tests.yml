@@ -36,7 +36,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: backend
-        run: composer install --no-interaction --no-progress
+        run: composer install --no-interaction --no-progress --ignore-platform-req=ext-oci8
 
       - name: Generate JWT keys
         working-directory: backend
