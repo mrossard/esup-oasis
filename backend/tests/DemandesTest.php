@@ -189,14 +189,14 @@ class DemandesTest extends ApiTestCaseCustom
         $client->request('PATCH', '/demandes/1', [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
-                'etat' => '/etats_demandes/2',
+                'etat' => '/etats_demandes/5',
             ],
         ]);
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
             '@id' => '/demandes/1',
-            'etat' => '/etats_demandes/2',
+            'etat' => '/etats_demandes/5',
         ]);
     }
 

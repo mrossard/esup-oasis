@@ -123,11 +123,14 @@ abstract class ApiTestCaseCustom extends ApiTestCase
             __DIR__ . '/../fixtures/tests/campagnes_demandes.yaml',
             __DIR__ . '/../fixtures/tests/campus.yaml',
             __DIR__ . '/../fixtures/tests/categories_amenagements.yaml',
+            __DIR__ . '/../fixtures/tests/chartes.yaml',
+            __DIR__ . '/../fixtures/tests/chartes_demandeurs.yaml',
             __DIR__ . '/../fixtures/tests/clubs_sportifs.yaml',
             __DIR__ . '/../fixtures/tests/commissions.yaml',
             __DIR__ . '/../fixtures/tests/competences.yaml',
             __DIR__ . '/../fixtures/tests/composantes.yaml',
             __DIR__ . '/../fixtures/tests/demandes.yaml',
+            __DIR__ . '/../fixtures/tests/decisions.yaml',
             __DIR__ . '/../fixtures/tests/etapes_demandes.yaml',
             __DIR__ . '/../fixtures/tests/etats_demandes.yaml',
             __DIR__ . '/../fixtures/tests/evenements.yaml',
@@ -154,6 +157,8 @@ abstract class ApiTestCaseCustom extends ApiTestCase
             __DIR__ . '/../fixtures/tests/utilisateurs_devs.yaml',
             __DIR__ . '/../fixtures/tests/valeurs_parametres.yaml',
             __DIR__ . '/../fixtures/tests/reponses.yaml',
+            __DIR__ . '/../fixtures/tests/decisions.yaml',
+            __DIR__ . '/../fixtures/tests/chartes_demandeurs.yaml',
         ];
 
         $loader->load($fixtures, purgeMode: PurgeMode::createNoPurgeMode());

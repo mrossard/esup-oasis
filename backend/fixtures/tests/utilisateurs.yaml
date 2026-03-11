@@ -140,3 +140,10 @@ App\Entity\Utilisateur:
     prenom: 'commission'
     admin: false
     roles: [ 'ROLE_MEMBRE_COMMISSION' ]
+  utilisateur-beneficiaire-decision:
+    uid: 'beneficiaire-decision'
+    email: 'beneficiaire-decision@app.fr'
+    nom: 'beneficiaire'
+    prenom: 'decision'
+    admin: false
+    roles: [ 'ROLE_BENEFICIAIRE' ]

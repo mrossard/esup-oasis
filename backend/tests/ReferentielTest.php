@@ -250,4 +250,62 @@ class ReferentielTest extends ApiTestCaseCustom
             'libelle' => 'Nouvel établissement',
         ]);
     }
+
+    public function testGetTypesEngagements(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('GET', '/types_engagements');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@context' => '/contexts/TypeEngagement',
+            '@id' => '/types_engagements',
+        ]);
+    }
+
+    public function testAdminCanCreateTypeEngagement(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('POST', '/types_engagements', [
+            'json' => [
+                'libelle' => 'Engagement test',
+                'actif' => true,
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertJsonContains([
+            'libelle' => 'Engagement test',
+        ]);
+    }
+
+    /*
+    public function testGetTypesSuiviAmenagements(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('GET', '/types_suivi_amenagements');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@context' => '/contexts/TypeSuiviAmenagement',
+            '@id' => '/types_suivi_amenagements',
+        ]);
+    }
+
+    public function testAdminCanCreateTypeSuiviAmenagement(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('POST', '/types_suivi_amenagements', [
+            'json' => [
+                'libelle' => 'Suivi test',
+                'actif' => true,
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertJsonContains([
+            'libelle' => 'Suivi test',
+        ]);
+    }
+    */
 }

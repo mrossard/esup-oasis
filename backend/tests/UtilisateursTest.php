@@ -44,7 +44,7 @@ class UtilisateursTest extends ApiTestCaseCustom
 
         // Search beneficiaires
         $client->request('GET', '/beneficiaires?recherche=benef');
-        $this->assertJsonContains(['hydra:totalItems' => 3]);
+        $this->assertJsonContains(['hydra:totalItems' => 4]);
 
         // Search intervenants (intervenant, intervenant2)
         // nouvelintervenant n'a pas encore le rôle dans les fixtures
