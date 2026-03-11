@@ -59,7 +59,7 @@ class TauxHorairesTest extends ApiTestCaseCustom
         $this->assertJsonContains([
             '@context' => '/contexts/TauxHoraire',
             '@type' => 'TauxHoraire',
-            '@id' => '/types_evenements/2/taux/2',
+            '@id' => '/types_evenements/2/taux/3',
         ]);
     }
 
