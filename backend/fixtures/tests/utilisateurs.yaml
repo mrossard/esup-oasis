@@ -133,3 +133,10 @@ App\Entity\Utilisateur:
     admin: false
     numeroEtudiant: 12345678
     roles: [ 'ROLE_DEMANDEUR' ]
+  membrecommission:
+    uid: 'membrecommission'
+    email: 'membrecommission@app.fr'
+    nom: 'membre'
+    prenom: 'commission'
+    admin: false
+    roles: [ 'ROLE_MEMBRE_COMMISSION' ]
