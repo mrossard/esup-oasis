@@ -14,7 +14,6 @@ namespace App\State\TypeSuiviAmenagement;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProcessorInterface;
-use App\ApiResource\TypeAmenagement;
 use App\ApiResource\TypeSuiviAmenagement;
 use App\Repository\TypeSuiviAmenagementRepository;
 use Override;
@@ -33,7 +32,7 @@ readonly class TypeSuiviAmenagementProcessor implements ProcessorInterface
          */
 
         $entity = match ($data->id) {
-            null => new TypeAmenagement(),
+            null => new \App\Entity\TypeSuiviAmenagement(),
             default => $this->repository->find($data->id),
         };
 
