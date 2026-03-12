@@ -37,3 +37,4 @@ when@test:
         'App\Message\CreationIntervenantMessage': sync
         'App\Message\ErreurTechniqueMessage': sync
         'App\Message\BilanActiviteDemandeMessage': sync
+        'Symfony\Component\Mailer\Messenger\SendEmailMessage': sync

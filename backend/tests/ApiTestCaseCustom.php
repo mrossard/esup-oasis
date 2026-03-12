@@ -117,6 +117,7 @@ abstract class ApiTestCaseCustom extends ApiTestCase
 
         $fixtures = [
             __DIR__ . '/../fixtures/tests/applications_clientes.yaml',
+            __DIR__ . '/../fixtures/tests/amenagements.yaml',
             __DIR__ . '/../fixtures/tests/avis_ese.yaml',
             __DIR__ . '/../fixtures/tests/beneficiaires.yaml',
             __DIR__ . '/../fixtures/tests/campagnes.yaml',
@@ -146,6 +147,7 @@ abstract class ApiTestCaseCustom extends ApiTestCase
             __DIR__ . '/../fixtures/tests/questions.yaml',
             __DIR__ . '/../fixtures/tests/questions_etapes_demandes.yaml',
             __DIR__ . '/../fixtures/tests/services.yaml',
+            __DIR__ . '/../fixtures/tests/sportifs_haut_niveau.yaml',
             __DIR__ . '/../fixtures/tests/tags.yaml',
             __DIR__ . '/../fixtures/tests/taux_horaires.yaml',
             __DIR__ . '/../fixtures/tests/types_amenagements.yaml',

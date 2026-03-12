@@ -49,4 +49,17 @@ class DecisionsTest extends ApiTestCaseCustom
 
         $this->assertResponseStatusCodeSame(403);
     }
+
+    public function testGestionnaireCanGetDecisionPdf(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        $client->request('GET', '/utilisateurs/beneficiaire-decision/decisions/2025', [
+            'headers' => [
+                'Accept' => 'application/pdf',
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('application/pdf', $client->getResponse()->getHeaders()['content-type'][0]);
+    }
 }

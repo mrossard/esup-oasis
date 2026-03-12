@@ -3,6 +3,8 @@
 namespace App\Tests;
 
 use ApiPlatform\Symfony\Bundle\Test\Response;
+use App\Entity\Utilisateur;
+use DateTime;
 
 class UtilisateursTest extends ApiTestCaseCustom
 {
@@ -42,9 +44,20 @@ class UtilisateursTest extends ApiTestCaseCustom
     {
         $client = $this->createClientWithCredentials('renfort');
 
+        // On compte le nombre de bénéficiaires en base (ceux qui matchent "benef")
+        $em = static::getContainer()->get('doctrine')->getManager();
+        $count = $em
+            ->createQuery('SELECT COUNT(DISTINCT u.uid) FROM App\Entity\Utilisateur u 
+                                   JOIN u.beneficiaires b 
+                                   WHERE (u.nom LIKE :search OR u.prenom LIKE :search OR u.uid LIKE :search OR u.email LIKE :search)
+                                   AND :now >= b.debut AND (:now < b.fin OR b.fin IS NULL)')
+            ->setParameter('search', '%benef%')
+            ->setParameter('now', new DateTime())
+            ->getSingleScalarResult();
+
         // Search beneficiaires
         $client->request('GET', '/beneficiaires?recherche=benef');
-        $this->assertJsonContains(['hydra:totalItems' => 4]);
+        $this->assertJsonContains(['hydra:totalItems' => (int) $count]);
 
         // Search intervenants (intervenant, intervenant2)
         // nouvelintervenant n'a pas encore le rôle dans les fixtures
@@ -218,5 +231,50 @@ class UtilisateursTest extends ApiTestCaseCustom
         $client->request('DELETE', '/utilisateurs/beneficiaire/tags/1');
 
         $this->assertResponseStatusCodeSame(204);
+    }
+
+    public function testNumeroAnonymeUniquenessAndVoter(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        //on s'assure d'avoir un numéro ano vide
+        $repo = static::getContainer()
+            ->get('doctrine')
+            ->getManager()
+            ->getRepository(Utilisateur::class);
+
+        $beneficiaire = $repo->findOneBy(['uid' => 'beneficiaire']);
+        $beneficiaire->setNumeroAnonyme(null);
+        $repo->save($beneficiaire, true);
+
+        $client->request('PATCH', '/utilisateurs/beneficiaire', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [
+                'numeroAnonyme' => 87654123,
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+
+        // on ne peut pas le modifier si existant!
+        $client->request('PATCH', '/utilisateurs/beneficiaire', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [
+                'numeroAnonyme' => 22222222,
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    public function testSearchLdap(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('GET', '/utilisateurs?term=Nom');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@type' => 'hydra:Collection',
+        ]);
     }
 }

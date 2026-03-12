@@ -121,3 +121,7 @@ when@test:
       alias: App\Test\NoopPurger
     App\Service\SiScol\AbstractSiScolDataProvider:
       alias: App\Service\SiScol\FakeSiScolDataProvider
+    Sensiolabs\GotenbergBundle\GotenbergPdfInterface:
+      class: App\Test\GotenbergPdfMock
+    App\Service\LdapService:
+      class: App\Test\FakeLdapService

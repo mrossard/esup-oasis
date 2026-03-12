@@ -183,6 +183,36 @@ class DemandesTest extends ApiTestCaseCustom
         ]);
     }
 
+    public function testCannotCreateTwoDemandesForSameCampaign(): void
+    {
+        $client = $this->createClientWithCredentials('demandeur');
+
+        // demandeur already has a demande for /types_demandes/1 in fixtures (demande1)
+        $client->request('POST', '/demandes', [
+            'json' => [
+                'typeDemande' => '/types_demandes/1',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(422);
+    }
+
+    public function testInvalidStateTransition(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        // demande1 is RECEPTIONNEE (2)
+        // Transition to EN_COURS (1) is invalid
+        $client->request('PATCH', '/demandes/1', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [
+                'etat' => '/etats_demandes/1',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(422);
+    }
+
     public function testAdminCanUpdateDemande(): void
     {
         $client = $this->createClientWithCredentials('admin');
@@ -261,7 +291,7 @@ class DemandesTest extends ApiTestCaseCustom
 
         // 4: question sportifs 2 (mandatory because triggered by 3=oui)
         $client->request('PUT', $demandeId . '/questions/4/reponse', [
-            'json' => ['commentaire' => 'mon numéro ministère'],
+            'json' => ['commentaire' => 'SHN_OK'],
         ]);
         $this->assertResponseStatusCodeSame(201);
 
@@ -276,7 +306,7 @@ class DemandesTest extends ApiTestCaseCustom
         // On vérifie l'état de la demande
         $client->request('GET', $demandeId);
         $this->assertJsonContains([
-            'etat' => '/etats_demandes/2', // Réceptionnée
+            'etat' => '/etats_demandes/10', // Attente validation accompagnement
             'complete' => true,
         ]);
     }
@@ -329,6 +359,35 @@ class DemandesTest extends ApiTestCaseCustom
         ]);
 
         $this->assertResponseStatusCodeSame(201);
+    }
+
+    public function testSHNValidator(): void
+    {
+        $client = $this->createClientWithCredentials('demandeur');
+
+        // OK case
+        $client->request('PUT', '/demandes/1/questions/4/reponse', [
+            'json' => [
+                'commentaire' => 'SHN_OK',
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+
+        // Wrong year
+        $client->request('PUT', '/demandes/1/questions/4/reponse', [
+            'json' => [
+                'commentaire' => 'SHN_WRONG_YEAR',
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(422);
+
+        // Not found
+        $client->request('PUT', '/demandes/1/questions/4/reponse', [
+            'json' => [
+                'commentaire' => 'SHN_UNKNOWN',
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(422);
     }
 
     public function testMembreCommissionCanSeeDemande(): void
