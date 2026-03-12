@@ -137,6 +137,28 @@ App\Entity\Utilisateur:
     admin: false
     numeroEtudiant: 12345678
     roles: [ 'ROLE_DEMANDEUR' ]
+  demandeur-modification:
+    uid: 'demandeur-modification'
+    email: 'demandeur-modification@app.fr'
+    nom: 'demandeur'
+    prenom: 'modification'
+    admin: false
+    roles: [ 'ROLE_USER' ]
+  demandeur-admin-update:
+    uid: 'demandeur-admin-update'
+    email: 'demandeur-admin-update@app.fr'
+    nom: 'demandeur'
+    prenom: 'admin-update'
+    admin: false
+    roles: [ 'ROLE_USER' ]
+  demandeur-complet:
+    uid: 'demandeur-complet'
+    email: 'demandeur-complet@app.fr'
+    nom: 'demandeur'
+    prenom: 'complet'
+    admin: false
+    numeroEtudiant: 87654321
+    roles: [ 'ROLE_USER' ]
   membrecommission:
     uid: 'membrecommission'
     email: 'membrecommission@app.fr'

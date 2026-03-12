@@ -125,3 +125,5 @@ when@test:
       class: App\Test\GotenbergPdfMock
     App\Service\LdapService:
       class: App\Test\FakeLdapService
+    App\Service\Photo\PhotoProviderInterface:
+      alias: App\Test\FakePhotoProvider

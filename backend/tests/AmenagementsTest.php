@@ -115,6 +115,24 @@ class AmenagementsTest extends ApiTestCaseCustom
         $this->assertResponseStatusCodeSame(403);
     }
 
+    public function testSearchAmenagements(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+
+        // Recherche (insensible à la casse)
+        $client->request('GET', '/amenagements/utilisateurs?nom=beneficiaire');
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'hydra:totalItems' => 1,
+        ]);
+
+        $client->request('GET', '/amenagements/utilisateurs?nom=notfound');
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            'hydra:totalItems' => 0,
+        ]);
+    }
+
     public function testGestionnaireCanDeleteAmenagement(): void
     {
         //on récupère un type d'aménagement

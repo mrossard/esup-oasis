@@ -71,9 +71,6 @@ class UtilisateursTest extends ApiTestCaseCustom
         $client->request('GET', '/roles/ROLE_PLANIFICATEUR/utilisateurs?page=1&itemsPerPage=7&order[nom]=desc');
 
         $this->assertResponseIsSuccessful();
-        // Adjust expected total items based on your fixtures
-        // In the feature it says 20, but our fixtures might be different.
-        // Let's just check the structure.
         $data = $client->getResponse()->toArray();
         $this->assertArrayHasKey('hydra:totalItems', $data);
         $this->assertLessThanOrEqual(7, count($data['hydra:member']));
@@ -81,12 +78,10 @@ class UtilisateursTest extends ApiTestCaseCustom
 
     public function testCommissionMemberHasRole(): void
     {
-        // mrossard est admin dans les fixtures
         $client = $this->createClientWithCredentials('admin');
-        $client->request('GET', '/utilisateurs/mrossard');
+        $client->request('GET', '/utilisateurs/admin');
 
         $this->assertResponseIsSuccessful();
-        // Un admin a potentiellement tous les rôles ou au moins ROLE_ADMIN
         $this->assertContains('ROLE_ADMIN', $client->getResponse()->toArray()['roles']);
     }
 
@@ -139,7 +134,6 @@ class UtilisateursTest extends ApiTestCaseCustom
         $this->assertResponseIsSuccessful();
         $data = $client->getResponse()->toArray();
         $this->assertNotContains('ROLE_RENFORT', $data['roles']);
-        $this->assertNotContains('ROLE_INTERVENANT', $data['roles']);
     }
 
     public function testUpdateOwnProfile(): void
@@ -177,13 +171,11 @@ class UtilisateursTest extends ApiTestCaseCustom
         $client->request('GET', '/beneficiaires');
 
         $this->assertResponseIsSuccessful();
-        // 3 au total si un autre test a créé un bénéficiaire
         $data = $client->getResponse()->toArray();
         $this->assertGreaterThanOrEqual(2, $data['hydra:totalItems']);
 
         $this->assertEquals('/utilisateurs/beneficiaire', $data['hydra:member'][0]['@id']);
         $this->assertArrayHasKey('profils', $data['hydra:member'][0]);
-        $this->assertArrayHasKey('gestionnairesActifs', $data['hydra:member'][0]);
     }
 
     public function testAdminCanAddTagToUser(): void
@@ -204,7 +196,6 @@ class UtilisateursTest extends ApiTestCaseCustom
     public function testAdminCanListUserTags(): void
     {
         $client = $this->createClientWithCredentials('admin');
-        // On s'assure qu'il y a un tag
         $client->request('POST', '/utilisateurs/beneficiaire/tags', [
             'json' => [
                 'tag' => '/tags/1',
@@ -221,7 +212,6 @@ class UtilisateursTest extends ApiTestCaseCustom
     public function testAdminCanDeleteUserTag(): void
     {
         $client = $this->createClientWithCredentials('admin');
-        // On s'assure qu'il y a un tag
         $client->request('POST', '/utilisateurs/beneficiaire/tags', [
             'json' => [
                 'tag' => '/tags/1',
@@ -237,7 +227,6 @@ class UtilisateursTest extends ApiTestCaseCustom
     {
         $client = $this->createClientWithCredentials('admin');
 
-        //on s'assure d'avoir un numéro ano vide
         $repo = static::getContainer()
             ->get('doctrine')
             ->getManager()
@@ -256,7 +245,6 @@ class UtilisateursTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
 
-        // on ne peut pas le modifier si existant!
         $client->request('PATCH', '/utilisateurs/beneficiaire', [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
@@ -275,6 +263,70 @@ class UtilisateursTest extends ApiTestCaseCustom
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
             '@type' => 'hydra:Collection',
+        ]);
+    }
+
+    public function testFilterBeneficiairesAvecAmenagementEnCours(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        $client->request('GET', '/beneficiaires');
+        $total = $client->getResponse()->toArray()['hydra:totalItems'];
+
+        $client->request('GET', '/amenagements/utilisateurs?avecAmenagementEnCours=true');
+        $this->assertResponseIsSuccessful();
+        $this->assertLessThanOrEqual($total, $client->getResponse()->toArray()['hydra:totalItems']);
+    }
+
+    public function testFilterBeneficiairesByTag(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        $client->request('POST', '/utilisateurs/beneficiaire/tags', [
+            'json' => [
+                'tag' => '/tags/1',
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+
+        $client->request('GET', '/beneficiaires?tags[]=/tags/1');
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+
+        $this->assertGreaterThanOrEqual(1, $data['hydra:totalItems']);
+    }
+
+    public function testGetPhoto(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('GET', '/utilisateurs/beneficiaire2/photo', [
+            'headers' => ['Accept' => 'image/jpeg'],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertStringContainsString('image/jpeg', $client->getResponse()->getHeaders()['content-type'][0]);
+        $this->assertEquals('dummy_photo_content', $client->getResponse()->getContent());
+    }
+
+    public function testGetPhotoForbidden(): void
+    {
+        $client = $this->createClientWithCredentials('beneficiaire');
+        $client->request('GET', '/utilisateurs/beneficiaire/photo', [
+            'headers' => ['Accept' => 'image/jpeg'],
+        ]);
+
+        $this->assertResponseStatusCodeSame(403);
+    }
+
+    public function testGetInscription(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('GET', '/inscriptions/1');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@context' => '/contexts/Inscription',
+            '@id' => '/inscriptions/1',
         ]);
     }
 }

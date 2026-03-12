@@ -216,7 +216,17 @@ class DemandesTest extends ApiTestCaseCustom
     public function testAdminCanUpdateDemande(): void
     {
         $client = $this->createClientWithCredentials('admin');
-        $client->request('PATCH', '/demandes/1', [
+        // create fresh
+        $client->request('POST', '/demandes', [
+            'json' => [
+                'typeDemande' => '/types_demandes/1',
+                'demandeur' => '/utilisateurs/demandeur-admin-update',
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $id = $client->getResponse()->toArray()['@id'];
+
+        $client->request('PATCH', $id, [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
                 'etat' => '/etats_demandes/5',
@@ -225,7 +235,7 @@ class DemandesTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
-            '@id' => '/demandes/1',
+            '@id' => $id,
             'etat' => '/etats_demandes/5',
         ]);
     }
@@ -260,7 +270,7 @@ class DemandesTest extends ApiTestCaseCustom
     public function testRepondreSubmitValideLaDemandeSiComplete(): void
     {
         // On utilise un utilisateur qui n'a VRAIMENT pas de demande
-        $client = $this->createClientWithCredentials('intervenant');
+        $client = $this->createClientWithCredentials('demandeur-complet');
         $client->request('POST', '/demandes', [
             'json' => [
                 'typeDemande' => '/types_demandes/1',
@@ -468,6 +478,68 @@ class DemandesTest extends ApiTestCaseCustom
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
             'etat' => '/etats_demandes/10', // Attente validation accompagnement
+        ]);
+    }
+
+    public function testGetEtapesDemandes(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('GET', '/etapes_demandes');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@id' => '/etapes_demandes',
+            '@type' => 'hydra:Collection',
+        ]);
+
+        $client->request('GET', '/etapes_demandes/1');
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@id' => '/etapes_demandes/1',
+            '@type' => 'EtapeDemande',
+        ]);
+    }
+
+    public function testModificationEtatDemande(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        // Create a new demande to have a clean state
+        $client->request('POST', '/demandes', [
+            'json' => [
+                'typeDemande' => '/types_demandes/1',
+                'demandeur' => '/utilisateurs/demandeur-modification',
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+        $demandeId = $client->getResponse()->toArray()['@id'];
+
+        // Initial state is EN_COURS (1)
+        // Move to REFUSEE (5)
+        $client->request('PATCH', $demandeId, [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [
+                'etat' => '/etats_demandes/5',
+            ],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $client->request('GET', $demandeId . '/modifications');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@id' => $demandeId . '/modifications',
+            'hydra:totalItems' => 1,
+        ]);
+
+        $data = $client->getResponse()->toArray();
+        $modId = $data['hydra:member'][0]['@id'];
+
+        $client->request('GET', $modId);
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@id' => $modId,
+            'etat' => '/etats_demandes/5',
         ]);
     }
 }
