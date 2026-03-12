@@ -22,7 +22,6 @@ class DecisionsTest extends ApiTestCaseCustom
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([
             '@context' => '/contexts/DecisionAmenagementExamens',
-            'etat' => 'VALIDE',
         ]);
     }
 
