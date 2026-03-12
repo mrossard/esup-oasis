@@ -111,6 +111,8 @@ services:
     arguments:
       $server: '%env(resolve:CLAMAV_SERVER)%'
       $port: '%env(resolve:CLAMAV_PORT)%'
+  App\Service\Photo\PhotoProviderInterface:
+    alias: App\Service\Photo\UnicampusProvider
 
 when@test:
   services:
