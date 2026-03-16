@@ -21,6 +21,11 @@ services:
     container_name: oasis-gotenberg
     restart: unless-stopped
 
+  clamav:
+    image: clamav/clamav
+    container_name: oasis-clamav
+    restart: unless-stopped
+
   backend:
     container_name: oasis-backend
     build:
@@ -32,11 +37,15 @@ services:
         condition: service_healthy
       gotenberg:
         condition: service_started
+      clamav:
+        condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
       DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@postgres:5432/${POSTGRES_DB:-app}?serverVersion=15&charset=utf8
       GOTENBERG_DSN: http://gotenberg:3000
       CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-*}
+      CLAMAV_SERVER: ${CLAMAV_SERVER:-clamav}
+      CLAMAV_PORT: ${CLAMAV_PORT:-3310}
     ports:
       - "${BACKEND_PORT:-8000}:80"
     volumes:
@@ -56,9 +65,13 @@ services:
         condition: service_healthy
       backend:
         condition: service_started
+      clamav:
+        condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
       DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@postgres:5432/${POSTGRES_DB:-app}?serverVersion=15&charset=utf8
+      CLAMAV_SERVER: ${CLAMAV_SERVER:-clamav}
+      CLAMAV_PORT: ${CLAMAV_PORT:-3310}
   
   frontend:
     container_name: oasis-frontend
