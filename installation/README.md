@@ -51,29 +51,29 @@ frontend.etab.fr {
 }
 ```
 
-Il est également possible avec une configuration plus complexe de reverse proxy d'avoir le frontend et le backend sur le
-même nom DNS. Par exemple :
+Il est également possible d'avoir le frontend et le backend sur le même nom DNS, en mettant le backend derrière un
+préfixe dédié. Par exemple :
 
 ```
-@topLevel {
-   path_regexp top ^/[^/]*$
-   expression {query} == ""
-}
+oasis.etab.fr:443 {
+        tls internal
 
-handle @topLevel {
-   reverse_proxy localhost:80
-}
+        handle_path /api/* {
+                reverse_proxy localhost:8000 {
+                          header_up X-Forwarded-Prefix /api
+                }
+        }
 
-@static path /static/*
-handle @static {
-   reverse_proxy localhost:80
-}
+        @back-connect path /connect/*
+        handle @back-connect {
+                 reverse_proxy localhost:8000
+        }
 
-handle {
-   reverse_proxy localhost:8000
+        handle {
+                reverse_proxy localhost:80
+        }
+
 }
 ```
 
-Ici toutes les requêtes sans paramètres qui ciblent un élément à la racine et toutes les requêtes vers /static/* sont
-redirigées vers le frontend, le reste vers le backend. C'est neanmoins plus "risqué", on pourrait à l'avenir avoir
-des collisions dans les chemins.
+il faut alors configurer la variable REACT_APP_API_PREFIX à la valeur "/api".
