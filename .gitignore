@@ -2,5 +2,5 @@
 .idea
 ###< ide
 
-installation/frontend/.env.local
-installation/backend/.env.local
+installation/frontend/.env
+installation/backend/.env
