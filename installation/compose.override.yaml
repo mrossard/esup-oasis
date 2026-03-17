@@ -1,0 +1,32 @@
+services:
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: oasis-mailhog
+    restart: unless-stopped
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile-dev
+    depends_on:
+      - mailhog
+    environment:
+      MAILER_DSN: smtp://mailhog:1025
+    extra_hosts:
+      host.docker.internal: host-gateway
+    volumes:
+      - ../backend/docker/xdebug-conf.ini:/usr/local/etc/php/conf.d/99-xdebug-conf.ini:ro
+      - ../backend:/app:delegated
+
+  backend-worker:
+    depends_on:
+      - mailhog
+    environment:
+      MAILER_DSN: smtp://mailhog:1025
+
+  frontend:
+    environment:
+      REACT_APP_ENVIRONMENT: "dev"

@@ -32,6 +32,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:-2.2}
     restart: unless-stopped
     depends_on:
       postgres:
@@ -42,6 +44,7 @@ services:
         condition: service_started
     environment:
       APP_ENV: ${APP_ENV:-dev}
+      APP_VERSION: ${APP_VERSION:-2.2}
       DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@postgres:5432/${POSTGRES_DB:-app}?serverVersion=15&charset=utf8
       GOTENBERG_DSN: http://gotenberg:3000
       CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-*}

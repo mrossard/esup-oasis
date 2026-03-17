@@ -77,3 +77,13 @@ oasis.etab.fr:443 {
 ```
 
 il faut alors configurer la variable REACT_APP_API_PREFIX à la valeur "/api".
+
+# Lancer l'application
+
+En mode développement :
+
+docker compose up -d
+
+En mode production :
+
+docker compose -f compose.yml up -d
