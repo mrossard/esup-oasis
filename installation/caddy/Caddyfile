@@ -1,0 +1,18 @@
+{$SERVER_NAME} {
+               tls internal
+
+               handle_path /api/* {
+                                  reverse_proxy backend:80 {
+                                                           header_up X-Forwarded-Prefix /api
+                                                           }
+                       }
+
+               @back-controllers path /fichiers/* /connnect/*
+               handle @back-controllers {
+                                        reverse_proxy backend:80
+                                        }
+
+               handle {
+                      reverse_proxy frontend:80
+                      }
+}
