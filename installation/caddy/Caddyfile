@@ -7,11 +7,6 @@
         }
     }
 
-    @back-controllers path /fichiers/* /connect/*
-    handle @back-controllers {
-        reverse_proxy backend:80
-    }
-
     handle {
         reverse_proxy frontend:80
     }
