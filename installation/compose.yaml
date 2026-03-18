@@ -42,14 +42,14 @@ services:
         condition: service_started
       clamav:
         condition: service_started
+    env_file:
+      - .env
     environment:
-      APP_ENV: ${APP_ENV:-dev}
-      APP_VERSION: ${APP_VERSION:-2.2}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@postgres:5432/${POSTGRES_DB:-app}?serverVersion=15&charset=utf8
-      GOTENBERG_DSN: http://gotenberg:3000
-      CORS_ALLOW_ORIGIN: ${CORS_ALLOW_ORIGIN:-*}
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@postgres:5432/${POSTGRES_DB:-app}?serverVersion=15&charset=utf8}
       CLAMAV_SERVER: ${CLAMAV_SERVER:-clamav}
       CLAMAV_PORT: ${CLAMAV_PORT:-3310}
+      GOTENBERG_DSN: ${GOTENBERG_DSN:-http://gotenberg:3000}
+      SERVER_NAME: ":80" # Attention : Nécessaire pour éviter que le backend tente de générer un certificat !
     ports:
       - "${BACKEND_PORT:-8000}:80"
     volumes:
@@ -64,6 +64,8 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile-worker
+      args:
+        APP_VERSION: ${APP_VERSION:-2.2}
     restart: unless-stopped
     depends_on:
       postgres:
@@ -73,25 +75,26 @@ services:
       clamav:
         condition: service_started
     environment:
-      APP_ENV: ${APP_ENV:-dev}
-      DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@postgres:5432/${POSTGRES_DB:-app}?serverVersion=15&charset=utf8
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:-!ChangeMe!}@postgres:5432/${POSTGRES_DB:-app}?serverVersion=15&charset=utf8}
       CLAMAV_SERVER: ${CLAMAV_SERVER:-clamav}
       CLAMAV_PORT: ${CLAMAV_PORT:-3310}
-      GOTENBERG_DSN: http://gotenberg:3000
-  
+      GOTENBERG_DSN: ${GOTENBERG_DSN:-http://gotenberg:3000}
+    env_file:
+      - .env
+
   frontend:
     platform: linux/amd64
     container_name: oasis-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        APP_VERSION: ${APP_VERSION:-2.2}
     restart: unless-stopped
     depends_on:
       - backend
-    environment:
-      REACT_APP_API: ${REACT_APP_API:-http://localhost:8000}
-      REACT_APP_API_PREFIX: ${REACT_APP_API_PREFIX:-/api}
-      REACT_APP_FRONTEND: ${REACT_APP_FRONTEND:-http://localhost:8080}
+    env_file:
+      - .env
     ports:
       - "${FRONTEND_PORT:-8080}:80"
 
@@ -111,4 +114,3 @@ volumes:
   db-data:
   backend-var:
   backend-jwt:
-
