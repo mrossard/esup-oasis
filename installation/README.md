@@ -26,6 +26,7 @@ sur le dépot github, puis lancer les services suivants :
 - `oasis-backend` : API Symfony (FrankenPHP).
 - `oasis-backend-worker` : Worker pour les tâches asynchrones.
 - `oasis-frontend` : Interface utilisateur (React/Nginx).
+- `oasis-clamav` : Service de scan antivirus.
 
 ## Accès
 

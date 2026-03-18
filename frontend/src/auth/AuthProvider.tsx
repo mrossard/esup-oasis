@@ -7,17 +7,17 @@
  * @author Julien Lemonnier <julien.lemonnier@u-bordeaux.fr>
  */
 
-import React, {useEffect, useState} from "react";
-import {Utilisateur} from "../lib/Utilisateur";
-import {message, notification} from "antd";
+import React, { useEffect, useState } from "react";
+import { Utilisateur } from "../lib/Utilisateur";
+import { message, notification } from "antd";
 import useOAuth2 from "./hook/useOAuth2";
 import jwt_decode from "jwt-decode";
 
-import {IUtilisateur} from "../api/ApiTypeHelpers";
-import {queryClient} from "../App";
+import { IUtilisateur } from "../api/ApiTypeHelpers";
+import { queryClient } from "../App";
 import useLocalStorageState from "use-local-storage-state";
-import {useNavigate} from "react-router-dom";
-import {env} from "../env";
+import { useNavigate } from "react-router-dom";
+import { env } from "../env";
 
 /**
  * Contexte d'authentification.
@@ -34,17 +34,17 @@ import {env} from "../env";
  * @property {Function} removeImpersonate - The function to remove impersonation.
  */
 export interface AuthContextType {
-    user: Utilisateur | undefined;
-    signOut: (callback: VoidFunction) => void;
-    loading: boolean;
-    error: string | null;
-    authenticate: VoidFunction;
-    setUser: (user: Utilisateur) => void;
-    token: string | undefined;
-    impersonate: string | undefined;
-    setImpersonate: (impersonate: string) => void;
-    removeImpersonate: VoidFunction;
-    isExpired: () => boolean;
+   user: Utilisateur | undefined;
+   signOut: (callback: VoidFunction) => void;
+   loading: boolean;
+   error: string | null;
+   authenticate: VoidFunction;
+   setUser: (user: Utilisateur) => void;
+   token: string | undefined;
+   impersonate: string | undefined;
+   setImpersonate: (impersonate: string) => void;
+   removeImpersonate: VoidFunction;
+   isExpired: () => boolean;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -59,225 +59,233 @@ type State<TData = string> = TData | null;
  * @returns {ReactElement} - The component JSX element.
  */
 export function AuthProvider({
-                                 children,
-                                 onSuccess,
-                             }: {
-    children: React.ReactNode;
-    onSuccess: VoidFunction;
+   children,
+   onSuccess,
+}: {
+   children: React.ReactNode;
+   onSuccess: VoidFunction;
 }): React.ReactElement {
-    const navigate = useNavigate();
-    const [user, setUser] = React.useState<IUtilisateur>();
-    const [login, setLogin, {removeItem: removeLocalStorageLogin}] =
-        useLocalStorageState<State>(`login`);
-    const [impersonateLS, setImpersonateLS, {removeItem: removeLocalStorageImpersonate}] =
-        useLocalStorageState<State>(`impersonate`);
-    const [expiration, setExpiration, {removeItem: removeLocalStorageExpiration}] =
-        useLocalStorageState<State<number>>("expiration");
+   const navigate = useNavigate();
+   const [user, setUser] = React.useState<IUtilisateur>();
+   const [login, setLogin, { removeItem: removeLocalStorageLogin }] =
+      useLocalStorageState<State>(`login`);
+   const [impersonateLS, setImpersonateLS, { removeItem: removeLocalStorageImpersonate }] =
+      useLocalStorageState<State>(`impersonate`);
+   const [expiration, setExpiration, { removeItem: removeLocalStorageExpiration }] =
+      useLocalStorageState<State<number>>("expiration");
 
-    const [loadingUser, setLoadingUser] = useState(false);
-    const [errorUser, setErrorUser] = useState<string | null>(null);
-    const [token, setToken] = useState<string>();
-    const [impersonate, setImpersonate] = useState<string>();
+   const [loadingUser, setLoadingUser] = useState(false);
+   const [errorUser, setErrorUser] = useState<string | null>(null);
+   const [token, setToken] = useState<string>();
+   const [impersonate, setImpersonate] = useState<string>();
 
-    // -- Déconnexion
-    const signOut = (callback?: VoidFunction) => {
-        setToken(undefined);
-        setUser(undefined);
-        setImpersonate(undefined);
-        localStorage.clear();
-        removeLocalStorageLogin();
-        removeLocalStorageExpiration();
-        if (callback) setTimeout(callback, 100);
-    };
+   // -- Déconnexion
+   const signOut = (callback?: VoidFunction) => {
+      setToken(undefined);
+      setUser(undefined);
+      setImpersonate(undefined);
+      localStorage.clear();
+      removeLocalStorageLogin();
+      removeLocalStorageExpiration();
+      if (callback) setTimeout(callback, 100);
+   };
 
-    // -- Vérification de l'expiration
-    const isExpired = (): boolean => {
-        if (!expiration) return true;
-        return expiration < Date.now();
-    };
+   // -- Vérification de l'expiration
+   const isExpired = (): boolean => {
+      if (!expiration) return true;
+      return expiration < Date.now();
+   };
 
-    // -- Gestion de l'impersonation
-    useEffect(() => {
-        if (impersonate) {
-            setImpersonateLS(impersonate);
-        } else {
-            removeLocalStorageImpersonate();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [impersonate]);
+   // -- Gestion de l'impersonation
+   useEffect(() => {
+      if (impersonate) {
+         setImpersonateLS(impersonate);
+      } else {
+         removeLocalStorageImpersonate();
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [impersonate]);
 
-    // -- Gestion de l'impersonation / local storage
-    useEffect(() => {
-        if (impersonateLS) {
-            setImpersonate(impersonateLS);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+   // -- Gestion de l'impersonation / local storage
+   useEffect(() => {
+      if (impersonateLS) {
+         setImpersonate(impersonateLS);
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, []);
 
-    // -- Gestion de la connexion : lorsque le login a été récupéré dans le token
-    useEffect(() => {
-        if (isExpired()) {
-            setUser(undefined);
-            removeLocalStorageLogin();
-            signOut(() => {
-            });
-        }
+   // -- Gestion de la connexion : lorsque le login a été récupéré dans le token
+   useEffect(() => {
+      if (isExpired()) {
+         setUser(undefined);
+         removeLocalStorageLogin();
+         signOut(() => {});
+      }
 
-        if (env.REACT_APP_API && (impersonate || login)) {
-            setLoadingUser(true);
+      if (env.REACT_APP_API && (impersonate || login)) {
+         setLoadingUser(true);
 
-            // Récupération des infos de l'utilisateur
-            fetch(new URL(env.REACT_APP_API_PREFIX + `/utilisateurs/${impersonate || login}`, env.REACT_APP_API), {
-                method: "GET",
-                credentials: "include",
-                headers: {
-                    "Content-Type": "application/ld+json",
-                },
+         // Récupération des infos de l'utilisateur
+         fetch(
+            new URL(
+               env.REACT_APP_API_PREFIX + `/utilisateurs/${impersonate || login}`,
+               env.REACT_APP_API,
+            ),
+            {
+               method: "GET",
+               credentials: "include",
+               headers: {
+                  "Content-Type": "application/ld+json",
+               },
+            },
+         )
+            .then((userResponse) => {
+               userResponse.json().then((userData: IUtilisateur) => {
+                  if (userData.roles && userData.roles.length === 1) {
+                     // Le seul rôle est ROLE_USER, l'utilisateur n'est pas affecté
+                     notification.error({
+                        message: "Erreur",
+                        description:
+                           "Vous ne possédez pas de rôle valide pour vous connecter à l'application.",
+                     });
+                     setLoadingUser(false);
+                     return;
+                  }
+
+                  // L'utilisateur est affecté
+                  setUser(userData);
+
+                  // redirect apres connexion lorsque l'utilisateur est affecté
+                  setTimeout(() => {
+                     // console.log("AuthProvider: 154 - redirect to /");
+                     //  queryClient.clear();
+                     setLoadingUser(false);
+                     onSuccess();
+                  }, 500);
+               });
             })
-                .then((userResponse) => {
-                    userResponse.json().then((userData: IUtilisateur) => {
-                        if (userData.roles && userData.roles.length === 1) {
-                            // Le seul rôle est ROLE_USER, l'utilisateur n'est pas affecté
-                            notification.error({
-                                message: "Erreur",
-                                description:
-                                    "Vous ne possédez pas de rôle valide pour vous connecter à l'application.",
-                            });
-                            setLoadingUser(false);
-                            return;
-                        }
-
-                        // L'utilisateur est affecté
-                        setUser(userData);
-
-                        // redirect apres connexion lorsque l'utilisateur est affecté
-                        setTimeout(() => {
-                            // console.log("AuthProvider: 154 - redirect to /");
-                            //  queryClient.clear();
-                            setLoadingUser(false);
-                            onSuccess();
-                        }, 500);
-                    });
-                })
-                .catch((error) => {
-                    removeLocalStorageLogin();
-                    setUser(undefined);
-                    console.error(error);
-                    setErrorUser(error.message);
-                    setLoadingUser(false);
-                });
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [impersonate, login, env.REACT_APP_API]);
-
-    function removeImpersonate() {
-        setImpersonate(() => {
-            queryClient.clear();
-            window.setTimeout(() => {
-                navigate("/");
-            }, 1000);
-            return undefined;
-        });
-    }
-
-    const {loading, error, getAuth} = useOAuth2({
-        authorizeUrl: env.REACT_APP_OAUTH_PROVIDER as string,
-        clientId: env.REACT_APP_OAUTH_CLIENT_ID as string,
-        redirectUri: `${env.REACT_APP_FRONTEND}/callback`,
-        clientUri: env.REACT_APP_FRONTEND as string,
-        scope: "profile",
-        responseType: "token",
-        onSuccess: (payload) => {
-            setImpersonate(() => {
-                removeLocalStorageLogin();
-                return undefined;
+            .catch((error) => {
+               removeLocalStorageLogin();
+               setUser(undefined);
+               console.error(error);
+               setErrorUser(error.message);
+               setLoadingUser(false);
             });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [impersonate, login, env.REACT_APP_API]);
 
-            if (!loadingUser && payload && payload.access_token) {
-                // Récupération du token d'authentification
-                setLoadingUser(true);
-                fetch(new URL(env.REACT_APP_API_PREFIX + "/connect/oauth/token?json=1", env.REACT_APP_API), {
-                    method: "POST",
-                    credentials: "include",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        accessToken: payload?.access_token,
-                    }),
-                })
-                    .then((response) => {
-                        if (response.status === 401) {
-                            // Utilisateur inconnu
-                            setErrorUser("Utilisateur inconnu");
-                            setLoadingUser(false);
-                            notification.error({
-                                message: <b>Erreur de connexion</b>,
-                                duration: 0,
-                                description: (
-                                    <p aria-label="Vous n'êtes pas autorisé à accéder à cette application">
-                                        Vous n'êtes pas autorisé•e à accéder à cette application.
-                                    </p>
-                                ),
-                            });
-                        }
+   function removeImpersonate() {
+      setImpersonate(() => {
+         queryClient.clear();
+         window.setTimeout(() => {
+            navigate("/");
+         }, 1000);
+         return undefined;
+      });
+   }
 
-                        // Connexion réussie, récupération du login dans le token
-                        response.json().then((apiData) => {
-                            if (apiData.token) {
-                                // Stockage du token d'authentification pour l'env de dev
-                                if (env.REACT_APP_ENVIRONMENT === "local") setToken(apiData.token);
+   const { loading, error, getAuth } = useOAuth2({
+      authorizeUrl: env.REACT_APP_OAUTH_PROVIDER as string,
+      clientId: env.REACT_APP_OAUTH_CLIENT_ID as string,
+      redirectUri: `${env.REACT_APP_FRONTEND}/callback`,
+      clientUri: env.REACT_APP_FRONTEND as string,
+      scope: "profile",
+      responseType: "token",
+      onSuccess: (payload) => {
+         setImpersonate(() => {
+            removeLocalStorageLogin();
+            return undefined;
+         });
 
-                                // Récupération des infos de l'utilisateur
-                                const {username, exp} = jwt_decode<{
-                                    username: string;
-                                    exp: number;
-                                }>(apiData.token as string);
+         if (!loadingUser && payload && payload.access_token) {
+            // Récupération du token d'authentification
+            setLoadingUser(true);
+            fetch(
+               new URL(env.REACT_APP_API_PREFIX + "/connect/oauth/token?json=1", env.REACT_APP_API),
+               {
+                  method: "POST",
+                  credentials: "include",
+                  headers: {
+                     "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({
+                     accessToken: payload?.access_token,
+                  }),
+               },
+            )
+               .then((response) => {
+                  if (response.status === 401) {
+                     // Utilisateur inconnu
+                     setErrorUser("Utilisateur inconnu");
+                     setLoadingUser(false);
+                     notification.error({
+                        message: <b>Erreur de connexion</b>,
+                        duration: 0,
+                        description: (
+                           <p aria-label="Vous n'êtes pas autorisé à accéder à cette application">
+                              Vous n'êtes pas autorisé•e à accéder à cette application.
+                           </p>
+                        ),
+                     });
+                  }
 
-                                setLogin(username);
-                                setExpiration(exp * 1000);
-                            }
-                        });
-                    })
-                    .catch((err) => {
-                        setErrorUser("Application non accessible");
-                        notification.error({
-                            message: <b>Erreur de connexion</b>,
-                            duration: 0,
-                            description: <p>L'application est actuellement inaccessible.</p>,
-                        });
-                        setLoadingUser(false);
-                        console.error(`Impossible de se connecter au serveur`, err);
-                    });
-            }
-        },
-        onError: (error_) => console.error("Error", error_),
-    });
+                  // Connexion réussie, récupération du login dans le token
+                  response.json().then((apiData) => {
+                     if (apiData.token) {
+                        // Stockage du token d'authentification pour l'env de dev
+                        if (env.REACT_APP_ENVIRONMENT === "local") setToken(apiData.token);
 
-    // noinspection JSUnusedGlobalSymbols
-    const authenticator = {
-        user: user ? new Utilisateur(user) : undefined,
-        loading: loading || loadingUser,
-        error: error || errorUser,
-        signOut,
-        authenticate: getAuth,
-        setUser: setUser,
-        token: token,
-        impersonate,
-        setImpersonate: (uid: string) => {
-            if (uid === user?.uid) {
-                message.error("Vous ne pouvez pas prendre votre propre identité.").then();
-                return;
-            }
-            setImpersonate(uid);
-        },
-        removeImpersonate,
-        isExpired,
-    };
+                        // Récupération des infos de l'utilisateur
+                        const { username, exp } = jwt_decode<{
+                           username: string;
+                           exp: number;
+                        }>(apiData.token as string);
 
-    return <AuthContext.Provider value={authenticator}>{children}</AuthContext.Provider>;
+                        setLogin(username);
+                        setExpiration(exp * 1000);
+                     }
+                  });
+               })
+               .catch((err) => {
+                  setErrorUser("Application non accessible");
+                  notification.error({
+                     message: <b>Erreur de connexion</b>,
+                     duration: 0,
+                     description: <p>L'application est actuellement inaccessible.</p>,
+                  });
+                  setLoadingUser(false);
+                  console.error(`Impossible de se connecter au serveur`, err);
+               });
+         }
+      },
+      onError: (error_) => console.error("Error", error_),
+   });
+
+   // noinspection JSUnusedGlobalSymbols
+   const authenticator = {
+      user: user ? new Utilisateur(user) : undefined,
+      loading: loading || loadingUser,
+      error: error || errorUser,
+      signOut,
+      authenticate: getAuth,
+      setUser: setUser,
+      token: token,
+      impersonate,
+      setImpersonate: (uid: string) => {
+         if (uid === user?.uid) {
+            message.error("Vous ne pouvez pas prendre votre propre identité.").then();
+            return;
+         }
+         setImpersonate(uid);
+      },
+      removeImpersonate,
+      isExpired,
+   };
+
+   return <AuthContext.Provider value={authenticator}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-    return React.useContext(AuthContext);
+   return React.useContext(AuthContext);
 }
