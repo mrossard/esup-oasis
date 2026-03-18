@@ -56,11 +56,11 @@ la [documentation dédiée au connecteur vers le SI de scolarité](/docs/backend
 * Pour de la production :
 
 ```
-$ docker compose up -d
+docker compose up -d
 ```
 
 * Pour les tests / le développement
 
 ```
-$ docker compose -f compose.yaml -f compose.dev.yml up -d
+docker compose -f compose.yaml -f compose.dev.yaml up -d
 ```

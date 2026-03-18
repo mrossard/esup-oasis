@@ -37,8 +37,6 @@ services:
       NODE_ENV: development
       CHOKIDAR_USEPOLLING: true
       WATCHPACK_POLLING: true
-    env_file:
-      - frontend/.env
     volumes:
       - ../frontend:/app:delegated
       - /app/node_modules
