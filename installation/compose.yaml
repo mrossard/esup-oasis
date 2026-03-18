@@ -25,6 +25,7 @@ services:
     image: clamav/clamav
     container_name: oasis-clamav
     restart: unless-stopped
+    platform: linux/amd64
 
   backend:
     platform: linux/amd64
