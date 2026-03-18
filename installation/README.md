@@ -1,6 +1,7 @@
 # Déploiement simplifié avec Docker Compose
 
-Cette procédure permet d'installer rapidement l'application ESUP-Oasis en utilisant Docker Compose.
+Cette procédure permet d'installer rapidement l'application ESUP-Oasis en utilisant Docker Compose. Elle inclut tous les
+composants nécessaires à son fonctionnement pour une installation "tout en un" sur la même machine.
 
 ## Pré-requis
 
@@ -8,83 +9,58 @@ Cette procédure permet d'installer rapidement l'application ESUP-Oasis en utili
 
 ## Installation
 
-1. **Configurer l'environnement :**
-    - Adaptez le fichier .env global à votre installation
-    - Copiez dans les dossiers installation/backend et installation/frontend les fichiers .env livrés dans les dossiers
-      d'installation respectifs, et modifier les pour vos besoins.
+### Configurer l'environnement:
 
-2. **Lancer les conteneurs :**
-   ```bash
-   docker compose up -d
-   ```
+Copiez le fichier [.env.exemple](.env.exemple) en `.env`, puis adaptez-le à votre installation (pour plus d'infos sur
+les
+variables, référez-vous aux documentations respectives du frontend et du backend).
 
-Cette commande va construire les images pour le frontend, le backend et le worker en utilisant les images pré-buildées
-sur le dépot github, puis lancer les services suivants :
+### Préparer l'initialisation de la base de données
 
-- `oasis-postgres` : Base de données PostgreSQL.
-- `oasis-gotenberg` : Service de génération de PDF.
-- `oasis-backend` : API Symfony (FrankenPHP).
-- `oasis-backend-worker` : Worker pour les tâches asynchrones.
-- `oasis-frontend` : Interface utilisateur (React/Nginx).
-- `oasis-clamav` : Service de scan antivirus.
+L'initialisation se fait via des fixtures, dont la version livrée correspond aux usages de l'Université de Bordeaux.
+Il s'agit de fichiers yaml qu'il vous faudra adapter à vos
+usages comme indiqué dans la documentation du backend sur
+les [données initiales](/docs/backend/README.md#données-initiales).
 
-## Accès
+### Incorporer votre personnalisation
 
-- **Frontend :** [http://localhost:8080](http://localhost:8080)
-- **Backend API :** [http://localhost:8000](http://localhost:8000)
+#### Frontend
 
-## Initialisation
+En plus de ce qui est contrôlé par des variables d'environnement, vous pouvez surcharger les images utilisées en
+plaçant
+vos versions locales (qui doivent avoir le même nom / format) dans le
+répertoire [installation/frontend/personnalisation/images/](frontend/personnalisation/images/).
 
-Le conteneur backend exécute automatiquement les migrations et l'initialisation de la base de données au démarrage.
-Les clés JWT sont également générées automatiquement si elles n'existent pas.
+De la même manière, vous pouvez personnaliser le pdf pointé par la variable `REACT_APP_GUIDE_SERVICE_SYNCHRO` si vous
+utilisez cette fonctionnalité, en plaçant votre fichier dans le
+dossier [installation/frontend/personnalisation/pdf/](frontend/personnalisation/pdf/).
 
-# Configuration du reverse proxy
+Plus de détails sur les personnalisations du frontend
+dans [la documentation dédiée](/docs/frontend/personnalisation-ui.md).
 
-La configuration recommandée est une séparation du frontend et backend sur deux noms DNS distincts, ce qui donnerait par
-exemple avec Caddy et si vous laissez les ports par défaut :
+#### Backend
+
+De la même manière que pour le frontend, vous pouvez adapter les templates, les images et les css utilisées en ajoutant
+vos propres versions dans le dossier [backend/personnalisation/](backend/personnalisation/).
+
+Plus de détails sur les templates disponibles dans la documentation dédiée pour [les emails](/docs/backend/emails.md);
+les décisions et les services faits suivent le même modèle.
+
+Vous pouvez également utiliser le
+dossier [backend/personnalisation/config/apogee](backend/personnalisation/config/apogee) pour spécifier les requêtes
+d'interrogation de la base apogée que vous aurez défini - plus d'informations dans
+la [documentation dédiée au connecteur vers le SI de scolarité](/docs/backend/connecteurs.md#si-scolarité).
+
+### Démarrer l'application
+
+* Pour de la production :
 
 ```
-backend.etab.fr {
-   reverse_proxy http://localhost:8000
-}
-frontend.etab.fr {
-   reverse_proxy http://localhost:80
-}
+$ docker compose up -d
 ```
 
-Il est également possible d'avoir le frontend et le backend sur le même nom DNS, en mettant le backend derrière un
-préfixe dédié. Par exemple :
+* Pour les tests / le développement
 
 ```
-oasis.etab.fr:443 {
-        tls internal
-
-        handle_path /api/* {
-                reverse_proxy localhost:8000 {
-                          header_up X-Forwarded-Prefix /api
-                }
-        }
-
-        @back-connect path /connect/*
-        handle @back-connect {
-                 reverse_proxy localhost:8000
-        }
-
-        handle {
-                reverse_proxy localhost:80
-        }
-
-}
+$ docker compose -f compose.yaml -f compose.dev.yml up -d
 ```
-
-il faut alors configurer la variable REACT_APP_API_PREFIX à la valeur "/api".
-
-# Lancer l'application
-
-En mode développement :
-
-docker compose up -d
-
-En mode production :
-
-docker compose -f compose.yml up -d
