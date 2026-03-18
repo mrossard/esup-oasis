@@ -54,10 +54,11 @@ services:
     ports:
       - "${BACKEND_PORT:-8000}:80"
     volumes:
-      - backend-var:/app/var
       - backend-jwt:/app/config/jwt
-      - ../backend/docker/entrypoint.sh:/usr/local/bin/docker-entrypoint:ro
-      - ../backend/src/Command:/app/src/Command
+      - ../backend/fixtures:/app/fixtures
+      - ../backend/docker/entrypoint.sh:/usr/local/bin/docker-entrypoint:ro #todo: supprimer quand on aura une image de base à jour
+      - ../backend/src/Command:/app/src/Command #todo: supprimer quand on aura une image de base à jour
+
 
   backend-worker:
     platform: linux/amd64
@@ -113,5 +114,4 @@ services:
 
 volumes:
   db-data:
-  backend-var:
   backend-jwt:

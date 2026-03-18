@@ -4,7 +4,6 @@ services:
     container_name: oasis-mailhog
     restart: unless-stopped
     ports:
-      - "1025:1025"
       - "8025:8025"
 
   backend:
@@ -14,12 +13,13 @@ services:
     depends_on:
       - mailhog
     environment:
+      APP_ENV: "dev"
       MAILER_DSN: smtp://mailhog:1025
     extra_hosts:
       host.docker.internal: host-gateway
     volumes:
       - ../backend/docker/xdebug-conf.ini:/usr/local/etc/php/conf.d/99-xdebug-conf.ini:ro
-      - ../backend:/app:delegated
+      - ../backend:/app
 
   backend-worker:
     depends_on:
@@ -37,14 +37,8 @@ services:
       NODE_ENV: development
       CHOKIDAR_USEPOLLING: true
       WATCHPACK_POLLING: true
-      WDS_SOCKET_HOST: lutins-devoauth.u-bordeaux.fr
-      WDS_SOCKET_PORT: 443
-      WDS_SOCKET_PROTOCOL: wss
-    platform: linux/arm64/v8
     env_file:
       - frontend/.env
-    ports:
-      - "8080:8080"
     volumes:
       - ../frontend:/app:delegated
       - /app/node_modules
