@@ -3,5 +3,5 @@
 ###< ide
 
 installation/frontend/.env
-installation/backend/.env.env
+installation/backend/.env
 installation/.env
