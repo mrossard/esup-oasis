@@ -30,7 +30,8 @@ Si vous disposez déjà d'un reverse proxy configuré pour vos besoins, vous pou
 
 > [!CAUTION]
 > Par défaut avec la configuration livrée caddy génère au démarrage un certificat auto-signé. Vous pouvez le remplacer
-> par un certificat valide en suivant la [documentation de caddy](https://caddyserver.com/docs/caddyfile/directives/tls.
+> par un certificat valide en suivant la documentation de caddy : https://caddyserver.com/docs/caddyfile/directives/tls.
+>
 > Cela revient pour une installation classique à modifier la ligne
 >
 > `tls internal`
