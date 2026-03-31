@@ -70,3 +70,4 @@ docker compose -f compose.yaml -f compose.dev.yaml up -d
 ### Aller plus loin
 
 * [Composants inclus](composants.md)
+* [Mise à jour](maj.md)
