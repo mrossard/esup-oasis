@@ -11,7 +11,7 @@ relancer la construction des images locales avec un :
 docker compose build
 ```
 
-Si des modifications supplémentaires (ajoutes/suppression de variables d'environnement par exemple) sont nécessaires,
+Si des modifications supplémentaires (ajout/suppression de variables d'environnement par exemple) sont nécessaires,
 elles feront l'objet d'information dans les notes de livraison de la version concernée.
 
 > [!WARNING]
