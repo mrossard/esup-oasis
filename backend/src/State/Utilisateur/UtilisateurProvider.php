@@ -29,8 +29,6 @@ use RuntimeException;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Security\Core\Exception\UserNotFoundException;
-use Symfony\Contracts\Cache\ItemInterface;
-use Symfony\Contracts\Cache\TagAwareCacheInterface;
 
 class UtilisateurProvider implements ProviderInterface
 {
@@ -43,7 +41,6 @@ class UtilisateurProvider implements ProviderInterface
         private readonly ProviderInterface $collectionProvider,
         private readonly UtilisateurManager $utilisateurManager,
         private readonly DecisionAmenagementManager $decisionAmenagementManager,
-        private readonly TagAwareCacheInterface $cache,
     ) {}
 
     /**
@@ -62,7 +59,6 @@ class UtilisateurProvider implements ProviderInterface
     ): Utilisateur|array|PaginatorInterface {
         //recherche dans le ldap
         if (!$operation instanceof GetCollection) {
-            //mise en cache des résultats pour un utilisateur donné
             return $this->ldapProvide($operation, $uriVariables, $context);
         }
         if ($operation->getName() === Utilisateur::COLLECTION_URI) {
