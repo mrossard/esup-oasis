@@ -38,6 +38,7 @@ use App\Validator\NonEnvoyeRHConstraint;
 use App\Validator\PeriodeNonBloqueeConstraint;
 use App\Validator\UtilisateurBeneficiaireEvenementConstraint;
 use DateTimeInterface;
+use ReflectionProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -182,10 +183,8 @@ final class Evenement
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     public ?Utilisateur $intervenant {
         get {
-            if (is_null($this->intervenant)) { //isset(null) == false...
-                return null;
-            }
-            if (!isset($this->intervenant) && $this->entity !== null && $this->entity->getIntervenant()) {
+            $prop = new ReflectionProperty(Evenement::class, 'intervenant');
+            if (!$prop->isInitialized($this) && $this->entity !== null && $this->entity->getIntervenant()) {
                 $this->intervenant = new Utilisateur($this->entity->getIntervenant()->getUtilisateur());
             }
             return $this->intervenant ?? null;
