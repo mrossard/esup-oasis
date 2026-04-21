@@ -67,6 +67,23 @@ class BeneficiairesProfilsTest extends ApiTestCaseCustom
         ]);
     }
 
+    public function testAddBeneficiaireWithExplicitProfil(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        $client->request('POST', '/utilisateurs/demandeur/profils', [
+            'json' => [
+                'profil' => '/profils/2',
+                'debut' => '2020-01-01',
+                'gestionnaire' => '/utilisateurs/gestionnaire',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertJsonContains([
+            'profil' => '/profils/2',
+        ]);
+    }
+
     public function testAddBeneficiaireWithoutProfil(): void
     {
         $client = $this->createClientWithCredentials('gestionnaire');

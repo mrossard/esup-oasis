@@ -29,6 +29,7 @@ use App\Validator\BeneficiaireDifferentGestionnaireContraint;
 use App\Validator\BeneficiaireSupprimableConstraint;
 use App\Validator\ProfilAvecTypologieConstraint;
 use DateTimeInterface;
+use ReflectionProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -82,9 +83,10 @@ final class BeneficiaireProfil
 
     #[ApiProperty(identifier: true)]
     #[Groups([self::GROUP_OUT])]
-    public ?int $id = null {
+    public ?int $id {
         get {
-            if ($this->id === null && $this->entity !== null) {
+            $prop = new ReflectionProperty(self::class, 'id');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
                 $this->id = $this->entity->getId();
             }
             return $this->id ?? null;
@@ -92,20 +94,22 @@ final class BeneficiaireProfil
     }
 
     //Copie de l'UID utilisateur. Non présenté à l'extérieur, juste utile pour uriVariables
-    public ?string $uid {
+    public string $uid {
         get {
-            if (!isset($this->uid) && $this->entity !== null && $this->entity->getUtilisateur()) {
+            $prop = new ReflectionProperty(self::class, 'uid');
+            if (!$prop->isInitialized($this) && $this->entity !== null && $this->entity->getUtilisateur()) {
                 $this->uid = $this->entity->getUtilisateur()->getUid();
             }
-            return $this->uid ?? null;
+            return $this->uid;
         }
     }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[ApiProperty(security: "is_granted('" . self::VOIR_PROFILS . "')")]
-    public ?ProfilBeneficiaire $profil = null {
+    public ProfilBeneficiaire $profil {
         get {
-            if ($this->profil === null && $this->entity !== null && $this->entity->getProfil()) {
+            $prop = new ReflectionProperty(self::class, 'profil');
+            if (!$prop->isInitialized($this) && $this->entity !== null && $this->entity->getProfil()) {
                 $this->profil = new ProfilBeneficiaire($this->entity->getProfil());
             }
             return $this->profil;
@@ -114,9 +118,10 @@ final class BeneficiaireProfil
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank(groups: [self::GROUP_VALIDATION_IN])]
-    public ?DateTimeInterface $debut = null {
+    public DateTimeInterface $debut {
         get {
-            if ($this->debut === null && $this->entity !== null) {
+            $prop = new ReflectionProperty(self::class, 'debut');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
                 $this->debut = $this->entity->getDebut();
             }
             return $this->debut;
@@ -124,9 +129,10 @@ final class BeneficiaireProfil
     }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public ?DateTimeInterface $fin = null {
+    public ?DateTimeInterface $fin {
         get {
-            if ($this->fin === null && $this->entity !== null) {
+            $prop = new ReflectionProperty(self::class, 'fin');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
                 $this->fin = $this->entity->getFin();
             }
             return $this->fin ?? null;
@@ -135,9 +141,10 @@ final class BeneficiaireProfil
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotBlank(groups: [self::GROUP_VALIDATION_IN])]
-    public ?Utilisateur $gestionnaire = null {
+    public Utilisateur $gestionnaire {
         get {
-            if ($this->gestionnaire === null && $this->entity !== null) {
+            $prop = new ReflectionProperty(self::class, 'gestionnaire');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
                 $this->gestionnaire = new Utilisateur($this->entity->getGestionnaire());
             }
             return $this->gestionnaire;
@@ -152,7 +159,8 @@ final class BeneficiaireProfil
     #[ApiProperty(security: "is_granted('" . self::VOIR_PROFILS . "')")]
     public array $typologies {
         get {
-            if (!isset($this->typologies) && $this->entity !== null) {
+            $prop = new ReflectionProperty(self::class, 'typologies');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
                 $this->typologies = array_map(
                     fn($t) => new TypologieHandicap($t),
                     $this->entity->getTypologies()->toArray(),
@@ -163,12 +171,13 @@ final class BeneficiaireProfil
     }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public bool $avecAccompagnement = true {
+    public bool $avecAccompagnement {
         get {
-            if ($this->entity !== null) {
-                return $this->entity->isAvecAccompagnement() ?? true;
+            $prop = new ReflectionProperty(self::class, 'avecAccompagnement');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
+                $this->avecAccompagnement = $this->entity->isAvecAccompagnement();
             }
-            return $this->avecAccompagnement;
+            return $this->avecAccompagnement ?? true;
         }
     }
 
