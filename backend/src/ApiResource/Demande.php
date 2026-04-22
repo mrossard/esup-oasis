@@ -151,13 +151,13 @@ class Demande
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\NotNull(message: 'Impossible si le DemandeDenormalizer fait son job')]
-    public Utilisateur $demandeur {
+    public ?Utilisateur $demandeur {
         get {
             $prop = new ReflectionProperty(self::class, 'demandeur');
             if (!$prop->isInitialized($this) && $this->entity !== null && $this->entity->getDemandeur() !== null) {
                 $this->demandeur = new Utilisateur($this->entity->getDemandeur());
             }
-            return $this->demandeur;
+            return $this->demandeur ?? null;
         }
     }
 
@@ -199,7 +199,10 @@ class Demande
         get {
             $prop = new ReflectionProperty(self::class, 'idCommission');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
-                $this->idCommission = $this->entity->getCampagne()->getCommission()?->getId();
+                $this->idCommission = $this->entity
+                    ->getCampagne()
+                    ->getCommission()
+                    ?->getId();
             }
             return $this->idCommission ?? null;
         }
@@ -217,13 +220,13 @@ class Demande
     }
 
     #[Groups([self::GROUP_OUT, self::GROUP_CHANGEMENT_ETAT])]
-    public EtatDemande $etat {
+    public ?EtatDemande $etat {
         get {
             $prop = new ReflectionProperty(self::class, 'etat');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
                 $this->etat = new EtatDemande($this->entity->getEtat());
             }
-            return $this->etat;
+            return $this->etat ?? null;
         }
     }
 

@@ -72,7 +72,7 @@ class BeneficiairesProfilsTest extends ApiTestCaseCustom
         $client = $this->createClientWithCredentials('gestionnaire');
         $client->request('POST', '/utilisateurs/demandeur/profils', [
             'json' => [
-                'profil' => '/profils/2',
+                'profil' => '/profils/7',
                 'debut' => '2020-01-01',
                 'gestionnaire' => '/utilisateurs/gestionnaire',
             ],
@@ -80,8 +80,43 @@ class BeneficiairesProfilsTest extends ApiTestCaseCustom
 
         $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
         $this->assertJsonContains([
-            'profil' => '/profils/2',
+            'profil' => '/profils/7',
         ]);
+    }
+
+    public function testAddBeneficiaireWithRequiredTypologie(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        $client->request('POST', '/utilisateurs/demandeur/profils', [
+            'json' => [
+                'profil' => '/profils/1',
+                'typologies' => ['/typologies/1'],
+                'debut' => '2020-01-01',
+                'gestionnaire' => '/utilisateurs/gestionnaire',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_CREATED);
+        $this->assertJsonContains([
+            'profil' => '/profils/1',
+            'typologies' => [
+                '/typologies/1',
+            ],
+        ]);
+    }
+
+    public function testAddBeneficiaireWithoutRequiredTypologieFails(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        $client->request('POST', '/utilisateurs/nouveau-beneficiaire/profils', [
+            'json' => [
+                'profil' => '/profils/1',
+                'debut' => '2020-01-01',
+                'gestionnaire' => '/utilisateurs/gestionnaire',
+            ],
+        ]);
+
+        $this->assertResponseStatusCodeSame(Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     public function testAddBeneficiaireWithoutProfil(): void

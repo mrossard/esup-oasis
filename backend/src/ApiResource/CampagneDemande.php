@@ -138,7 +138,7 @@ class CampagneDemande
     }
 
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public ?Commission $commission = null {
+    public ?Commission $commission {
         get {
             $prop = new ReflectionProperty(self::class, 'commission');
             if (!$prop->isInitialized($this) && $this->entity !== null && $this->entity->getCommission() !== null) {

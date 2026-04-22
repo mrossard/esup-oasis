@@ -94,13 +94,13 @@ final class BeneficiaireProfil
     }
 
     //Copie de l'UID utilisateur. Non présenté à l'extérieur, juste utile pour uriVariables
-    public string $uid {
+    public ?string $uid {
         get {
             $prop = new ReflectionProperty(self::class, 'uid');
             if (!$prop->isInitialized($this) && $this->entity !== null && $this->entity->getUtilisateur()) {
                 $this->uid = $this->entity->getUtilisateur()->getUid();
             }
-            return $this->uid;
+            return $this->uid ?? null;
         }
     }
 
@@ -111,6 +111,10 @@ final class BeneficiaireProfil
             $prop = new ReflectionProperty(self::class, 'profil');
             if (!$prop->isInitialized($this) && $this->entity !== null && $this->entity->getProfil()) {
                 $this->profil = new ProfilBeneficiaire($this->entity->getProfil());
+            }
+            if (!$prop->isInitialized($this)) {
+                $this->profil = new ProfilBeneficiaire();
+                $this->profil->id = \App\Entity\ProfilBeneficiaire::A_DETERMINER;
             }
             return $this->profil;
         }

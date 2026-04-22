@@ -60,6 +60,7 @@ class DisciplineSportive
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
     #[Assert\NotBlank]
+    #[ApiProperty(openapiContext: ['type' => 'string'])]
     public ?string $libelle = null {
         get {
             if (null === $this->libelle && $this->entity !== null) {

@@ -135,7 +135,7 @@ final class Evenement
 
     //quoi?
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
-    public ?string $libelle = null {
+    public ?string $libelle {
         get {
             $prop = new ReflectionProperty(self::class, 'libelle');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
@@ -321,7 +321,7 @@ final class Evenement
     //état
     #[Groups([self::GROUP_OUT, self::GROUP_IN])]
     #[Assert\GreaterThan(propertyPath: 'dateCreation')]
-    public ?DateTimeInterface $dateAnnulation = null {
+    public ?DateTimeInterface $dateAnnulation {
         get {
             $prop = new ReflectionProperty(self::class, 'dateAnnulation');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
@@ -331,7 +331,7 @@ final class Evenement
         }
     }
     #[Groups([self::GROUP_OUT])]
-    public ?DateTimeInterface $dateEnvoiRH = null {
+    public ?DateTimeInterface $dateEnvoiRH {
         get {
             $prop = new ReflectionProperty(self::class, 'dateEnvoiRH');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
@@ -363,7 +363,7 @@ final class Evenement
     }
 
     #[Groups([self::GROUP_OUT])]
-    public ?DateTimeInterface $dateModification = null {
+    public ?DateTimeInterface $dateModification {
         get {
             $prop = new ReflectionProperty(self::class, 'dateModification');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
@@ -373,7 +373,7 @@ final class Evenement
         }
     }
     #[Groups([self::GROUP_OUT])]
-    public ?Utilisateur $utilisateurModification = null {
+    public ?Utilisateur $utilisateurModification {
         get {
             $prop = new ReflectionProperty(self::class, 'utilisateurModification');
             if (!$prop->isInitialized($this) && $this->entity !== null && $this->entity->getUtilisateurModification()) {
@@ -396,7 +396,7 @@ final class Evenement
     }
 
     #[Groups([self::GROUP_OUT])]
-    public ?DateTimeInterface $dateValidation = null {
+    public ?DateTimeInterface $dateValidation {
         get {
             $prop = new ReflectionProperty(self::class, 'dateValidation');
             if (!$prop->isInitialized($this) && $this->entity !== null) {

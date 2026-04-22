@@ -15,6 +15,7 @@ namespace App\ApiResource;
 use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -72,7 +73,8 @@ class BilanActivite
     public const string GROUP_OUT = 'bilan-activite:out';
 
     #[Groups([self::GROUP_OUT])]
-    public ?int $id = null {
+    #[ApiProperty(identifier: true)]
+    public ?int $id {
         get {
             $prop = new ReflectionProperty(self::class, 'id');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
