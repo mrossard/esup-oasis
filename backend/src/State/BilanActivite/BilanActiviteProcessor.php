@@ -80,9 +80,6 @@ readonly class BilanActiviteProcessor implements ProcessorInterface
         //on envoie le message pour déclencher l'export
         $this->messageBus->dispatch(new BilanActiviteDemandeMessage($bilan->getId()));
 
-        $bilanActivite = new BilanActivite($bilan, $this->iriConverter);
-        $id = $bilanActivite->id;
-
-        return $bilanActivite;
+        return new BilanActivite($bilan, $this->iriConverter);
     }
 }

@@ -47,8 +47,6 @@ readonly class DemandeDenormalizer implements DenormalizerInterface
             $demande->demandeur = new Utilisateur($this->security->getUser());
         }
 
-        $type = $demande->typeDemande; //on force la lecture du type de demande, nécessaire pour la validation
-
         return $demande;
     }
 
