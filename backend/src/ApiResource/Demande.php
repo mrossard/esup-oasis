@@ -199,10 +199,7 @@ class Demande
         get {
             $prop = new ReflectionProperty(self::class, 'idCommission');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
-                $this->idCommission = $this->entity
-                    ->getCampagne()
-                    ->getCommission()
-                    ?->getId();
+                $this->idCommission = $this->entity->getCampagne()->getCommission()?->getId();
             }
             return $this->idCommission ?? null;
         }
@@ -220,7 +217,7 @@ class Demande
     }
 
     #[Groups([self::GROUP_OUT, self::GROUP_CHANGEMENT_ETAT])]
-    public ?EtatDemande $etat {
+    public EtatDemande $etat {
         get {
             $prop = new ReflectionProperty(self::class, 'etat');
             if (!$prop->isInitialized($this) && $this->entity !== null) {
