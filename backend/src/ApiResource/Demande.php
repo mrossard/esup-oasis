@@ -71,6 +71,7 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriVariables: ['id'],
             denormalizationContext: ['groups' => [self::GROUP_CHANGEMENT_ETAT]],
             securityPostDenormalize: "is_granted('" . self::MAJ_DEMANDE . "', [previous_object, object])",
+            validationContext: ['groups' => [self::GROUP_CHANGEMENT_ETAT]],
             processor: PatchDemandeProcessor::class,
             map: false,
         ),
@@ -125,7 +126,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(CampagneNonArchiveeFilter::class)]
 #[ApiFilter(PreloadAssociationsFilter::class)]
 #[DemandeUniqueParCampagneConstraint]
-#[DemandeWorkflowConstraint]
+#[DemandeWorkflowConstraint(groups: [self::GROUP_CHANGEMENT_ETAT])]
 class Demande
 {
     public const string ITEM_URI = '/demandes/{id}';
