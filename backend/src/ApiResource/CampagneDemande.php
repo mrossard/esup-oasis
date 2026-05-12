@@ -13,6 +13,7 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
@@ -20,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
+use App\Filter\TypeDemandeCampagneFilter;
 use App\State\CampagneDemande\CampagneDemandeProcessor;
 use App\State\CampagneDemande\CampagneDemandeProvider;
 use DateTimeInterface;
@@ -52,6 +54,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     processor: CampagneDemandeProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\CampagneDemande::class),
 )]
+#[ApiFilter(TypeDemandeCampagneFilter::class)]
 class CampagneDemande
 {
     public const string COLLECTION_URI = '/types_demandes/{typeId}/campagnes';
