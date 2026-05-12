@@ -17,7 +17,6 @@ use ApiPlatform\Metadata\HttpOperation;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\AvisEse;
 use App\ApiResource\CampagneDemande;
 use App\Filter\TypeDemandeCampagneFilter;
 use App\State\MappedCollectionPaginator;

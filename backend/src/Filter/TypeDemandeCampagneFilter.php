@@ -24,15 +24,14 @@ class TypeDemandeCampagneFilter extends AbstractFilter
     public const string PROPERTY = 'typedemandeid';
 
     protected function filterProperty(
-        string                      $property,
-        mixed                       $value,
-        QueryBuilder                $queryBuilder,
+        string $property,
+        mixed $value,
+        QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-        string                      $resourceClass,
-        ?Operation                  $operation = null,
-        array                       $context = [],
-    ): void
-    {
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
         if ($property !== self::PROPERTY) {
             return;
         }

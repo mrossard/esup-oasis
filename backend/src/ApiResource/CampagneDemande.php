@@ -12,6 +12,7 @@
 
 namespace App\ApiResource;
 
+use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
@@ -55,6 +56,7 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     stateOptions: new Options(entityClass: \App\Entity\CampagneDemande::class),
 )]
 #[ApiFilter(TypeDemandeCampagneFilter::class)]
+#[ApiFilter(OrderFilter::class, properties: ['debut'])]
 class CampagneDemande
 {
     public const string COLLECTION_URI = '/types_demandes/{typeId}/campagnes';

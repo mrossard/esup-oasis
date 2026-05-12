@@ -161,6 +161,23 @@ class DemandesTest extends ApiTestCaseCustom
         ]);
     }
 
+    public function testTypeDemandeCampagneOrder(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        // Ascending order
+        $client->request('GET', '/types_demandes/1/campagnes?order[debut]=asc');
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        $this->assertEquals('campagne sportifs archievée 2010', $data['hydra:member'][0]['libelle']);
+
+        // Descending order
+        $client->request('GET', '/types_demandes/1/campagnes?order[debut]=desc');
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        $this->assertEquals('campagne sportifs archievée 2010', $data['hydra:member'][2]['libelle']);
+    }
+
     public function testAdminCanCreateCampagne(): void
     {
         $client = $this->createClientWithCredentials('admin');
