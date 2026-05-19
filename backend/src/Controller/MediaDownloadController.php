@@ -50,6 +50,9 @@ class MediaDownloadController extends AbstractController
         $response->headers->set('Content-Disposition', $disposition);
         $response->headers->set('Content-Type', $fichier->getTypeMime());
         $response->headers->set('Vary', ['Content-Type', 'Authorization', 'Cookie', 'X-Switch-User']);
+        $response->setPublic();
+        $response->setMaxAge(0);
+
         return $response;
     }
 }
