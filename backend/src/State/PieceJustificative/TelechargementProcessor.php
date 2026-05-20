@@ -50,7 +50,7 @@ readonly class TelechargementProcessor implements ProcessorInterface
         //on crée la référence du fichier en base
         $fichier = new Fichier();
         $fichier->setNom($data->file->getClientOriginalName());
-        $fichier->setTypeMime($data->file->getClientMimeType());
+        $fichier->setTypeMime($data->file->getMimeType());
         $fichier->setProprietaire($this->security->getUser());
         $fichier->setMetadata($metadata);
 
