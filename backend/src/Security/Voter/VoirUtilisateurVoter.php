@@ -3,6 +3,9 @@
 namespace App\Security\Voter;
 
 use App\ApiResource\Utilisateur;
+use App\Entity\Beneficiaire;
+use App\Entity\Evenement;
+use App\Entity\InterventionForfait;
 use App\Entity\MembreCommission;
 use App\Repository\DemandeRepository;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -78,6 +81,30 @@ class VoirUtilisateurVoter extends Voter
                 haystack: $commissionsAutorisees,
             ))) {
                 return true;
+            }
+        }
+
+        //Intervenants : voient les bénéficiaires de leurs interventions/événements
+        if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_INTERVENANT)) {
+            $interventions = $utilisateurCourant->getIntervenant()->getInterventions();
+            foreach ($interventions as $evenement) {
+                assert($evenement instanceof Evenement);
+                if (array_any(
+                    $evenement->getBeneficiaires()->toArray(),
+                    fn(Beneficiaire $benef) => $benef->getUtilisateur()->getUid() === $subject->uid,
+                )) {
+                    return true;
+                }
+            }
+            $interventionsForfait = $utilisateurCourant->getIntervenant()->getInterventionsForfait();
+            foreach ($interventionsForfait as $evenement) {
+                assert($evenement instanceof InterventionForfait);
+                if (array_any(
+                    $evenement->getBeneficiaires()->toArray(),
+                    fn(Beneficiaire $benef) => $benef->getUtilisateur()->getUid() === $subject->uid,
+                )) {
+                    return true;
+                }
             }
         }
 

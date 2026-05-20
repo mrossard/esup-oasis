@@ -183,6 +183,47 @@ class VoirUtilisateurVoterTest extends TestCase
         ));
     }
 
+    public function testIntervenantCanSeeBeneficiaryOfTheirEvents(): void
+    {
+        $subject = new Utilisateur();
+        $subject->uid = 'student123';
+
+        $token = $this->createMock(TokenInterface::class);
+        $token->method('getUserIdentifier')->willReturn('intervenant123');
+
+        $userCourant = $this->createMock(\App\Entity\Utilisateur::class);
+        $intervenant = $this->createMock(\App\Entity\Intervenant::class);
+        
+        $beneficiaire = $this->createMock(\App\Entity\Beneficiaire::class);
+        $beneficiaireUtilisateur = $this->createMock(\App\Entity\Utilisateur::class);
+        $beneficiaireUtilisateur->method('getUid')->willReturn('student123');
+        $beneficiaire->method('getUtilisateur')->willReturn($beneficiaireUtilisateur);
+
+        $evenement = $this->createMock(\App\Entity\Evenement::class);
+        $evenement->method('getBeneficiaires')->willReturn(new ArrayCollection([$beneficiaire]));
+
+        $intervenant->method('getInterventions')->willReturn(new ArrayCollection([$evenement]));
+        $intervenant->method('getInterventionsForfait')->willReturn(new ArrayCollection());
+
+        $userCourant->method('getIntervenant')->willReturn($intervenant);
+
+        $this->security->method('getUser')->willReturn($userCourant);
+        $this->security
+            ->method('isGranted')
+            ->willReturnCallback(fn($attribute) => match ($attribute) {
+                \App\Entity\Utilisateur::ROLE_PLANIFICATEUR => false,
+                \App\Entity\Utilisateur::ROLE_GESTIONNAIRE => false,
+                \App\Entity\Utilisateur::ROLE_INTERVENANT => true,
+                default => false,
+            });
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->voter->vote(
+            $token,
+            $subject,
+            [Utilisateur::VOIR_UTILISATEUR],
+        ));
+    }
+
     public function testAccessDeniedForOthers(): void
     {
         $subject = new Utilisateur();
