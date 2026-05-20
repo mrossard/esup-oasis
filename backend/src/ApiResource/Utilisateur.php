@@ -114,7 +114,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Get(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['uid'],
-            security: "is_granted('" . self::VOIR_UTILISATEUR . "')",
+            security: "is_granted('" . self::VOIR_UTILISATEUR . "', object)",
             provider: UtilisateurProvider::class,
             map: false,
         ),
