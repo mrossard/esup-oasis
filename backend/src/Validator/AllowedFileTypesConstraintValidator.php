@@ -29,12 +29,13 @@ class AllowedFileTypesConstraintValidator extends ConstraintValidator
                 'mime' => [
                     'application/msword',
                     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                    'application/vnd.oasis.opendocument.text',
                 ],
-                'extension' => ['doc', 'docx'],
+                'extension' => ['doc', 'docx', 'odt'],
             ],
             'IMAGE' => [
-                'mime' => ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
-                'extension' => ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+                'mime' => ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/tiff'],
+                'extension' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'tif', 'tiff'],
             ],
             'VIDEO' => [
                 'mime' => [
@@ -42,6 +43,8 @@ class AllowedFileTypesConstraintValidator extends ConstraintValidator
                     'video/webm',
                     'video/ogg',
                     'video/quicktime',
+                    'video/x-msvideo',
+                    'video/x-ms-wmv',
                 ],
                 'extension' => [
                     'mp4',
@@ -49,6 +52,8 @@ class AllowedFileTypesConstraintValidator extends ConstraintValidator
                     'webm',
                     'ogv',
                     'mov',
+                    'avi',
+                    'wmv',
                 ],
             ],
             'TXT' => [
