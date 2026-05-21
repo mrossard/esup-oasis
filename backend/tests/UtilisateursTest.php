@@ -342,4 +342,12 @@ class UtilisateursTest extends ApiTestCaseCustom
 
         $this->assertResponseStatusCodeSame(403);
     }
+
+    public function testIntervenantCanSeeCreatorOfTheirEvents(): void
+    {
+        $client = $this->createClientWithCredentials('intervenant');
+        $client->request('GET', '/utilisateurs/admin');
+
+        $this->assertResponseIsSuccessful();
+    }
 }

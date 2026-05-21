@@ -51,7 +51,7 @@ class VoirUtilisateurVoter extends Voter
         }
 
         // Tout le monde accédant à la plateforme peut voir les infos des gestionnaires - à affiner ?
-        if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_GESTIONNAIRE, $subject)) {
+        if (in_array(\App\Entity\Utilisateur::ROLE_GESTIONNAIRE, $subject->roles)) {
             return true;
         }
 
