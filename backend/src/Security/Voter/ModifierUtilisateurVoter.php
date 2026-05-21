@@ -35,7 +35,7 @@ final class ModifierUtilisateurVoter extends Voter
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $attribute === Utilisateur::CAN_PATCH_USER && is_array($subject);
+        return $attribute === Utilisateur::MODIFIER_UTILISATEUR && is_array($subject);
     }
 
     /**

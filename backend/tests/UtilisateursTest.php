@@ -227,10 +227,7 @@ class UtilisateursTest extends ApiTestCaseCustom
     {
         $client = $this->createClientWithCredentials('admin');
 
-        $repo = static::getContainer()
-            ->get('doctrine')
-            ->getManager()
-            ->getRepository(Utilisateur::class);
+        $repo = static::getContainer()->get('doctrine')->getManager()->getRepository(Utilisateur::class);
 
         $beneficiaire = $repo->findOneBy(['uid' => 'beneficiaire']);
         $beneficiaire->setNumeroAnonyme(null);
@@ -328,5 +325,21 @@ class UtilisateursTest extends ApiTestCaseCustom
             '@context' => '/contexts/Inscription',
             '@id' => '/inscriptions/1',
         ]);
+    }
+
+    public function testIntervenantCanSeeBeneficiaryOfTheirEvents(): void
+    {
+        $client = $this->createClientWithCredentials('intervenant');
+        $client->request('GET', '/utilisateurs/beneficiaire');
+
+        $this->assertResponseIsSuccessful();
+    }
+
+    public function testIntervenantCannotSeeOtherBeneficiary(): void
+    {
+        $client = $this->createClientWithCredentials('intervenant2');
+        $client->request('GET', '/utilisateurs/beneficiaire2');
+
+        $this->assertResponseStatusCodeSame(403);
     }
 }
