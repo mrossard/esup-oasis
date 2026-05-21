@@ -3,6 +3,7 @@
 namespace App\Security\Voter;
 
 use App\ApiResource\Utilisateur;
+use App\Entity\ApplicationCliente;
 use App\Entity\Beneficiaire;
 use App\Entity\Evenement;
 use App\Entity\InterventionForfait;
@@ -34,6 +35,11 @@ class VoirUtilisateurVoter extends Voter
         assert($attribute === Utilisateur::VOIR_UTILISATEUR);
         assert($subject instanceof Utilisateur);
 
+        // les applications clientes voient tout le monde
+        if ($this->security->isGranted(ApplicationCliente::ROLE_APPLICATION_CLIENTE)) {
+            return true;
+        }
+
         // on se voit soi-même
         if ($subject->uid === $token->getUserIdentifier()) {
             return true;
@@ -50,6 +56,7 @@ class VoirUtilisateurVoter extends Voter
         }
 
         $utilisateurCourant = $this->security->getUser();
+
         assert($utilisateurCourant instanceof \App\Entity\Utilisateur);
 
         // Référents de composantes
