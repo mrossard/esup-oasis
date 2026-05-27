@@ -15,9 +15,12 @@ namespace App\Tests;
 use App\ApiResource\Formation;
 use App\ApiResource\Inscription;
 use App\ApiResource\Utilisateur;
+use App\Entity\Beneficiaire;
 use App\Entity\Commission;
 use App\Entity\Composante;
 use App\Entity\Demande;
+use App\Entity\Evenement;
+use App\Entity\Intervenant;
 use App\Entity\MembreCommission;
 use App\Repository\DemandeRepository;
 use App\Security\Voter\VoirUtilisateurVoter;
@@ -79,6 +82,7 @@ class VoirUtilisateurVoterTest extends TestCase
     {
         $subject = new Utilisateur();
         $subject->uid = 'gest123';
+        $subject->roles = ['ROLE_USER', 'ROLE_GESTIONNAIRE'];
 
         $token = $this->createMock(TokenInterface::class);
         $token->method('getUserIdentifier')->willReturn('any_user');
@@ -192,15 +196,56 @@ class VoirUtilisateurVoterTest extends TestCase
         $token->method('getUserIdentifier')->willReturn('intervenant123');
 
         $userCourant = $this->createMock(\App\Entity\Utilisateur::class);
-        $intervenant = $this->createMock(\App\Entity\Intervenant::class);
-        
-        $beneficiaire = $this->createMock(\App\Entity\Beneficiaire::class);
+        $intervenant = $this->createMock(Intervenant::class);
+
+        $beneficiaire = $this->createMock(Beneficiaire::class);
         $beneficiaireUtilisateur = $this->createMock(\App\Entity\Utilisateur::class);
         $beneficiaireUtilisateur->method('getUid')->willReturn('student123');
         $beneficiaire->method('getUtilisateur')->willReturn($beneficiaireUtilisateur);
 
-        $evenement = $this->createMock(\App\Entity\Evenement::class);
+        $evenement = $this->createMock(Evenement::class);
         $evenement->method('getBeneficiaires')->willReturn(new ArrayCollection([$beneficiaire]));
+
+        $intervenant->method('getInterventions')->willReturn(new ArrayCollection([$evenement]));
+        $intervenant->method('getInterventionsForfait')->willReturn(new ArrayCollection());
+
+        $userCourant->method('getIntervenant')->willReturn($intervenant);
+
+        $this->security->method('getUser')->willReturn($userCourant);
+        $this->security
+            ->method('isGranted')
+            ->willReturnCallback(fn($attribute) => match ($attribute) {
+                \App\Entity\Utilisateur::ROLE_PLANIFICATEUR => false,
+                \App\Entity\Utilisateur::ROLE_GESTIONNAIRE => false,
+                \App\Entity\Utilisateur::ROLE_INTERVENANT => true,
+                default => false,
+            });
+
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->voter->vote(
+            $token,
+            $subject,
+            [Utilisateur::VOIR_UTILISATEUR],
+        ));
+    }
+
+    public function testIntervenantCanSeeCreatorOfTheirEvents(): void
+    {
+        $subject = new Utilisateur();
+        $subject->uid = 'creator123';
+        $subject->roles = ['ROLE_USER', 'ROLE_GESTIONNAIRE'];
+
+        $token = $this->createMock(TokenInterface::class);
+        $token->method('getUserIdentifier')->willReturn('intervenant123');
+
+        $userCourant = $this->createMock(\App\Entity\Utilisateur::class);
+        $intervenant = $this->createMock(Intervenant::class);
+
+        $creatorUtilisateur = $this->createMock(\App\Entity\Utilisateur::class);
+        $creatorUtilisateur->method('getUid')->willReturn('creator123');
+
+        $evenement = $this->createMock(Evenement::class);
+        $evenement->method('getUtilisateurCreation')->willReturn($creatorUtilisateur);
+        $evenement->method('getBeneficiaires')->willReturn(new ArrayCollection());
 
         $intervenant->method('getInterventions')->willReturn(new ArrayCollection([$evenement]));
         $intervenant->method('getInterventionsForfait')->willReturn(new ArrayCollection());

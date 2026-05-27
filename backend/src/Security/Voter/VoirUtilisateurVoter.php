@@ -3,6 +3,7 @@
 namespace App\Security\Voter;
 
 use App\ApiResource\Utilisateur;
+use App\Entity\ApplicationCliente;
 use App\Entity\Beneficiaire;
 use App\Entity\Evenement;
 use App\Entity\InterventionForfait;
@@ -34,6 +35,11 @@ class VoirUtilisateurVoter extends Voter
         assert($attribute === Utilisateur::VOIR_UTILISATEUR);
         assert($subject instanceof Utilisateur);
 
+        // les applications clientes voient tout le monde
+        if ($this->security->isGranted(ApplicationCliente::ROLE_APPLICATION_CLIENTE)) {
+            return true;
+        }
+
         // on se voit soi-même
         if ($subject->uid === $token->getUserIdentifier()) {
             return true;
@@ -45,11 +51,12 @@ class VoirUtilisateurVoter extends Voter
         }
 
         // Tout le monde accédant à la plateforme peut voir les infos des gestionnaires - à affiner ?
-        if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_GESTIONNAIRE, $subject)) {
+        if (in_array(\App\Entity\Utilisateur::ROLE_GESTIONNAIRE, $subject->roles)) {
             return true;
         }
 
         $utilisateurCourant = $this->security->getUser();
+
         assert($utilisateurCourant instanceof \App\Entity\Utilisateur);
 
         // Référents de composantes
