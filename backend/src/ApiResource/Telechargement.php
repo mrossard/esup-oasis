@@ -118,15 +118,7 @@ class Telechargement
     }
 
     #[Groups([self::GROUP_OUT])]
-    public string $urlContenu {
-        get {
-            $prop = new ReflectionProperty(self::class, 'urlContenu');
-            if (!$prop->isInitialized($this) && $this->entity !== null) {
-                $this->urlContenu = '/fichiers/' . $this->id; //en dur, c'est moche
-            }
-            return $this->urlContenu ?? null;
-        }
-    }
+    public string $urlContenu;
 
     public function __construct(
         private readonly ?Fichier $entity = null,
