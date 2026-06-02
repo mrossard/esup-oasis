@@ -105,8 +105,7 @@ class BeneficiaireFilter extends AbstractFilter
             $queryBuilder
                 ->join($beneficiaireAlias . '.profil', $profilAlias)
                 ->andWhere($profilAlias . '.id = :' . $profilIdParam)
-                ->setParameter($profilIdParam, $profil->id)
-                ->setParameter($nowParam, $this->now());
+                ->setParameter($profilIdParam, $profil->id);
         }
     }
 
