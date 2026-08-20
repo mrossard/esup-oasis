@@ -10,6 +10,7 @@
 import { NavigateFunction } from "react-router-dom";
 import { Button, MenuProps } from "antd";
 import React from "react";
+import { env } from "@/env";
 
 /**
  * Generates the menu items for the beneficiary/intervenant planning menu.
@@ -17,31 +18,36 @@ import React from "react";
  * @param setSelectedKey
  * @param navigate - The function to navigate to a specific page.
  * @param className - Optional class name for the menu item.
+ * @param labels
  * @returns An array of menu items for the beneficiary/intervenant planning menu.
  */
 export function menuItemDemandeur(
-   setSelectedKey: (key: string) => void,
-   navigate: NavigateFunction,
-   className?: string,
+  setSelectedKey: (key: string) => void,
+  navigate: NavigateFunction,
+  className?: string,
+  labels?: Record<string, string>,
 ): MenuProps["items"] {
-   return [
+  if (env.REACT_APP_GERER_DEMANDES)
+    return [
       {
-         key: "demandes",
-         label: (
-            <Button
-               type="text"
-               className="no-hover p-0"
-               onClick={() => {
-                  setSelectedKey("demandes");
-                  navigate("/demandes");
-               }}
-            >
-               Demandes
-            </Button>
-         ),
-         className: className,
-         children: [],
-         popupClassName: "d-none",
+        key: "demandes",
+        label: (
+          <Button
+            type="text"
+            className="no-hover p-0"
+            onClick={() => {
+              setSelectedKey("demandes");
+              navigate("/demandes");
+            }}
+          >
+            {labels?.MENU_DEMANDES_DEMANDEUR ?? "Demandes"}
+          </Button>
+        ),
+        className: className,
+        children: [],
+        popupClassName: "d-none",
       },
-   ];
+    ];
+
+  return [];
 }

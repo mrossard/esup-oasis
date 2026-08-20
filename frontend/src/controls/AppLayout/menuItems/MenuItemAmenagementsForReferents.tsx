@@ -16,28 +16,30 @@ import React from "react";
  *
  * @param setSelectedKey
  * @param {Function} navigate - The navigate function to be called when a menu item is clicked.
+ * @param labels
  * @return {Array} - An array of menu item objects.
  */
 export const menuItemAmenagementsForReferents = (
-   setSelectedKey: (key: string) => void,
-   navigate: NavigateFunction,
+  setSelectedKey: (key: string) => void,
+  navigate: NavigateFunction,
+  labels?: Record<string, string>,
 ): MenuProps["items"] => [
-   {
-      key: "beneficaires",
-      className: "mr-auto",
-      children: [],
-      popupClassName: "d-none",
-      label: (
-         <Button
-            type="text"
-            className="no-hover p-0"
-            onClick={() => {
-               setSelectedKey("beneficaires");
-               navigate("/amenagements?mode=beneficiaire");
-            }}
-         >
-            Aménagements
-         </Button>
-      ),
-   },
+  {
+    key: "beneficiaires-referent",
+    className: "mr-auto",
+    children: [],
+    popupClassName: "d-none",
+    label: (
+      <Button
+        type="text"
+        className="no-hover p-0"
+        onClick={() => {
+          setSelectedKey("beneficiaires-referent");
+          navigate("/amenagements?mode=beneficiaire");
+        }}
+      >
+        {labels?.MENU_REFERENT_AMENAGEMENTS ?? "Aménagements"}
+      </Button>
+    ),
+  },
 ];

@@ -16,27 +16,29 @@ import React from "react";
  *
  * @param setSelectedKey
  * @param {NavigateFunction} navigate - The function used for navigating to a specific route.
+ * @param labels
  * @return {MenuProps["items"]} - The menu items for the "Intervenants" menu item.
  */
 export const menuItemIntervenants = (
-   setSelectedKey: (key: string) => void,
-   navigate: NavigateFunction,
+  setSelectedKey: (key: string) => void,
+  navigate: NavigateFunction,
+  labels?: Record<string, string>,
 ): MenuProps["items"] => [
-   {
-      key: "intervenants",
-      label: (
-         <Button
-            type="text"
-            className="no-hover p-0"
-            onClick={() => {
-               setSelectedKey("intervenants");
-               navigate("/intervenants");
-            }}
-         >
-            Intervenants
-         </Button>
-      ),
-      children: [],
-      popupClassName: "d-none",
-   },
+  {
+    key: "intervenants",
+    label: (
+      <Button
+        type="text"
+        className="no-hover p-0"
+        onClick={() => {
+          setSelectedKey("intervenants");
+          navigate("/intervenants");
+        }}
+      >
+        {labels?.MENU_INTERVENANTS ?? "Intervenants"}
+      </Button>
+    ),
+    children: [],
+    popupClassName: "d-none",
+  },
 ];

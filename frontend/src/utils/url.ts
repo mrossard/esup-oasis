@@ -12,7 +12,7 @@
  * @param object
  */
 export const objectToQuery = (object: Record<string, string>) => {
-   return new URLSearchParams(object).toString();
+  return new URLSearchParams(object).toString();
 };
 
 /**
@@ -20,6 +20,13 @@ export const objectToQuery = (object: Record<string, string>) => {
  * @param query
  */
 export const queryToObject = (query: string) => {
-   const parameters = new URLSearchParams(query);
-   return Object.fromEntries(parameters.entries());
+  const parameters = new URLSearchParams(query);
+  return Object.fromEntries(parameters.entries());
 };
+
+/**
+ * Construit une URL `mailto:` en encodant l'adresse, afin qu'une adresse
+ * contenant `?`, `&` ou `#` ne puisse pas injecter de paramètres (cc, bcc, body…).
+ * @param email adresse du destinataire (donnée potentiellement issue de l'API)
+ */
+export const mailtoHref = (email: string): string => `mailto:${encodeURIComponent(email)}`;
