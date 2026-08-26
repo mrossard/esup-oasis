@@ -38,6 +38,14 @@ class ApogeeProvider extends AbstractSiScolDataProvider
     /**
      * @inheritDoc
      */
+    public function getProviderId(): string
+    {
+        return "apogee";
+    }
+    
+    /**
+     * @inheritDoc
+     */
     public function getInscriptions(Utilisateur $etudiant, DateTimeInterface $debut, ?DateTimeInterface $fin): array
     {
         try {
