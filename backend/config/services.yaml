@@ -49,8 +49,10 @@ services:
       $ldapDn: '%env(resolve:LDAP_DN)%'
 
   App\Service\SiScol\AbstractSiScolDataProvider:
-    alias: App\Service\SiScol\ApogeeProvider
-
+    factory: ['@App\Service\SiScol\SiScolDataProviderFactory', 'create']
+    autoconfigure: false
+    
+  #APOGEE
   App\Service\SiScol\ApogeeProvider:
     arguments:
       $username: '%env(resolve:APOGEE_USER)%'
@@ -126,3 +128,7 @@ when@test:
       class: App\Test\FakeLdapService
     App\Service\Photo\PhotoProviderInterface:
       alias: App\Test\FakePhotoProvider
+    App\Service\SiScol\SiScolDataProviderFactory:
+        public: true
+        autowire: true
+        autoconfigure: true

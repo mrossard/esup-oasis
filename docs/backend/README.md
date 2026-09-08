@@ -87,6 +87,8 @@ disponibles dans le fichier
 * **LDAP_CHAMP_ETU_ID** : Champ contenant le numéro étudiant
 * **MAILER_DSN** : DSN du serveur smtp (`smtp://user:password@server:port`)
 * **GOTENBERG_DSN** : URL de l'instance Gotenberg
+* **SI_SCOL** : implémentation à utiliser pour l'accès au SI de scol (cf la section sur
+  les [connecteurs](connecteurs.md#personnalisation))
 * **APOGEE_USER** : utilisateur avec droits de lecture dans la base Apogée
 * **APOGEE_PWD** : mot de passe de l'utilisateur Apogée
 * **APOGEE_DB** : url de la base Apogée (`//serveur:port/SID`)

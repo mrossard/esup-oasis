@@ -19,6 +19,15 @@ use DateTimeInterface;
 
 class FakeSiScolDataProvider extends AbstractSiScolDataProvider
 {
+
+    /**
+     * @inheritDoc
+     */
+    public function getProviderId(): string
+    {
+        return "fake";
+    }
+    
     /**
      * @inheritDoc
      */
