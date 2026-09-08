@@ -86,7 +86,7 @@ le dossier `config/apogee` (attention à bien respecter les noms des champs reto
 Les versions livrées de ces requêtes s'appuient sur une table locale `extern_niveau_etape` pour remonter le niveau LMD,
 vous devrez donc les adapter. Le niveau LMD peut être simplement laissé vide.
 
-#### Implémentation sa propre classe
+#### Implémentation de sa propre classe
 
 Vous pouvez aussi opter pour une réimplémentation locale de l'interfaçage avec le SI scolarité (pour utiliser les WS
 apogée, pour un établissement utilisant Pegase...) en étendant la classe abstraite
@@ -95,6 +95,10 @@ apogée, pour un établissement utilisant Pegase...) en étendant la classe abst
 Les méthodes à implémenter sont le miroir des deux requêtes plus haut : `getInscriptions` doit retourner un tableau des
 inscriptions, `getFormation` retourne un tableau contenant les informations de cette formation. Attention à respecter le
 format de tableau en prenant exemple sur l'implémentation fournie.
+
+Une 3ème méthode getProviderId () doit retourner une chaine de caractères (de votre choix, mais unique parmi les
+implémentations disponibles) servant d'identifiant pour cette iméplmentation; il faudra ensuite utiliser cette valeur
+pour renseigner la variable d'environnement `SI_SCOL`, dont la valeur par défaut est `APOGEE`.
 
 ## GED Nuxeo
 

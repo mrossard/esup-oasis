@@ -53,6 +53,10 @@ spécifier les requêtes
 d'interrogation de la base apogée que vous aurez défini - plus d'informations dans
 la [documentation dédiée au connecteur vers le SI de scolarité](/docs/backend/connecteurs.md#si-scolarité).
 
+Si vous utilisez un autre SI de scolarité sans implémentation fournie, vous pouvez également ajouter votre
+implémentation dans le dossier [backend/personnalisation/SiScol](../../installation/backend/personnalisation/SiScol) -
+cf [documentation dédiée au connecteur vers le SI de scolarité](/docs/backend/connecteurs.md#si-scolarité)
+
 ### Démarrer l'application
 
 * Pour de la production :

@@ -15,9 +15,19 @@ namespace App\Service\SiScol;
 use App\Entity\Formation;
 use App\Entity\Utilisateur;
 use DateTimeInterface;
+use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 
+#[AutoconfigureTag('oasis.siscol_provider')]
 abstract class AbstractSiScolDataProvider
 {
+
+    /**
+     * Retourne l'identifiant du provider du SiScol
+     *
+     * @return string
+     */
+    abstract public function getProviderId(): string;
+    
     /**
      * Tableau listant les formations auxquelles est inscrit l'étudiant sur l'intervalle de temps donné
      * [[codeFormation, libFormation, codeComposante, libComposante, debut, fin], ...]

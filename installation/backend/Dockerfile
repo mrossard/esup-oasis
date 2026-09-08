@@ -10,3 +10,4 @@ COPY ./personnalisation/templates/Decisions/* /app/templates/Decisions/
 COPY ./personnalisation/templates/ServicesFaits/* /app/templates/ServicesFaits/
 COPY ./personnalisation/public/css/* /app/public/css/
 COPY ./personnalisation/public/images/* /app/public/images/
+COPY ./personnalisation/SiScol/* /app/src/Service/SiScol/
