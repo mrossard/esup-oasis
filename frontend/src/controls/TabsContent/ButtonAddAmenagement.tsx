@@ -71,36 +71,40 @@ export function ButtonAddAmenagement(props: {
       )}
       <Dropdown
         menu={{
-          items: amenagementsByCategories?.map((c) => ({
-            key: c["@id"] as string,
-            label: c.libelle,
-            children: [
-              ...c.typesAmenagements.map((ta) => ({
-                key: ta["@id"] as string,
-                label: ta.libelle,
-                icon: <AppstoreAddOutlined />,
-                onClick: () => {
-                  setTypeAmenagementAjoute(ta);
-                },
-              })),
-              c.typesAmenagements.length > 1
-                ? {
-                    type: "divider",
-                    key: "divider",
-                  }
-                : null,
-              c.typesAmenagements.length > 1
-                ? {
-                    key: `${c["@id"]}_add-category`,
-                    label: "Ajouter plusieurs aménagements",
-                    icon: <AppstoreFilled />,
+          items: amenagementsByCategories
+            ?.filter((c) => c.actif)
+            .map((c) => ({
+              key: c["@id"] as string,
+              label: c.libelle,
+              children: [
+                ...c.typesAmenagements
+                  .filter((ta) => ta.actif)
+                  .map((ta) => ({
+                    key: ta["@id"] as string,
+                    label: ta.libelle,
+                    icon: <AppstoreAddOutlined />,
                     onClick: () => {
-                      setCategorieAmenagementAjoute(c);
+                      setTypeAmenagementAjoute(ta);
                     },
-                  }
-                : null,
-            ],
-          })),
+                  })),
+                c.typesAmenagements.length > 1
+                  ? {
+                      type: "divider",
+                      key: "divider",
+                    }
+                  : null,
+                c.typesAmenagements.length > 1
+                  ? {
+                      key: `${c["@id"]}_add-category`,
+                      label: "Ajouter plusieurs aménagements",
+                      icon: <AppstoreFilled />,
+                      onClick: () => {
+                        setCategorieAmenagementAjoute(c);
+                      },
+                    }
+                  : null,
+              ],
+            })),
         }}
       >
         <Button type="primary" icon={<PlusOutlined />}>
