@@ -79,7 +79,7 @@ class UnicampusProvider implements PhotoProviderInterface
     /**
      * @throws PhotoIndisponibleException
      */
-    private function parseAndReturnFirstResultOracle(string $sql)
+    private function parseAndReturnFirstResultOracle(string $sql): string
     {
         $stmt = oci_parse($this->db, $sql);
 
@@ -99,7 +99,7 @@ class UnicampusProvider implements PhotoProviderInterface
     /**
      * @throws PhotoIndisponibleException
      */
-    private function parseAndReturnFirstResultPostgre(string $sql)
+    private function parseAndReturnFirstResultPostgre(string $sql): string
     {
         $result = pg_query($this->db, $sql);
         if (!$result) {
@@ -111,7 +111,7 @@ class UnicampusProvider implements PhotoProviderInterface
             throw new PhotoIndisponibleException('Pas de photo pour cet étudiant');
         }
 
-        return $row['STOCKAGE_PHOTO'];
+        return pg_unescape_bytea($row['stockage_photo']);
     }
 
     /**
