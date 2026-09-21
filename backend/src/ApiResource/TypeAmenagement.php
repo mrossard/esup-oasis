@@ -142,9 +142,10 @@ class TypeAmenagement
     }
 
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
-    public ?bool $decision = null {
+    public ?bool $decision {
         get {
-            if ($this->decision === null && $this->entity !== null) {
+            $prop = new ReflectionProperty(self::class, 'decision');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
                 $this->decision = $this->entity->isDecision();
             }
             return $this->decision ?? false;
@@ -155,4 +156,3 @@ class TypeAmenagement
         private readonly ?\App\Entity\TypeAmenagement $entity = null,
     ) {}
 }
-
