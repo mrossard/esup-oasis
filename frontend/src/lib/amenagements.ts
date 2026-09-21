@@ -5,6 +5,7 @@
  * For full copyright and license information please view the LICENSE file distributed with the source code.
  *
  * @author Julien Lemonnier <julien.lemonnier@u-bordeaux.fr>
+ * @author Fabien Léon <fabien.leon@univ-brest.fr>
  */
 
 import { IAmenagement, ICategorieAmenagement, ITypeAmenagement } from "@api";
@@ -148,25 +149,25 @@ export function getAmenagementsByCategories(
 }
 
 export function getAmenagementsDecision(
-   amenagements: IAmenagement[],
-   categories: ICategorieAmenagement[],
-   typesAmenagements: ITypeAmenagement[],
+  amenagements: IAmenagement[],
+  categories: ICategorieAmenagement[],
+  typesAmenagements: ITypeAmenagement[],
 ) {
-   return categories
-      .map((categorie) => {
-         return {
-            ...categorie,
-            typeAmenagements: typesAmenagements
-               .filter((ta) => ta.categorie === categorie["@id"])
-               .filter((ta) => ta.decision)
-               .map((ta) => {
-                  return {
-                     ...ta,
-                     amenagements: amenagements.filter((a) => a.typeAmenagement === ta["@id"]),
-                  };
-               })
-               .filter((ta) => ta.amenagements.length > 0),
-         };
-      })
-      .filter((c) => c.typeAmenagements.length > 0);
+  return categories
+    .map((categorie) => {
+      return {
+        ...categorie,
+        typeAmenagements: typesAmenagements
+          .filter((ta) => ta.categorie === categorie["@id"])
+          .filter((ta) => ta.decision)
+          .map((ta) => {
+            return {
+              ...ta,
+              amenagements: amenagements.filter((a) => a.typeAmenagement === ta["@id"]),
+            };
+          })
+          .filter((ta) => ta.amenagements.length > 0),
+      };
+    })
+    .filter((c) => c.typeAmenagements.length > 0);
 }

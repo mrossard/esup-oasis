@@ -5,6 +5,7 @@
  * For full copyright and license information please view the LICENSE file distributed with the source code.
  *
  * @author Julien Lemonnier <julien.lemonnier@u-bordeaux.fr>
+ * @author Fabien Léon <fabien.leon@univ-brest.fr>
  */
 
 import { Badge } from "antd";
@@ -35,16 +36,14 @@ export default function AmenagementBadge(props: {
     if (props.decision) {
       return amenagements?.items
         .map((a) => {
-          const type = types?.items.find((t) => t["@id"] === a.typeAmenagement);
-          return type;
+          return types?.items.find((t) => t["@id"] === a.typeAmenagement);
         })
-        .filter((t) => t?.decision)
-        .length;
+        .filter((t) => t?.decision).length;
     } else {
       return amenagements?.items
         .map((a) => {
-            const type = types?.items.find((t) => t["@id"] === a.typeAmenagement);
-            return getDomaineAmenagement(type);
+          const type = types?.items.find((t) => t["@id"] === a.typeAmenagement);
+          return getDomaineAmenagement(type);
         })
         .filter((d) => !props.domaineAmenagement?.id || props.domaineAmenagement.id === d?.id)
         .length;

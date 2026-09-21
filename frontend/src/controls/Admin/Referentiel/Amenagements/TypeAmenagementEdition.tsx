@@ -5,6 +5,7 @@
  * For full copyright and license information please view the LICENSE file distributed with the source code.
  *
  * @author Julien Lemonnier <julien.lemonnier@u-bordeaux.fr>
+ * @author Fabien Léon <fabien.leon@univ-brest.fr>
  */
 
 import { Button, Card, Divider, Drawer, Form, Input, Radio, Select, Switch } from "antd";
@@ -173,9 +174,12 @@ export function TypeAmenagementEdition({
               }))}
             />
           </Form.Item>
-          <Form.Item 
+
+          <Divider />
+
+          <Form.Item
             name="decision"
-            label="Afficher dans la décision"
+            label="Inclure dans la décision d'établissement"
             className="mt-2"
             valuePropName="checked"
           >

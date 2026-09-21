@@ -5,6 +5,7 @@
  * For full copyright and license information please view the LICENSE file distributed with the source code.
  *
  * @author Julien Lemonnier <julien.lemonnier@u-bordeaux.fr>
+ * @author Fabien Léon <fabien.leon@univ-brest.fr>
  */
 
 import { useApi } from "@context/api/ApiProvider";
@@ -118,18 +119,11 @@ export default function DossierBeneficiaire(props: { beneficiaireId: string }): 
             key: "decision",
             label: (
               <Space>
-                Décision d'étab
-                <AmenagementBadge
-                  utilisateurId={props.beneficiaireId}
-                  decision
-                />
+                Décisions d'établissement
+                <AmenagementBadge utilisateurId={props.beneficiaireId} decision />
               </Space>
             ),
-            children: (
-              <TabDecisionEtab
-                utilisateurId={props.beneficiaireId}
-              />
-            ),
+            children: <TabDecisionEtab utilisateurId={props.beneficiaireId} />,
             icon: <FileDoneOutlined />,
           },
           {
