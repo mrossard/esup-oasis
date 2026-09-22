@@ -85,10 +85,10 @@ export function TabAmenagements(props: {
                   <span key={ta["@id"]} style={{ width: "100%", display: "contents" }}>
                     {ta.amenagements.map((a) => (
                       <CardAmenagement
-                        couleur={props.domaineAmenagement.couleur}
+                        key={a["@id"]}
                         categorie={c.libelle!}
                         amenagement={a}
-                        type={ta.libelle}
+                        type={ta}
                         onClickEdit={setEditedAmenagement}
                       ></CardAmenagement>
                     ))}

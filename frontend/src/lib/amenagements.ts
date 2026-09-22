@@ -9,6 +9,7 @@
  */
 
 import { IAmenagement, ICategorieAmenagement, ITypeAmenagement } from "@api";
+import { isEnCoursSurPeriode } from "@utils/dates";
 
 export type DomaineAmenagementInfos = {
   id: string;
@@ -83,6 +84,19 @@ export function getDomaineAmenagement(amenagement: ITypeAmenagement | undefined)
   return null;
 }
 
+function typeAmenagementCorrespondAuDomaine(ta: ITypeAmenagement, domaine?: string) {
+  switch (domaine) {
+    case "pedagogique":
+      return ta.pedagogique;
+    case "aideHumaine":
+      return ta.aideHumaine;
+    case "examen":
+      return ta.examens;
+    default:
+      return true;
+  }
+}
+
 export function getTypesAmenagementByCategories(
   categories: ICategorieAmenagement[],
   typesAmenagements: ITypeAmenagement[],
@@ -95,18 +109,7 @@ export function getTypesAmenagementByCategories(
         typesAmenagements: typesAmenagements
           .filter((ta) => ta.categorie === categorie["@id"])
           .filter((ta) => ta.actif)
-          .filter((ta) => {
-            switch (domaine) {
-              case "pedagogique":
-                return ta.pedagogique;
-              case "aideHumaine":
-                return ta.aideHumaine;
-              case "examen":
-                return ta.examens;
-              default:
-                return true;
-            }
-          }),
+          .filter((ta) => typeAmenagementCorrespondAuDomaine(ta, domaine)),
       };
     })
     .filter((c) => c.typesAmenagements.length > 0);
@@ -124,18 +127,7 @@ export function getAmenagementsByCategories(
         ...categorie,
         typeAmenagements: typesAmenagements
           .filter((ta) => ta.categorie === categorie["@id"])
-          .filter((ta) => {
-            switch (domaine) {
-              case "pedagogique":
-                return ta.pedagogique;
-              case "aideHumaine":
-                return ta.aideHumaine;
-              case "examen":
-                return ta.examens;
-              default:
-                return true;
-            }
-          })
+          .filter((ta) => typeAmenagementCorrespondAuDomaine(ta, domaine))
           .map((ta) => {
             return {
               ...ta,
@@ -152,6 +144,7 @@ export function getAmenagementsDecision(
   amenagements: IAmenagement[],
   categories: ICategorieAmenagement[],
   typesAmenagements: ITypeAmenagement[],
+  filter: "TOUS" | "EN_COURS" | "EXPIRE" = "TOUS",
 ) {
   return categories
     .map((categorie) => {
@@ -163,7 +156,13 @@ export function getAmenagementsDecision(
           .map((ta) => {
             return {
               ...ta,
-              amenagements: amenagements.filter((a) => a.typeAmenagement === ta["@id"]),
+              amenagements: amenagements.filter((a) => {
+                if (a.typeAmenagement !== ta["@id"]) return false;
+                if (filter === "TOUS") return true;
+
+                const enCours = isEnCoursSurPeriode(a.debut, a.fin);
+                return filter === "EN_COURS" ? enCours : !enCours;
+              }),
             };
           })
           .filter((ta) => ta.amenagements.length > 0),
