@@ -35,9 +35,7 @@ export default function AmenagementBadge(props: {
   const nb = useMemo(() => {
     if (props.decision) {
       return amenagements?.items
-        .map((a) => {
-          return types?.items.find((t) => t["@id"] === a.typeAmenagement);
-        })
+        .map((a) => types?.items.find((t) => t["@id"] === a.typeAmenagement))
         .filter((t) => t?.decision).length;
     } else {
       return amenagements?.items

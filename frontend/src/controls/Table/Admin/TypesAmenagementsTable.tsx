@@ -14,7 +14,7 @@ import { EditOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { ITypeAmenagement } from "@api";
 import BooleanState from "@controls/State/BooleanState";
-import { getDomaineAmenagement } from "@lib";
+import { decisionEtab, getDomaineAmenagement } from "@lib";
 
 interface TypesAmenagementsTableProps {
   categorieId: string;
@@ -71,7 +71,7 @@ export function TypesAmenagementsTable({
           render: (actif) => <BooleanState value={actif} onLabel="Activé" offLabel="Désactivé" />,
         },
         {
-          title: "Décision d'étab.",
+          title: decisionEtab.Denomination,
           dataIndex: "decision",
           width: 120,
           className: "text-center",
@@ -81,7 +81,7 @@ export function TypesAmenagementsTable({
               value={decision}
               onLabel="Inclus"
               offLabel="Non"
-              tooltip="Inclure dans la décision d'établissement"
+              tooltip={`Inclure dans ${decisionEtab.defini}`}
             />
           ),
         },

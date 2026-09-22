@@ -18,7 +18,7 @@ import { Empty, Flex, Row, Typography } from "antd";
 
 import useBreakpoint from "antd/es/grid/hooks/useBreakpoint";
 import { BoutonDecisionEtab } from "./BoutonDecisionEtab";
-import { getDomaineAmenagement } from "@lib";
+import { decisionEtab, getDomaineAmenagement } from "@lib";
 
 export function TabDecisionEtab(props: { utilisateurId: string }) {
   const screens = useBreakpoint();
@@ -45,7 +45,7 @@ export function TabDecisionEtab(props: { utilisateurId: string }) {
     <>
       <Flex justify="space-between" align="center" className="mt-1 mb-2" wrap>
         <Typography.Title level={3} className="mt-0 mb-0">
-          Décisions d'établissement
+          {decisionEtab.Denomination}
         </Typography.Title>
         <div className={`text-right${!screens.lg ? " mt-2" : ""}`}>
           <BoutonDecisionEtab utilisateurId={props.utilisateurId} />

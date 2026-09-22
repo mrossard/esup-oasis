@@ -22,7 +22,7 @@ import {
 } from "@ant-design/icons";
 import { TabIdentite } from "@controls/TabsContent/TabIdentite";
 import { TabDemandes } from "@controls/TabsContent/TabDemandes";
-import { DOMAINES_AMENAGEMENTS_INFOS } from "@lib";
+import { decisionEtab, DOMAINES_AMENAGEMENTS_INFOS } from "@lib";
 import { TabAmenagements } from "@controls/TabsContent/TabAmenagements";
 import { TabDecisionEtab } from "@controls/TabsContent/TabDecisionEtab";
 import { useAuth } from "@/auth/AuthProvider";
@@ -119,7 +119,7 @@ export default function DossierBeneficiaire(props: { beneficiaireId: string }): 
             key: "decision",
             label: (
               <Space>
-                Décisions d'établissement
+                {decisionEtab.Denomination}
                 <AmenagementBadge utilisateurId={props.beneficiaireId} decision />
               </Space>
             ),
