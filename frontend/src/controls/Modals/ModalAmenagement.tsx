@@ -159,12 +159,13 @@ export function ModalAmenagement(props: {
       title={props.amenagementId ? "Éditer un aménagement" : "Ajouter un aménagement"}
       width={700}
       footer={
-        <Flex justify="space-between">
+        <Flex justify="space-between" className="w-100">
           <Popconfirm
             okText="Oui, supprimer"
             okButtonProps={{ danger: true }}
             title="Supprimer cet aménagement ?"
             onConfirm={() => {
+              props.setOpen(false);
               mutateDeleteAmenagement.mutate({
                 "@id": props.amenagementId as string,
               });
