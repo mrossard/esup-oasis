@@ -87,6 +87,8 @@ disponibles dans le fichier
 * **LDAP_CHAMP_ETU_ID** : Champ contenant le numéro étudiant
 * **MAILER_DSN** : DSN du serveur smtp (`smtp://user:password@server:port`)
 * **GOTENBERG_DSN** : URL de l'instance Gotenberg
+* **SI_SCOL** : implémentation à utiliser pour l'accès au SI de scol (cf la section sur
+  les [connecteurs](connecteurs.md#personnalisation))
 * **APOGEE_USER** : utilisateur avec droits de lecture dans la base Apogée
 * **APOGEE_PWD** : mot de passe de l'utilisateur Apogée
 * **APOGEE_DB** : url de la base Apogée (`//serveur:port/SID`)
@@ -107,6 +109,34 @@ Les valeurs renseignées dans le fichier .env peuvent être surchargées par des
 système (https://symfony.com/doc/current/configuration.html#overriding-environment-variables-defined-by-the-system), ou
 encore via un fichier
 .env.local (https://symfony.com/doc/current/configuration.html#overriding-environment-values-via-env-local).
+
+### Configuration applicative "statique"
+
+En plus des variables d'environnement statiques, une partie de la configuration applicative est gérée via le
+fichier .env. Ce sont des chaines de caractères "statiques" utilisées principalement dans les courriels envoyés
+par le backend :
+
+* **APP_TITRE** : le nom affiché de l'application
+* **APP_ETABLISSEMENT** : le nom de l'établissement
+* **APP_ETABLISSEMENT_ARTICLE** : article (`le`, `la` ou `l'`) à utiliser devant le nom de l'établissement
+* **APP_ETABLISSEMENT_ABV** : nom court de l'établissement
+* **APP_ETABLISSEMENT_ABV_ARTICLE** : article (`le`, `la` ou `l'`) à utiliser devant le nom court de l'établissement
+* **APP_ETABLISSEMENT_URL** : url du site institutionnel de l'établissement
+* **APP_SERVICE** : nom court du service d'accompagnement des étudiants (ex : "TANDEM")
+* **APP_SERVICE_DENOMINATION** nom du service d'accompagnement des étudiants (ex: "service TANDEM")
+* **APP_SERVICE_DENOMINATION_LONGUE** : nom long du service d'accompagnement des étudiants (ex:"Service Tandem
+  d'Accompagnement des Étudiants (TANDEM)")
+* **APP_SERVICE_ARTICLE** : article (`le`, `la` ou `l'`) à utiliser devant le nom du service
+* **APP_EMAIL_SERVICE** : courriel du service d'accompagnement des étudiants
+* **APP_URL_SERVICE** : url du site web du service d'accompagnement des étudiants
+* **APP_SERVICE_SPORTIFS_DENOMINATION** : nom du service qui gère les demandes des sportifs
+* **APP_SERVICE_SPORTIFS_ARTICLE** : article (`le`, `la` ou `l'`) à utiliser devant le nom du service qui gère les
+  demandes des sportifs
+* **APP_SERVICE_SPORTIFS_EMAIL** : courriel du service qui gère les demandes des sportifs
+* **APP_LOGO** : chemin relatif de l'image contenant le logo de l'application sur le serveur backend (par rapport au
+  dossier "public" - ex: "/images/logo.svg")
+* **APP_LOGO_FOOTER_MAILS** : chemin relatif de l'image contenant le logo à ajouter au footer des courriels sur le
+  serveur backend (par rapport au dossier "public" - ex: "/images/logo_footer.svg")
 
 ### Exécution
 
