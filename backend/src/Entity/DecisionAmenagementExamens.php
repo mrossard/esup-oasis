@@ -13,10 +13,12 @@
 namespace App\Entity;
 
 use App\Repository\DecisionAmenagementExamensRepository;
+use App\State\EntityToResourceTransformer;
 use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\ObjectMapper\Attribute\Map;
 
 #[ORM\Entity(repositoryClass: DecisionAmenagementExamensRepository::class)]
 #[ORM\Index(name: 'IDX_DECISION_BENEFICIAIRE_DEBUT', columns: ['beneficiaire_id', 'debut'])]
@@ -25,6 +27,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'IDX_DECISION_BENEFICIAIRE_ETAT', columns: ['beneficiaire_id', 'etat'])]
 #[ORM\Index(name: 'IDX_DECISION_AMENAGEMENT_EXAMENS_DEBUT', columns: ['debut'])]
 #[ORM\Index(name: 'IDX_DECISION_AMENAGEMENT_EXAMENS_DEBUT_FIN', columns: ['debut', 'fin'])]
+#[Map(target: \App\ApiResource\DecisionAmenagementExamens::class, transform: [
+    EntityToResourceTransformer::class,
+    'entityToResource',
+])]
 class DecisionAmenagementExamens
 {
     public const string ETAT_ATTENTE_VALIDATION_CAS = 'ATTENTE_VALIDATION_CAS';
@@ -36,25 +42,32 @@ class DecisionAmenagementExamens
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]
     #[ORM\Column]
+    #[Map(if: false)]
     private ?int $id = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Map(if: false)]
     private ?DateTimeInterface $debut = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Map(if: false)]
     private ?DateTimeInterface $fin = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[Map(if: false)]
     private ?DateTimeInterface $dateModification = null;
 
     #[ORM\ManyToOne(inversedBy: 'decisionsAmenagementExamens')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Map(if: false)]
     private ?Utilisateur $beneficiaire = null;
 
     #[ORM\Column(length: 255)]
+    #[Map(if: false)]
     private ?string $etat = null;
 
     #[ORM\OneToOne(inversedBy: 'decisionAmenagementExamens', cascade: ['persist', 'remove'])]
+    #[Map(if: false)]
     private ?Fichier $fichier = null;
 
     public function getId(): ?int
