@@ -103,6 +103,9 @@ class DecisionAmenagementManager
         //ici on veut aussi rafraichir le cache de l'utilisateur et de la decision elle-même
         $utilisateurResource = new \App\ApiResource\Utilisateur($beneficiaire);
         $this->messageBus->dispatch(new RessourceModifieeMessage($utilisateurResource));
+        //si l'état n'a pas changé, le contenu du document a changé quand même !
+        $decisionResource = new \App\ApiResource\DecisionAmenagementExamens($decision);
+        $this->messageBus->dispatch(new RessourceModifieeMessage($decisionResource));
     }
 
     public function getDecisionCourante(Utilisateur $utilisateur): ?DecisionAmenagementExamens
