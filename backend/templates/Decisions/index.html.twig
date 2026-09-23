@@ -90,7 +90,7 @@
 <div class="content">
     <header>
         <div class="expediteur">
-            <img src="{{ APP_LOGO }}" style="height: 125px" alt="logo"/>
+            <img src="{{ backUrl }}{{ data.APP_LOGO }}" style="height: 125px" alt="logo"/>
             {% set premierAmenagement = data.amenagements|first %}
             {% set premierBeneficiaire = premierAmenagement.beneficiaires|first %}
             <div class="gestionnaire">
