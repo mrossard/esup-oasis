@@ -31,7 +31,7 @@ readonly class ParametreService
             );
         }
 
-        return $param->isFichier()
+        return $param?->isFichier()
             ? $param?->getValeurCourante()?->getFichier()
             : $param?->getValeurCourante()?->getValeur();
     }
