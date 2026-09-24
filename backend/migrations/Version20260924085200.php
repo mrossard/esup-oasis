@@ -12,7 +12,7 @@ final class Version20260924085200 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Ajout paramètre LIEU_COURRIER';
+        return 'Ajout paramètre ADRESSE_POSTALE';
     }
 
     public function up(Schema $schema): void
