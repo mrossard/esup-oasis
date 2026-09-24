@@ -45,6 +45,7 @@ class Parametre
     public const string RESPONSABLE_PHASE_NOM = 'RESPONSABLE_PHASE_NOM';
     public const string RESPONSABLE_PHASE_QUALITE = 'RESPONSABLE_PHASE_QUALITE';
     public const string LIEU_COURRIER = 'LIEU_COURRIER';
+    public const string ADRESSE_POSTALE = 'ADRESSE_POSTALE';
 
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'SEQUENCE')]

@@ -51,6 +51,7 @@ readonly class DecisionAmenagementEditionNormalizer implements NormalizerInterfa
 
         $data['annee'] = $this->anneeDuJour($this->now());
         $data['lieu'] = $this->parametreService->valeur(Parametre::LIEU_COURRIER);
+        $data['adresse_postale'] = $this->parametreService->valeur(Parametre::ADRESSE_POSTALE);
         $data['president']['qualite'] = $this->parametreService->valeur(Parametre::PRESIDENT_QUALITE);
         $data['president']['nom'] = $this->parametreService->valeur(Parametre::PRESIDENT_NOM);
         $data['responsable_phase']['qualite'] = $this->parametreService->valeur(Parametre::RESPONSABLE_PHASE_QUALITE);
