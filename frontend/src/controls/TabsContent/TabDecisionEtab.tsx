@@ -96,18 +96,20 @@ export function TabDecisionEtab(props: { utilisateurId: string }) {
         )}
       </div>
 
-      <div className="mt-5">
-        <Typography.Title level={3} className="mt-0 mb-0">
-          Aménagements expirés
-        </Typography.Title>
-        <div className="text-legende">
-          Ces aménagements ne sont pas inclus dans {decisionEtab.defini}.
-        </div>
+      {amenagementsDecisionExpires.length > 0 && (
+        <div className="mt-5">
+          <Typography.Title level={3} className="mt-0 mb-0">
+            Aménagements expirés
+          </Typography.Title>
+          <div className="text-legende">
+            Ces aménagements ne sont pas inclus dans {decisionEtab.defini}.
+          </div>
 
-        <Row gutter={[16, 16]} className="mt-3">
-          <ListeAmenagementsDecision amenagementsDecision={amenagementsDecisionExpires} />
-        </Row>
-      </div>
+          <Row gutter={[16, 16]} className="mt-3">
+            <ListeAmenagementsDecision amenagementsDecision={amenagementsDecisionExpires} />
+          </Row>
+        </div>
+      )}
     </>
   );
 }
