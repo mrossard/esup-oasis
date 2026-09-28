@@ -2609,42 +2609,18 @@ export interface components {
             tauxHoraire?: components["schemas"]["TauxHoraire.jsonld-ActiviteBeneficiaire.out"] | null;
         };
         "ActiviteBilanFinancier.customcsv": {
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            periode?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            typeEvenement?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            tauxHoraire?: string | null;
+            periode?: components["schemas"]["PeriodeRH.customcsv"];
+            typeEvenement?: components["schemas"]["TypeEvenement.customcsv"];
+            tauxHoraire?: components["schemas"]["TauxHoraire.customcsv"] | null;
             nbHeures?: string;
             coeffCharges?: string;
             readonly montantBrut?: string;
             readonly montantBrutCharge?: string;
         };
         "ActiviteBilanFinancier.jsonld": {
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            periode?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            typeEvenement?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            tauxHoraire?: string | null;
+            periode?: components["schemas"]["PeriodeRH.jsonld"];
+            typeEvenement?: components["schemas"]["TypeEvenement.jsonld"];
+            tauxHoraire?: components["schemas"]["TauxHoraire.jsonld"] | null;
             nbHeures?: string;
             coeffCharges?: string;
             readonly montantBrut?: string;
@@ -3288,6 +3264,10 @@ export interface components {
         "DecisionAmenagementExamens.html-utilisateur.out": {
             etat?: string;
         };
+        "DecisionAmenagementExamens.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
+            etat?: string;
+            readonly urlContenu?: string | null;
+        };
         "DecisionAmenagementExamens.jsonld-decision.out": components["schemas"]["HydraItemBaseSchema"] & {
             etat?: string;
             urlContenu?: string | null;
@@ -3836,13 +3816,13 @@ export interface components {
                 "@id"?: string;
                 "@type"?: string;
                 /** Format: iri-reference */
-                "hydra:first"?: string;
+                "hydra:first"?: string | null;
                 /** Format: iri-reference */
-                "hydra:last"?: string;
+                "hydra:last"?: string | null;
                 /** Format: iri-reference */
-                "hydra:previous"?: string;
+                "hydra:previous"?: string | null;
                 /** Format: iri-reference */
-                "hydra:next"?: string;
+                "hydra:next"?: string | null;
             };
         };
         HydraCollectionBaseSchemaNoPagination: {
@@ -3894,6 +3874,18 @@ export interface components {
             /** Format: date-time */
             fin?: string;
         };
+        "Inscription.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
+            id?: number;
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            formation?: string;
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string;
+        };
         "Inscription.jsonld-amenagement.out": components["schemas"]["HydraItemBaseSchema"] & {
             formation?: components["schemas"]["Formation.jsonld-amenagement.out"];
         };
@@ -3920,20 +3912,12 @@ export interface components {
         };
         "IntervenantBilanFinancier.customcsv": {
             uid?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            intervenant?: string;
+            intervenant?: components["schemas"]["Utilisateur.customcsv"];
             activitesParPeriode?: components["schemas"]["ActiviteBilanFinancier.customcsv"][];
         };
         "IntervenantBilanFinancier.jsonld": {
             uid?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            intervenant?: string;
+            intervenant?: components["schemas"]["Utilisateur.jsonld"];
             activitesParPeriode?: components["schemas"]["ActiviteBilanFinancier.jsonld"][];
         };
         "InterventionForfait-forfait.in": {
@@ -4043,58 +4027,26 @@ export interface components {
             utilisateurModification?: string | null;
         };
         "LigneServiceFait.customcsv-services_faits.out": {
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            intervenant?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            type?: string;
+            intervenant?: components["schemas"]["Utilisateur.customcsv-services_faits.out"];
+            type?: components["schemas"]["TypeEvenement.customcsv-services_faits.out"];
             nbHeures?: string;
             tauxHoraire?: components["schemas"]["TauxHoraire.customcsv-services_faits.out"] | null;
         };
         "LigneServiceFait.html-services_faits.out": {
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            intervenant?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            type?: string;
+            intervenant?: components["schemas"]["Utilisateur.html-services_faits.out"];
+            type?: components["schemas"]["TypeEvenement.html-services_faits.out"];
             nbHeures?: string;
             tauxHoraire?: components["schemas"]["TauxHoraire.html-services_faits.out"] | null;
         };
         "LigneServiceFait.jsonld-services_faits.out": {
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            intervenant?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            type?: string;
+            intervenant?: components["schemas"]["Utilisateur.jsonld-services_faits.out"];
+            type?: components["schemas"]["TypeEvenement.jsonld-services_faits.out"];
             nbHeures?: string;
             tauxHoraire?: components["schemas"]["TauxHoraire.jsonld-services_faits.out"] | null;
         };
         "LigneServiceFait.pdf-services_faits.out": {
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            intervenant?: string;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            type?: string;
+            intervenant?: components["schemas"]["Utilisateur.pdf-services_faits.out"];
+            type?: components["schemas"]["TypeEvenement.pdf-services_faits.out"];
             nbHeures?: string;
             tauxHoraire?: components["schemas"]["TauxHoraire.pdf-services_faits.out"] | null;
         };
@@ -4267,6 +4219,23 @@ export interface components {
             butoir?: string;
             envoyee?: boolean;
         };
+        "PeriodeRH.customcsv": {
+            id?: number | null;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            /** Format: date-time */
+            butoir: string;
+            envoyee?: boolean;
+            /** Format: date-time */
+            dateEnvoi?: string | null;
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            utilisateurEnvoi?: string | null;
+        };
         "PeriodeRH.customcsv-services_faits.out": {
             id?: number | null;
             /** Format: date-time */
@@ -4311,6 +4280,23 @@ export interface components {
              * @example https://example.com/
              */
             utilisateurEnvoi?: string | null;
+        };
+        "PeriodeRH.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
+            readonly id?: number | null;
+            /** Format: date-time */
+            debut: string;
+            /** Format: date-time */
+            fin: string;
+            /** Format: date-time */
+            butoir: string;
+            envoyee?: boolean;
+            /** Format: date-time */
+            readonly dateEnvoi?: string | null;
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            readonly utilisateurEnvoi?: string | null;
         };
         "PeriodeRH.jsonld-periode.out": components["schemas"]["HydraItemBaseSchema"] & {
             id?: number | null;
@@ -4736,6 +4722,20 @@ export interface components {
             /** Format: date-time */
             fin?: string | null;
         };
+        "TauxHoraire.customcsv": {
+            id?: number | null;
+            typeId?: number;
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            typeEvenement?: string;
+            montant: string;
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string | null;
+        };
         "TauxHoraire.customcsv-services_faits.out": {
             id?: number | null;
             montant: string;
@@ -4754,6 +4754,14 @@ export interface components {
         };
         "TauxHoraire.html-taux.out": {
             id?: number | null;
+            montant: string;
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string | null;
+        };
+        "TauxHoraire.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
+            readonly id?: number | null;
             montant: string;
             /** Format: date-time */
             debut?: string;
@@ -4816,6 +4824,7 @@ export interface components {
             pedagogique?: boolean;
             examens?: boolean;
             aideHumaine?: boolean;
+            decision?: boolean | null;
         };
         "TypeAmenagement-type_amenagement.in.jsonMergePatch": {
             libelle?: string;
@@ -4829,6 +4838,7 @@ export interface components {
             pedagogique?: boolean;
             examens?: boolean;
             aideHumaine?: boolean;
+            decision?: boolean | null;
         };
         "TypeAmenagement.html-amenagements_utilisateurs.out": {
             id?: number | null;
@@ -4851,6 +4861,7 @@ export interface components {
             pedagogique?: boolean;
             examens?: boolean;
             aideHumaine?: boolean;
+            decision?: boolean | null;
         };
         "TypeAmenagement.jsonld-amenagements_utilisateurs.out": components["schemas"]["HydraItemBaseSchema"] & {
             id?: number | null;
@@ -4873,6 +4884,7 @@ export interface components {
             pedagogique?: boolean;
             examens?: boolean;
             aideHumaine?: boolean;
+            decision?: boolean | null;
         };
         "TypeDemande-type_demande.in": {
             libelle: string;
@@ -4992,6 +5004,24 @@ export interface components {
             tauxHoraires?: string[];
             forfait?: boolean;
         };
+        "TypeEvenement.customcsv": {
+            id?: number | null;
+            libelle: string;
+            actif?: boolean;
+            couleur?: string | null;
+            visibleParDefaut?: boolean;
+            /** @default false */
+            avecValidation: boolean;
+            tauxHoraires?: string[];
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            tauxActif?: string | null;
+            forfait?: boolean;
+        };
+        "TypeEvenement.customcsv-services_faits.out": Record<string, never>;
+        "TypeEvenement.html-services_faits.out": Record<string, never>;
         "TypeEvenement.html-typesEvenements.out": {
             id?: number | null;
             libelle: string;
@@ -5008,6 +5038,23 @@ export interface components {
             tauxActif?: string | null;
             forfait?: boolean;
         };
+        "TypeEvenement.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
+            readonly id?: number | null;
+            libelle: string;
+            actif?: boolean;
+            couleur?: string | null;
+            visibleParDefaut?: boolean;
+            /** @default false */
+            avecValidation: boolean;
+            tauxHoraires?: string[];
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            readonly tauxActif?: string | null;
+            forfait?: boolean;
+        };
+        "TypeEvenement.jsonld-services_faits.out": components["schemas"]["HydraItemBaseSchema"] & Record<string, never>;
         "TypeEvenement.jsonld-typesEvenements.out": components["schemas"]["HydraItemBaseSchema"] & {
             id?: number | null;
             libelle: string;
@@ -5024,6 +5071,7 @@ export interface components {
             tauxActif?: string | null;
             forfait?: boolean;
         };
+        "TypeEvenement.pdf-services_faits.out": Record<string, never>;
         "TypeSuiviAmenagement-type_suivi_amenagement.in": {
             libelle: string;
             actif?: boolean;
@@ -5081,6 +5129,49 @@ export interface components {
             abonneRecapHebdo?: boolean;
             numeroAnonyme?: number | null;
         };
+        "Utilisateur.customcsv": {
+            uid?: string;
+            roleId?: string | null;
+            email?: string;
+            nom?: string;
+            prenom?: string;
+            /** Format: date-time */
+            dateNaissance?: string | null;
+            genre?: string | null;
+            numeroEtudiant?: number | null;
+            /** Format: email */
+            emailPerso?: string | null;
+            telPerso?: string | null;
+            contactUrgence?: string | null;
+            roles?: ("ROLE_ADMIN" | "ROLE_GESTIONNAIRE" | "ROLE_RENFORT" | "ROLE_USER" | "ROLE_BENEFICIAIRE" | "ROLE_DEMANDEUR" | "ROLE_INTERVENANT" | "ROLE_PLANIFICATEUR" | "ROLE_ADMIN_TECHNIQUE" | "ROLE_MEMBRE_COMMISSION" | "ROLE_REFERENT_COMPOSANTE" | "ROLE_VALIDER_CONFORMITE_DEMANDE" | "ROLE_ATTRIBUER_PROFIL")[];
+            services?: string[];
+            campus?: string[];
+            competences?: string[];
+            typesEvenements?: string[];
+            profils?: string[];
+            etatAvisEse?: string;
+            amenagements?: string[];
+            tags?: string[];
+            gestionnairesActifs?: string[];
+            /** Format: date-time */
+            intervenantDebut?: string | null;
+            /** Format: date-time */
+            intervenantFin?: string | null;
+            inscriptions?: string[];
+            boursier?: boolean | null;
+            statutEtudiant?: string | null;
+            abonneImmediat?: boolean;
+            abonneVeille?: boolean;
+            abonneAvantVeille?: boolean;
+            abonneRecapHebdo?: boolean;
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            decisionAmenagementAnneeEnCours?: string | null;
+            numeroAnonyme?: number | null;
+        };
+        "Utilisateur.customcsv-services_faits.out": Record<string, never>;
         "Utilisateur.html-ActiviteBeneficiaire.out": {
             email?: string;
             nom?: string;
@@ -5119,6 +5210,7 @@ export interface components {
             prenom?: string;
             inscriptions?: components["schemas"]["Inscription.html-demande.out"][];
         };
+        "Utilisateur.html-services_faits.out": Record<string, never>;
         "Utilisateur.html-utilisateur.out": {
             uid?: string;
             email?: string;
@@ -5153,6 +5245,42 @@ export interface components {
             abonneAvantVeille?: boolean;
             abonneRecapHebdo?: boolean;
             decisionAmenagementAnneeEnCours?: components["schemas"]["DecisionAmenagementExamens.html-utilisateur.out"] | null;
+            numeroAnonyme?: number | null;
+        };
+        "Utilisateur.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
+            readonly uid?: string;
+            readonly email?: string;
+            readonly nom?: string;
+            readonly prenom?: string;
+            /** Format: date-time */
+            readonly dateNaissance?: string | null;
+            readonly genre?: string | null;
+            readonly numeroEtudiant?: number | null;
+            /** Format: email */
+            emailPerso?: string | null;
+            telPerso?: string | null;
+            contactUrgence?: string | null;
+            roles?: ("ROLE_ADMIN" | "ROLE_GESTIONNAIRE" | "ROLE_RENFORT" | "ROLE_USER" | "ROLE_BENEFICIAIRE" | "ROLE_DEMANDEUR" | "ROLE_INTERVENANT" | "ROLE_PLANIFICATEUR" | "ROLE_ADMIN_TECHNIQUE" | "ROLE_MEMBRE_COMMISSION" | "ROLE_REFERENT_COMPOSANTE" | "ROLE_VALIDER_CONFORMITE_DEMANDE" | "ROLE_ATTRIBUER_PROFIL")[];
+            services?: string[];
+            campus?: string[];
+            competences?: string[];
+            typesEvenements?: string[];
+            profils?: string[];
+            readonly etatAvisEse?: string;
+            readonly tags?: string[];
+            readonly gestionnairesActifs?: string[];
+            /** Format: date-time */
+            intervenantDebut?: string | null;
+            /** Format: date-time */
+            intervenantFin?: string | null;
+            readonly inscriptions?: components["schemas"]["Inscription.jsonld"][];
+            readonly boursier?: boolean | null;
+            readonly statutEtudiant?: string | null;
+            abonneImmediat?: boolean;
+            abonneVeille?: boolean;
+            abonneAvantVeille?: boolean;
+            abonneRecapHebdo?: boolean;
+            readonly decisionAmenagementAnneeEnCours?: components["schemas"]["DecisionAmenagementExamens.jsonld"] | null;
             numeroAnonyme?: number | null;
         };
         "Utilisateur.jsonld-ActiviteBeneficiaire.out": components["schemas"]["HydraItemBaseSchema"] & {
@@ -5193,6 +5321,7 @@ export interface components {
             prenom?: string;
             inscriptions?: components["schemas"]["Inscription.jsonld-demande.out"][];
         };
+        "Utilisateur.jsonld-services_faits.out": components["schemas"]["HydraItemBaseSchema"] & Record<string, never>;
         "Utilisateur.jsonld-utilisateur.out": components["schemas"]["HydraItemBaseSchema"] & {
             uid?: string;
             email?: string;
@@ -5229,6 +5358,7 @@ export interface components {
             decisionAmenagementAnneeEnCours?: components["schemas"]["DecisionAmenagementExamens.jsonld-utilisateur.out"] | null;
             numeroAnonyme?: number | null;
         };
+        "Utilisateur.pdf-services_faits.out": Record<string, never>;
         "ValeurParametre-valeur_param.in": {
             valeur?: string | null;
             /**

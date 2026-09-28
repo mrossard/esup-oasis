@@ -5,6 +5,7 @@
  * For full copyright and license information please view the LICENSE file distributed with the source code.
  *
  * @author Julien Lemonnier <julien.lemonnier@u-bordeaux.fr>
+ * @author Fabien Léon <fabien.leon@univ-brest.fr>
  */
 
 import { useApi } from "@context/api/ApiProvider";
@@ -21,15 +22,16 @@ import {
 } from "@ant-design/icons";
 import { TabIdentite } from "@controls/TabsContent/TabIdentite";
 import { TabDemandes } from "@controls/TabsContent/TabDemandes";
-import { DOMAINES_AMENAGEMENTS_INFOS } from "@lib";
+import { decisionEtab, DOMAINES_AMENAGEMENTS_INFOS } from "@lib";
 import { TabAmenagements } from "@controls/TabsContent/TabAmenagements";
+import { TabDecisionEtab } from "@controls/TabsContent/TabDecisionEtab";
 import { useAuth } from "@/auth/AuthProvider";
 import { UtilisateurTags } from "@controls/Tags/UtilisateurTags";
 import { useSearchParams } from "react-router-dom";
 import { TabAvisEse } from "@controls/TabsContent/TabAvisEse";
 import { BeneficiaireAvisEseAvatar } from "@controls/Avatars/BeneficiaireAvisEseAvatar";
 import { TabEntretiens } from "@controls/TabsContent/TabEntretiens";
-import AmenagementDomaineBadge from "@controls/Badge/AmenagementDomaineBadge";
+import AmenagementBadge from "@controls/Badge/AmenagementBadge";
 import EntretiensBadge from "@controls/Badge/EntretiensBadge";
 import DemandesBadge from "@controls/Badge/DemandesBadge";
 import { TabDocuments } from "@controls/TabsContent/TabDocuments";
@@ -98,7 +100,7 @@ export default function DossierBeneficiaire(props: { beneficiaireId: string }): 
                 label: (
                   <Space>
                     {domaineAmenagement.libelleLongPluriel}
-                    <AmenagementDomaineBadge
+                    <AmenagementBadge
                       utilisateurId={props.beneficiaireId}
                       domaineAmenagement={domaineAmenagement}
                     />
@@ -113,6 +115,17 @@ export default function DossierBeneficiaire(props: { beneficiaireId: string }): 
                 icon: <AppstoreAddOutlined />,
               };
             }),
+          {
+            key: "decision",
+            label: (
+              <Space>
+                {decisionEtab.Denomination}
+                <AmenagementBadge utilisateurId={props.beneficiaireId} decision />
+              </Space>
+            ),
+            children: <TabDecisionEtab utilisateurId={props.beneficiaireId} />,
+            icon: <FileDoneOutlined />,
+          },
           {
             key: "ese",
             label: (

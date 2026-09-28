@@ -141,6 +141,17 @@ class TypeAmenagement
         }
     }
 
+    #[Groups([self::GROUP_IN, self::GROUP_OUT])]
+    public bool $decision {
+        get {
+            $prop = new ReflectionProperty(self::class, 'decision');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
+                $this->decision = $this->entity->isDecision();
+            }
+            return $this->decision ?? false;
+        }
+    }
+
     public function __construct(
         private readonly ?\App\Entity\TypeAmenagement $entity = null,
     ) {}

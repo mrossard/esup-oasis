@@ -47,7 +47,7 @@ readonly class DecisionAmenagementEditionNormalizer implements NormalizerInterfa
         $entity = $this->decisionAmenagementManager->parUidEtAnnee($object->uid, $object->annee);
         $data['amenagements'] = array_filter($entity
             ->getBeneficiaire()
-            ->getAmenagementsActifs(), fn($amenagement) => $amenagement->getType()->isExamens());
+            ->getAmenagementsActifs(), fn($amenagement) => $amenagement->getType()->isDecision());
 
         $data['annee'] = $this->anneeDuJour($this->now());
         $data['lieu'] = $this->parametreService->valeur(Parametre::LIEU_COURRIER);
