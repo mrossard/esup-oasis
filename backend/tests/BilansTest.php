@@ -78,7 +78,7 @@ class BilansTest extends ApiTestCaseCustom
         $data = $client->getResponse()->toArray();
         $this->assertNotEmpty($data['hydra:member']);
         foreach ($data['hydra:member'] as $item) {
-            $campusId = is_string($item['campus']) ? $item['campus'] : ($item['campus']['@id'] ?? null);
+            $campusId = is_string($item['campus'] ?? null) ? $item['campus'] : $item['campus']['@id'] ?? null;
             if (null !== $campusId) {
                 $this->assertEquals('/campus/1', $campusId);
             }
@@ -94,7 +94,7 @@ class BilansTest extends ApiTestCaseCustom
         $data = $client->getResponse()->toArray();
         $this->assertNotEmpty($data['hydra:member']);
         foreach ($data['hydra:member'] as $item) {
-            $typeId = is_string($item['type']) ? $item['type'] : ($item['type']['@id'] ?? null);
+            $typeId = is_string($item['type']) ? $item['type'] : $item['type']['@id'] ?? null;
             $this->assertEquals('/types_evenements/1', $typeId);
         }
     }
