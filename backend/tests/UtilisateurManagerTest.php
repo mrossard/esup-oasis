@@ -65,4 +65,27 @@ class UtilisateurManagerTest extends ApiTestCaseCustom
         $this->assertEquals($demandeur, $beneficiaire->getUtilisateur());
         $this->assertEquals(6, $beneficiaire->getProfil()->getId()); // profil6 for artistes
     }
+
+    public function testRecalculRoles(): void
+    {
+        $container = static::getContainer();
+        $em = $container->get('doctrine')->getManager();
+        /** @var Utilisateur $user */
+        $user = $em->getRepository(Utilisateur::class)->findOneBy(['uid' => 'enseignant']);
+        $this->assertNotContains(Utilisateur::ROLE_REFERENT_COMPOSANTE, $user->getRoles());
+
+        $composante = $em->getRepository(\App\Entity\Composante::class)->find(1);
+        $composante->addReferent($user);
+
+        /** @var UtilisateurManager $manager */
+        $manager = $container->get(UtilisateurManager::class);
+        $manager->recalculRoles($user);
+
+        $this->assertContains(Utilisateur::ROLE_REFERENT_COMPOSANTE, $user->getRoles());
+
+        $composante->removeReferent($user);
+        $manager->recalculRoles($user);
+
+        $this->assertNotContains(Utilisateur::ROLE_REFERENT_COMPOSANTE, $user->getRoles());
+    }
 }

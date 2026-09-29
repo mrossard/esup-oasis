@@ -63,6 +63,7 @@ readonly class PatchComposanteProcessor implements ProcessorInterface
 
         array_walk($referentsSupprimes, function (Utilisateur $referent) use ($entity) {
             $entity->removeReferent($referent);
+            $this->utilisateurManager->recalculRoles($referent);
             $utilisateurResource = new \App\ApiResource\Utilisateur($referent);
             $this->messageBus->dispatch(new RessourceModifieeMessage($utilisateurResource));
         });
@@ -70,6 +71,7 @@ readonly class PatchComposanteProcessor implements ProcessorInterface
         array_walk($referentsAjoutes, function (\App\ApiResource\Utilisateur $ref) use ($entity) {
             $referent = $this->utilisateurManager->parUid($ref->uid, true);
             $entity->addReferent($referent);
+            $this->utilisateurManager->recalculRoles($referent);
             $utilisateurResource = new \App\ApiResource\Utilisateur($referent);
             $this->messageBus->dispatch(new RessourceModifieeMessage($utilisateurResource));
         });

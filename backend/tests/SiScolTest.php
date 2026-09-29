@@ -38,7 +38,7 @@ class SiScolTest extends ApiTestCaseCustom
         $client->request('PATCH', '/composantes/1', [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
-                'referents' => ['/utilisateurs/admin'],
+                'referents' => ['/utilisateurs/enseignant'],
             ],
         ]);
 
@@ -48,6 +48,25 @@ class SiScolTest extends ApiTestCaseCustom
         ]);
         $data = $client->getResponse()->toArray();
         $referents = array_map(fn($r) => is_string($r) ? $r : $r['@id'], $data['referents']);
-        $this->assertContains('/utilisateurs/admin', $referents);
+        $this->assertContains('/utilisateurs/enseignant', $referents);
+
+        $client->request('GET', '/utilisateurs/enseignant');
+        $this->assertResponseIsSuccessful();
+        $userData = $client->getResponse()->toArray();
+        $this->assertContains('ROLE_REFERENT_COMPOSANTE', $userData['roles']);
+
+        // Retrait du référent
+        $client->request('PATCH', '/composantes/1', [
+            'headers' => ['Content-Type' => 'application/merge-patch+json'],
+            'json' => [
+                'referents' => [],
+            ],
+        ]);
+        $this->assertResponseIsSuccessful();
+
+        $client->request('GET', '/utilisateurs/enseignant');
+        $this->assertResponseIsSuccessful();
+        $userData = $client->getResponse()->toArray();
+        $this->assertNotContains('ROLE_REFERENT_COMPOSANTE', $userData['roles']);
     }
 }
