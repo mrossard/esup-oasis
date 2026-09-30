@@ -741,4 +741,10 @@ readonly class UtilisateurManager
 
         return $utilisateur;
     }
+
+    // force le recalcul des rôles pour un uitilisateur
+    public function recalculRoles(Utilisateur $utilisateur): void
+    {
+        $this->utilisateurRepository->save($utilisateur, true); //le recalcul est déclenché systématiquement par le repository
+    }
 }

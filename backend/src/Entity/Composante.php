@@ -126,6 +126,7 @@ class Composante
     {
         if (!$this->referents->contains($referent)) {
             $this->referents->add($referent);
+            $referent->addComposante($this);
         }
 
         return $this;
@@ -133,7 +134,9 @@ class Composante
 
     public function removeReferent(Utilisateur $referent): static
     {
-        $this->referents->removeElement($referent);
+        if ($this->referents->removeElement($referent)) {
+            $referent->removeComposante($this);
+        }
 
         return $this;
     }
