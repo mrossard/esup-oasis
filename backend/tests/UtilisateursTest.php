@@ -387,4 +387,92 @@ class UtilisateursTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
     }
+
+    public function testGestionnaireCanSeeInfosComplementairesForStudent(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+
+        $em = static::getContainer()->get('doctrine')->getManager();
+        $repo = $em->getRepository(Utilisateur::class);
+        $beneficiaire = $repo->findOneBy(['uid' => 'beneficiaire']);
+        $beneficiaire->setNumeroEtudiant(12345678);
+        $repo->save($beneficiaire, true);
+
+        $client->request('GET', '/utilisateurs/beneficiaire');
+
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        $this->assertArrayHasKey('infosComplementaires', $data);
+        $this->assertSame(['someKey' => 'someValue'], $data['infosComplementaires']);
+    }
+
+    public function testStudentCanSeeTheirOwnInfosComplementaires(): void
+    {
+        $client = $this->createClientWithCredentials('beneficiaire');
+
+        $em = static::getContainer()->get('doctrine')->getManager();
+        $repo = $em->getRepository(Utilisateur::class);
+        $beneficiaire = $repo->findOneBy(['uid' => 'beneficiaire']);
+        $beneficiaire->setNumeroEtudiant(12345678);
+        $repo->save($beneficiaire, true);
+
+        $client->request('GET', '/utilisateurs/beneficiaire');
+
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        $this->assertArrayHasKey('infosComplementaires', $data);
+        $this->assertSame(['someKey' => 'someValue'], $data['infosComplementaires']);
+    }
+
+    public function testOtherUserCannotSeeInfosComplementaires(): void
+    {
+        $client = $this->createClientWithCredentials('intervenant');
+
+        $em = static::getContainer()->get('doctrine')->getManager();
+        $repo = $em->getRepository(Utilisateur::class);
+        $beneficiaire = $repo->findOneBy(['uid' => 'beneficiaire']);
+        $beneficiaire->setNumeroEtudiant(12345678);
+        $repo->save($beneficiaire, true);
+
+        $client->request('GET', '/utilisateurs/beneficiaire');
+
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        $this->assertArrayNotHasKey('infosComplementaires', $data);
+    }
+
+    public function testUserWithoutNumeroEtudiantHasNoInfosComplementaires(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        $client->request('GET', '/utilisateurs/admin');
+
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        $this->assertArrayNotHasKey('infosComplementaires', $data);
+    }
+
+    public function testCollectionPreloadsInfosComplementaires(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+
+        $em = static::getContainer()->get('doctrine')->getManager();
+        $repo = $em->getRepository(Utilisateur::class);
+        $beneficiaire = $repo->findOneBy(['uid' => 'beneficiaire']);
+        $beneficiaire->setNumeroEtudiant(12345678);
+        $repo->save($beneficiaire, true);
+
+        $client->request('GET', '/beneficiaires');
+
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        $this->assertArrayHasKey('hydra:member', $data);
+        $this->assertNotEmpty($data['hydra:member']);
+
+        // Find beneficiaire in the collection
+        $beneficiaires = array_filter($data['hydra:member'], fn($u) => $u['uid'] === 'beneficiaire');
+        $this->assertNotEmpty($beneficiaires);
+        $item = array_values($beneficiaires)[0];
+        $this->assertArrayHasKey('infosComplementaires', $item);
+        $this->assertSame(['someKey' => 'someValue'], $item['infosComplementaires']);
+    }
 }

@@ -20,6 +20,7 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Contracts\Cache\CacheInterface;
 
 class ApogeeProvider extends AbstractSiScolDataProvider
 {
@@ -33,16 +34,19 @@ class ApogeeProvider extends AbstractSiScolDataProvider
         private readonly string $requeteInscriptions,
         #[Autowire('%env(file:resolve:APOGEE_REQUETE_FORMATION)%')]
         private readonly string $requeteFormation,
-    ) {}
+        CacheInterface $cache,
+    ) {
+        parent::__construct($cache);
+    }
 
     /**
      * @inheritDoc
      */
     public function getProviderId(): string
     {
-        return "apogee";
+        return 'apogee';
     }
-    
+
     /**
      * @inheritDoc
      */
@@ -160,5 +164,11 @@ class ApogeeProvider extends AbstractSiScolDataProvider
             ];
         }
         return $data;
+    }
+
+    protected function infosComplementaires(iterable $etudiants): array
+    {
+        //par défaut pas d'infos complémentaires à afficher
+        return [];
     }
 }
