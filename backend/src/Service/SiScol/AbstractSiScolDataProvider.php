@@ -15,11 +15,17 @@ namespace App\Service\SiScol;
 use App\Entity\Formation;
 use App\Entity\Utilisateur;
 use DateTimeInterface;
+use Psr\Cache\InvalidArgumentException;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\Cache\ItemInterface;
 
 #[AutoconfigureTag('oasis.siscol_provider')]
 abstract class AbstractSiScolDataProvider
 {
+    public function __construct(
+        protected readonly CacheInterface $cache,
+    ) {}
 
     /**
      * Retourne l'identifiant du provider du SiScol
@@ -27,7 +33,7 @@ abstract class AbstractSiScolDataProvider
      * @return string
      */
     abstract public function getProviderId(): string;
-    
+
     /**
      * Tableau listant les formations auxquelles est inscrit l'étudiant sur l'intervalle de temps donné
      * [[codeFormation, libFormation, codeComposante, libComposante, debut, fin], ...]
@@ -50,4 +56,89 @@ abstract class AbstractSiScolDataProvider
      * @throws BackendUnavailableException
      */
     abstract public function getFormation(Formation $incomplete): array;
+
+    /**
+     * Appelle l'implémentation sous-jacente et gère la mise en cache si disponible
+     *
+     * @return array<string, string>
+     */
+    public function getInfosComplementaires(Utilisateur $etudiant): array
+    {
+        if (null === $etudiant->getNumeroEtudiant()) {
+            return [];
+        }
+
+        return $this->getInfosComplementairesMultiple([$etudiant])[$etudiant->getNumeroEtudiant()] ?? [];
+    }
+
+    /**
+     * @param iterable<Utilisateur> $etudiants
+     * @return array<string, array<string, string>> un tableau d'infos clé/valeur indexé par le numéro étudiant
+     */
+    public function getInfosComplementairesMultiple(iterable $etudiants): array
+    {
+        if (!$this->cache) {
+            return $this->infosComplementaires($etudiants);
+        }
+
+        $manquants = [];
+        $existants = [];
+        foreach ($etudiants as $etudiant) {
+            if (null === $etudiant->getNumeroEtudiant()) {
+                continue;
+            }
+            $infos = $this->getCachedInfosOrNull($etudiant);
+            if (null === $infos) {
+                $manquants[] = $etudiant;
+                continue;
+            }
+            $existants[$etudiant->getNumeroEtudiant()] = $infos;
+        }
+
+        if (empty($manquants)) {
+            return $existants;
+        }
+
+        //on ajoute les manquants dans le cache individuellement
+        $infosManquants = $this->infosComplementaires($manquants);
+
+        foreach ($manquants as $manquant) {
+            $cacheKey = $this->getCacheKey($manquant);
+            $existants[$manquant->getNumeroEtudiant()] = $this->cache->get($cacheKey, function (ItemInterface $item) use (
+                $manquant,
+                $infosManquants,
+            ) {
+                $item->expiresAfter(3600);
+                return $infosManquants[$manquant->getNumeroEtudiant()] ?? [];
+            });
+        }
+
+        return $existants;
+    }
+
+    private function getCachedInfosOrNull(Utilisateur $etudiant): ?array
+    {
+        $cacheMiss = '__cache_miss__';
+
+        $value = $this->cache->get($this->getCacheKey($etudiant), function (ItemInterface $item, bool &$save) use (
+            $cacheMiss,
+        ): string {
+            $save = false;
+            $item->expiresAfter(0);
+
+            return $cacheMiss;
+        });
+
+        return $value === $cacheMiss ? null : $value;
+    }
+
+    private function getCacheKey(Utilisateur $etudiant): string
+    {
+        return 'infos_complementaires_' . $etudiant->getUid();
+    }
+
+    /**
+     * @return array<string, array<string, string>> un tableau d'infos clé/valeur indexé par le numéro étudiant
+     */
+    abstract protected function infosComplementaires(iterable $etudiants): array;
 }

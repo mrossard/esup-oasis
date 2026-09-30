@@ -661,6 +661,10 @@ final class Utilisateur
         }
     }
 
+    #[Groups(self::GROUP_OUT)]
+    #[ApiProperty(security: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)")]
+    public array $infosComplementaires;
+
     public function nomAffichage(): string
     {
         return ucfirst($this->prenom) . ' ' . ucfirst($this->nom);
