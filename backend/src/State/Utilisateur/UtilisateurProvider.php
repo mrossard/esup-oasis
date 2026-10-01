@@ -19,6 +19,7 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\DecisionAmenagementExamens;
+use App\ApiResource\InfoComplementaire;
 use App\ApiResource\Utilisateur;
 use App\Service\ErreurLdapException;
 use App\State\DecisionAmenagementExamens\DecisionAmenagementManager;
@@ -122,7 +123,9 @@ class UtilisateurProvider implements ProviderInterface
         };
 
         if ($entity->getNumeroEtudiant()) {
-            $utilisateur->infosComplementaires = $this->utilisateurManager->infosComplementaires($entity);
+            foreach ($this->utilisateurManager->infosComplementaires($entity) as $cle => $valeur) {
+                $utilisateur->infosComplementaires[] = new InfoComplementaire($cle, $valeur);
+            }
         }
 
         return $utilisateur;
