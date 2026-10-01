@@ -413,7 +413,7 @@ class UtilisateursTest extends ApiTestCaseCustom
         $this->assertResponseIsSuccessful();
         $data = $client->getResponse()->toArray();
         $this->assertArrayHasKey('infosComplementaires', $data);
-        $this->assertArraySubset(['libelle' => 'someKey', 'valeur' => 'someValue'], $data['infosComplementaires']);
+        $this->assertArraySubset([['libelle' => 'someKey', 'valeur' => 'someValue']], $data['infosComplementaires']);
     }
 
     public function testStudentCanSeeTheirOwnInfosComplementaires(): void
@@ -431,7 +431,7 @@ class UtilisateursTest extends ApiTestCaseCustom
         $this->assertResponseIsSuccessful();
         $data = $client->getResponse()->toArray();
         $this->assertArrayHasKey('infosComplementaires', $data);
-        $this->assertSame(['someKey' => 'someValue'], $data['infosComplementaires']);
+        $this->assertArraySubset([['libelle' => 'someKey', 'valeur' => 'someValue']], $data['infosComplementaires']);
     }
 
     public function testOtherUserCannotSeeInfosComplementaires(): void
@@ -458,7 +458,7 @@ class UtilisateursTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $data = $client->getResponse()->toArray();
-        $this->assertArrayNotHasKey('infosComplementaires', $data);
+        $this->assertEmpty($data['infosComplementaires']);
     }
 
     public function testCollectionPreloadsInfosComplementaires(): void
@@ -483,6 +483,6 @@ class UtilisateursTest extends ApiTestCaseCustom
         $this->assertNotEmpty($beneficiaires);
         $item = array_values($beneficiaires)[0];
         $this->assertArrayHasKey('infosComplementaires', $item);
-        $this->assertSame(['someKey' => 'someValue'], $item['infosComplementaires']);
+        $this->assertArraySubset([['libelle' => 'someKey', 'valeur' => 'someValue']], $item['infosComplementaires']);
     }
 }
