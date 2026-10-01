@@ -36,7 +36,7 @@ class ApogeeProvider extends AbstractSiScolDataProvider
         private readonly string $requeteFormation,
         CacheInterface $cache,
     ) {
-        parent::__construct($cache);
+        parent::__construct($cache, $this->logger);
     }
 
     /**
@@ -168,7 +168,38 @@ class ApogeeProvider extends AbstractSiScolDataProvider
 
     protected function infosComplementaires(iterable $etudiants): array
     {
+        $this->logger->debug('début récupération des infos complémentaires');
+
+        try {
+            $db = $this->connect();
+        } catch (RuntimeException) {
+            $this->logger->warning('Récupération des infos complémentaires impossible, apogée indisponible');
+            return [];
+        }
+
         //par défaut pas d'infos complémentaires à afficher
-        return [];
+        $codEtus = array_map(
+            fn(Utilisateur $etudiant) => $etudiant->getNumeroEtudiant(),
+            array_filter(
+                iterator_to_array($etudiants),
+                fn(Utilisateur $etudiant) => $etudiant->getNumeroEtudiant() !== null,
+            ),
+        );
+        $codEtus = implode(',', $codEtus);
+
+        $sql = 'select cod_etu, cod_nne_ind || cod_cle_nne_ind as ine
+                from individu i
+                where cod_etu in (' . $codEtus . ')';
+
+        $stmt = oci_parse($db, $sql);
+
+        oci_execute($stmt);
+
+        $data = [];
+        while ($row = oci_fetch_object($stmt)) {
+            $data[$row->COD_ETU] = ['ine' => $row->INE];
+        }
+
+        return $data;
     }
 }
