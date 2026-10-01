@@ -35,8 +35,11 @@ class SiScolDataProviderTest extends TestCase
                 return 'test';
             }
 
-            public function getInscriptions(Utilisateur $etudiant, DateTimeInterface $debut, ?DateTimeInterface $fin): array
-            {
+            public function getInscriptions(
+                Utilisateur $etudiant,
+                DateTimeInterface $debut,
+                ?DateTimeInterface $fin,
+            ): array {
                 return [];
             }
 
@@ -171,6 +174,9 @@ class SiScolDataProviderTest extends TestCase
 
     public function testApogeeProviderReturnsEmptyArrayByDefault(): void
     {
+        if (!function_exists('oci_connect')) {
+            $this->markTestSkipped();
+        }
         $cache = new ArrayAdapter();
         $apogeeProvider = new ApogeeProvider(
             'user',
