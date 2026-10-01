@@ -12,6 +12,7 @@
 
 namespace App\Service\SiScol;
 
+use App\ApiResource\InfoComplementaire;
 use App\Entity\Formation;
 use App\Entity\Utilisateur;
 use DateTime;
@@ -82,9 +83,7 @@ class FakeSiScolDataProvider extends AbstractSiScolDataProvider
     {
         $result = [];
         foreach ($etudiants as $etudiant) {
-            $result[$etudiant->getNumeroEtudiant()] = [
-                'someKey' => 'someValue',
-            ];
+            $result[$etudiant->getNumeroEtudiant()] = new InfoComplementaire('someKey', 'someValue');
         }
         return $result;
     }
