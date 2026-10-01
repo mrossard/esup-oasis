@@ -664,7 +664,7 @@ final class Utilisateur
     #[Groups(self::GROUP_OUT)]
     #[ApiProperty(security: "is_granted('" . self::VOIR_INFOS_PERSO . "', object)")]
     /**
-     * @var array<array<string, string>> $infosComplementaires
+     * @var InfoComplementaire[] $infosComplementaires
      */
     public array $infosComplementaires = [];
 

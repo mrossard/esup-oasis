@@ -15,7 +15,10 @@ namespace App\Service\SiScol;
 use App\Entity\Formation;
 use App\Entity\Utilisateur;
 use DateTimeInterface;
+use Monolog\Level;
 use Psr\Cache\InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+use Stringable;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
@@ -24,7 +27,8 @@ use Symfony\Contracts\Cache\ItemInterface;
 abstract class AbstractSiScolDataProvider
 {
     public function __construct(
-        protected readonly CacheInterface $cache,
+        private readonly ?CacheInterface $cache = null,
+        private readonly ?LoggerInterface $logger = null,
     ) {}
 
     /**
@@ -77,7 +81,8 @@ abstract class AbstractSiScolDataProvider
      */
     public function getInfosComplementairesMultiple(iterable $etudiants): array
     {
-        if (!$this->cache) {
+        if (null === $this->cache) {
+            $this->log(Level::Info, 'Pas de cache défini par ' . get_class($this));
             return $this->infosComplementaires($etudiants);
         }
 
@@ -135,6 +140,13 @@ abstract class AbstractSiScolDataProvider
     private function getCacheKey(Utilisateur $etudiant): string
     {
         return 'infos_complementaires_' . $etudiant->getUid();
+    }
+
+    private function log($level, string|Stringable $message, array $context = [])
+    {
+        if (null !== $this->logger) {
+            $this->logger->log($level, $message, $context);
+        }
     }
 
     /**
