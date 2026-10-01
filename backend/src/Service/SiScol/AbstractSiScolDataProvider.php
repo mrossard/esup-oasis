@@ -152,5 +152,8 @@ abstract class AbstractSiScolDataProvider
     /**
      * @return array<string, array<string, string>> un tableau d'infos clé/valeur indexé par le numéro étudiant
      */
-    abstract protected function infosComplementaires(iterable $etudiants): array;
+    protected function infosComplementaires(iterable $etudiants): array
+    {
+        return [];
+    }
 }
