@@ -9,7 +9,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useApi } from "@context/api/ApiProvider";
-import { App, Col, Form, Row, Skeleton, Space } from "antd";
+import { App, Col, Form, Row, Skeleton } from "antd";
 import { useAuth } from "@/auth/AuthProvider";
 import { QK_UTILISATEURS } from "@api";
 import { IdentiteSection } from "@controls/TabsContent/TabIdentite/IdentiteSection";
@@ -87,20 +87,17 @@ export function TabIdentite(props: {
       <Row gutter={16}>
         <Col xs={24} xl={12}>
           <ScolariteSection utilisateur={utilisateur} isFetching={isFetching} />
+          <InfosComplementairesSection utilisateur={utilisateur} isFetching={isFetching} />
         </Col>
         <Col xs={24} xl={12}>
-          <Space vertical className="w-100">
-            {user?.isGestionnaire && (
-              <SuiviSection
-                utilisateur={utilisateur}
-                isFetching={isFetching}
-                mutateUtilisateur={mutateUtilisateur.mutate}
-                form={form}
-              />
-            )}
-
-            <InfosComplementairesSection utilisateur={utilisateur} isFetching={isFetching} />
-          </Space>
+          {user?.isGestionnaire && (
+            <SuiviSection
+              utilisateur={utilisateur}
+              isFetching={isFetching}
+              mutateUtilisateur={mutateUtilisateur.mutate}
+              form={form}
+            />
+          )}
         </Col>
       </Row>
 
