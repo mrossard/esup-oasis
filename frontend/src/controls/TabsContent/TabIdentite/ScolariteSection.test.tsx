@@ -10,13 +10,13 @@
 import React from "react";
 import { screen } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
-import { IUtilisateur } from "@api";
+import { IInscription, IUtilisateur } from "@api";
 import { renderWithProviders } from "@/test";
 import { ScolariteSection } from "./ScolariteSection";
 
-vi.mock("@controls/TabsContent/TabScolarite", () => ({
-  ScolariteListItem: ({ inscription }: { inscription: { formation?: { libelle?: string } } }) => (
-    <div data-testid="inscription">{inscription.formation?.libelle}</div>
+vi.mock("@controls/Items/InscriptionsDetail", () => ({
+  InscriptionsDetail: ({ inscriptions }: { inscriptions?: IInscription[] }) => (
+    <div data-testid="inscriptions-detail">{inscriptions?.length ?? 0} inscriptions</div>
   ),
 }));
 
@@ -42,24 +42,19 @@ describe("ScolariteSection", () => {
     expect(screen.queryByRole("button", { name: /copy|copier/i })).not.toBeInTheDocument();
   });
 
-  it("trie les inscriptions par début décroissant", () => {
+  it("transmet les inscriptions au composant InscriptionsDetail", () => {
     rendre({
       inscriptions: [
         { "@id": "/i/1", debut: "2021-09-01", formation: { libelle: "Ancienne" } },
-        { "@id": "/i/3", debut: "2023-09-01", formation: { libelle: "Récente" } },
-        { "@id": "/i/2", debut: "2022-09-01", formation: { libelle: "Médiane" } },
+        { "@id": "/i/2", debut: "2023-09-01", formation: { libelle: "Récente" } },
       ],
     } as Partial<IUtilisateur>);
-    expect(screen.getAllByTestId("inscription").map((n) => n.textContent)).toEqual([
-      "Récente",
-      "Médiane",
-      "Ancienne",
-    ]);
+    expect(screen.getByTestId("inscriptions-detail")).toHaveTextContent("2 inscriptions");
   });
 
   it("ne plante pas sans inscriptions", () => {
     rendre({});
-    expect(screen.queryByTestId("inscription")).not.toBeInTheDocument();
+    expect(screen.getByTestId("inscriptions-detail")).toHaveTextContent("0 inscriptions");
   });
 
   it("affiche un skeleton pendant le chargement", () => {
