@@ -13,6 +13,8 @@ const {
   mockGetPreferenceArray,
   mockGetPreferenceJson,
   mockSetPreferenceJson,
+  mockUseGetItem,
+  mockAuthUser,
 } = vi.hoisted(() => ({
   mockUseGetCollectionPaginated: vi.fn(() => ({
     data: undefined as { items: unknown[]; totalItems: number } | undefined,
@@ -21,23 +23,25 @@ const {
   mockGetPreferenceArray: vi.fn(() => []),
   mockGetPreferenceJson: vi.fn(() => ({})),
   mockSetPreferenceJson: vi.fn(),
+  mockUseGetItem: vi.fn(() => ({ data: undefined as unknown, isLoading: false })),
+  mockAuthUser: {
+    isGestionnaire: false,
+    isAdmin: false,
+    uid: "test@test.fr",
+  },
 }));
 
 vi.mock("@context/api/ApiProvider", () => ({
   useApi: () => ({
     useGetCollectionPaginated: mockUseGetCollectionPaginated,
     useGetFullCollection: vi.fn(() => ({ data: undefined, isLoading: false, isFetching: false })),
-    useGetItem: vi.fn(() => ({ data: undefined, isLoading: false })),
+    useGetItem: mockUseGetItem,
   }),
 }));
 
 vi.mock("@/auth/AuthProvider", () => ({
   useAuth: () => ({
-    user: {
-      isGestionnaire: false,
-      isAdmin: false,
-      uid: "test@test.fr",
-    },
+    user: mockAuthUser,
     impersonate: undefined,
   }),
 }));
@@ -95,6 +99,9 @@ describe("BeneficiaireTable", () => {
     mockUseGetCollectionPaginated.mockReturnValue({ data: undefined, isFetching: false });
     mockGetPreferenceArray.mockReturnValue([]);
     mockGetPreferenceJson.mockReturnValue({});
+    mockAuthUser.isGestionnaire = false;
+    mockAuthUser.isAdmin = false;
+    mockUseGetItem.mockReturnValue({ data: undefined, isLoading: false });
   });
 
   it("rendu sans données : le tableau s'affiche sans erreur", () => {
@@ -359,5 +366,44 @@ describe("BeneficiaireTable", () => {
         ]),
       }),
     );
+  });
+
+  it("affiche les colonnes complémentaires dans la table quand elles sont sélectionnées", () => {
+    mockAuthUser.isGestionnaire = true;
+    mockUseGetItem.mockReturnValue({
+      data: {
+        valeursCourantes: [{ valeur: "Régime spécial" }],
+      },
+      isLoading: false,
+    });
+    mockUseGetCollectionPaginated.mockReturnValue({
+      data: {
+        items: [
+          {
+            "@id": "/utilisateurs/1",
+            nom: "Dupont",
+            prenom: "Jean",
+            infosComplementaires: [{ libelle: "Régime spécial", valeur: "Oui" }],
+          },
+        ],
+        totalItems: 1,
+      },
+      isFetching: false,
+    });
+
+    renderWithProviders(<BeneficiaireTable />);
+
+    // Ouvrir le menu des colonnes
+    const btnColonnes = screen.getByRole("button", { name: /colonnes/i });
+    fireEvent.click(btnColonnes);
+
+    // Cocher la colonne complémentaire
+    const checkbox = screen.getByRole("checkbox", { name: "Régime spécial" });
+    fireEvent.click(checkbox);
+
+    // Vérifier que l'en-tête de la colonne est affiché
+    expect(screen.getByRole("columnheader", { name: "Régime spécial" })).toBeInTheDocument();
+    // Vérifier que la cellule affiche la valeur
+    expect(screen.getByText("Oui")).toBeInTheDocument();
   });
 });

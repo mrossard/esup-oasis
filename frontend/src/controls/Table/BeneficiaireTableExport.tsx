@@ -65,6 +65,13 @@ function getBeneficiairesData(
   tags: ITag[] | undefined,
 ) {
   return beneficiaires.map((beneficiaire) => {
+    const infosCompData: Record<string, string> = {};
+    beneficiaire.infosComplementaires?.forEach((info) => {
+      if (info.libelle) {
+        infosCompData[info.libelle] = info.valeur ?? "";
+      }
+    });
+
     return {
       key: beneficiaire["@id"],
       "@id": beneficiaire["@id"],
@@ -95,6 +102,7 @@ function getBeneficiairesData(
         ?.map((tag) => tags?.find((t) => t["@id"] === tag))
         .map((tag) => tag?.libelle?.replaceAll('"', '""'))
         .join(", "),
+      ...infosCompData,
     };
   });
 }
@@ -142,7 +150,7 @@ export default function BeneficiaireTableExport({
     }
     return colonnesVisibles
       .filter((colKey) => colKey !== BENEFICIAIRE_TABLE_COLUMNS_KEYS.ACTIONS)
-      .flatMap((colKey) => COLUMN_HEADERS_MAP[colKey] || []);
+      .flatMap((colKey) => COLUMN_HEADERS_MAP[colKey] || [{ label: colKey, key: colKey }]);
   }, [colonnesVisibles]);
 
   const refDataReady = !!(composantes?.items && gestionnaires?.items && tags?.items);

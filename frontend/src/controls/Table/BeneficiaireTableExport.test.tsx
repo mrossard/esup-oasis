@@ -71,4 +71,35 @@ describe("BeneficiaireTableExport", () => {
     const headerKeys = lastProps.headers.map((h: { key: string }) => h.key);
     expect(headerKeys).toEqual(["nom", "prenom", "tags", "numeroEtudiant"]);
   });
+
+  it("inclut les colonnes complémentaires dans les headers et mappe leurs valeurs dans getData", () => {
+    mockCsvExportButton.mockClear();
+    render(
+      <BeneficiaireTableExport
+        filtreBeneficiaire={FILTRE_BENEFICIAIRE_DEFAULT}
+        colonnesVisibles={["nom", "Régime spécial", "actions"]}
+      />,
+    );
+
+    const lastProps = mockCsvExportButton.mock.calls[0]?.[0];
+    const headers = lastProps.headers;
+    expect(headers).toEqual([
+      { label: "Nom", key: "nom" },
+      { label: "Prénom", key: "prenom" },
+      { label: "Régime spécial", key: "Régime spécial" },
+    ]);
+
+    const fakeBeneficiaire = {
+      "@id": "/utilisateurs/1",
+      nom: "Dupont",
+      prenom: "Jean",
+      infosComplementaires: [
+        { libelle: "Régime spécial", valeur: "Oui" },
+        { libelle: "Autre info", valeur: "Non" },
+      ],
+    };
+    const rowData = lastProps.getData([fakeBeneficiaire]);
+    expect(rowData[0]["Régime spécial"]).toBe("Oui");
+    expect(rowData[0]["Autre info"]).toBe("Non");
+  });
 });
