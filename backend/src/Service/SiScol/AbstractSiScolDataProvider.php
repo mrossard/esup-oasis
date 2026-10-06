@@ -156,4 +156,9 @@ abstract class AbstractSiScolDataProvider
     {
         return [];
     }
+
+    public function listeInfosComplementairesDisponibles(): array
+    {
+        return [];
+    }
 }
