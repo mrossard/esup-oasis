@@ -216,4 +216,51 @@ class ApogeeProvider extends AbstractSiScolDataProvider
 
         return $data;
     }
+
+    public function listeInfosComplementairesDisponibles(): array
+    {
+        //on appelle infosComplémentaires sur un étudiant avec une inscription valide pour récupérer la liste des champs
+        $sql = "select max(cod_etu) as cod_etu 
+                from individu i 
+                    join ins_adm_anu ia on i.cod_ind = ia.cod_ind
+                where eta_iaa = 'E'";
+
+        if (empty($this->requeteInfosComp)) {
+            return [];
+        }
+
+        try {
+            $db = $this->connect();
+        } catch (RuntimeException) {
+            $this->logger->warning('Récupération de la liste ds infos complémentaires impossible, apogée indisponible');
+            return [];
+        }
+
+        $stmt = oci_parse($db, $sql);
+        oci_execute($stmt);
+
+        if (!($row = oci_fetch_object($stmt))) {
+            $this->logger->warning(
+                'Récupération de la liste ds infos complémentaires impossible, aucun étudiant trouvé.',
+            );
+            return [];
+        }
+
+        $codEtu = $row->COD_ETU;
+        $sqlInfos = str_replace(':codesEtudiants', $codEtu, $this->requeteInfosComp);
+        $stmtInfos = oci_parse($db, $sqlInfos);
+
+        oci_execute($stmtInfos);
+
+        $data = [];
+        $id = 1;
+        if ($row = oci_fetch_array($stmtInfos, OCI_ASSOC)) {
+            foreach ($row as $key => $value) {
+                $data[$id] = $key;
+                $id++;
+            }
+        }
+
+        return $data;
+    }
 }
