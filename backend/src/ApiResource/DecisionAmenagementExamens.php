@@ -37,11 +37,7 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Patch(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'annee'],
-            // état inchangé : saisie des observations, possible tant que la décision n'est pas envoyée
-            securityPostDenormalize: "object.etat == previous_object.etat"
-                . " ? previous_object.etat in ['" . \App\Entity\DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS
-                . "', '" . \App\Entity\DecisionAmenagementExamens::ETAT_VALIDE . "']"
-                . " : is_granted('" . self::MODIFIER_DECISION . "', object)",
+            securityPostDenormalize: "is_granted('" . self::MODIFIER_DECISION . "', [previous_object, object])",
         ),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
