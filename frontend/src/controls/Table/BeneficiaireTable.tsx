@@ -7,9 +7,16 @@
  * @author Julien Lemonnier <julien.lemonnier@u-bordeaux.fr>
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { IBeneficiaire } from "@api";
-import { beneficiaireTableColumns } from "@controls/Table/BeneficiaireTableColumns";
+import {
+  BENEFICIAIRE_TABLE_COLUMNS_KEYS,
+  beneficiaireTableColumns,
+  getBeneficiaireTableColumnOptions,
+  getBeneficiaireTableInitialColumns,
+  TableColumnOption,
+} from "@controls/Table/BeneficiaireTableColumns";
+import { BeneficiaireTableColumnsDropdown } from "@controls/Table/BeneficiaireTableColumnsDropdown";
 import { RoleValues } from "@lib";
 import { Button, Flex, Space, Table } from "antd";
 import Icon from "@ant-design/icons";
@@ -87,14 +94,206 @@ function filtreBeneficiaireDefault(
 }
 
 const SESSION_KEY_FILTRE_BENEFICIAIRE = "oasis:filter:beneficiaire";
+export const STORAGE_KEY_COLONNES_BENEFICIAIRES = "oasis:table:beneficiaires:colonnes";
+export const PREF_KEY_COLONNES_BENEFICIAIRES = "colonnesBeneficiaires";
+
+function sanitizeColumnPreferences(
+  availableKeys: string[],
+  initialKeys: string[],
+  storedOrdre?: string[] | null,
+  storedVisibles?: string[] | null,
+): { ordre: string[]; visibles: string[] } {
+  const nom = BENEFICIAIRE_TABLE_COLUMNS_KEYS.NOM;
+  const actions = BENEFICIAIRE_TABLE_COLUMNS_KEYS.ACTIONS;
+
+  // Ordre initial par défaut : colonnes initiales dans leur ordre historique,
+  // puis les autres colonnes disponibles, puis actions
+  const defaultOrder = [
+    ...initialKeys.filter((k) => k !== actions),
+    ...availableKeys.filter((k) => !initialKeys.includes(k) && k !== actions),
+    ...(availableKeys.includes(actions) ? [actions] : []),
+  ];
+
+  const middleKeys = (storedOrdre || defaultOrder).filter(
+    (k) => availableKeys.includes(k) && k !== nom && k !== actions,
+  );
+  availableKeys.forEach((k) => {
+    if (k !== nom && k !== actions && !middleKeys.includes(k)) {
+      middleKeys.push(k);
+    }
+  });
+
+  const ordre = [nom, ...middleKeys, ...(availableKeys.includes(actions) ? [actions] : [])];
+
+  // 2. Visibles : "nom" est toujours affichée, autres colonnes selon sélection (ou initialKeys par défaut)
+  const rawVisibles = storedVisibles || initialKeys;
+  const visibles = [nom, ...rawVisibles.filter((k) => availableKeys.includes(k) && k !== nom)];
+
+  return { ordre, visibles };
+}
 
 export default function BeneficiaireTable() {
   const { setDrawerUtilisateur } = useDrawers();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const auth = useAuth();
-  const { getPreferenceArray, preferencesChargees } = usePreferences();
+  const { getPreferenceArray, getPreferenceJson, setPreferenceJson, preferencesChargees } =
+    usePreferences();
   const { enabled: sessionEnabled, toggle: toggleSession } = useFiltreSessionStorage();
+
+  const isGestionnaire = auth.user?.isGestionnaire;
+  const colonnesDisponibles = useMemo(
+    () => getBeneficiaireTableColumnOptions(isGestionnaire),
+    [isGestionnaire],
+  );
+  const initialColumns = useMemo(
+    () => getBeneficiaireTableInitialColumns(isGestionnaire),
+    [isGestionnaire],
+  );
+
+  const hadCustomColumns = useRef(false);
+
+  const [columnPrefs, setColumnPrefs] = useState<{ ordre: string[]; visibles: string[] }>(() => {
+    const availableKeys = colonnesDisponibles.map((c) => c.key);
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY_COLONNES_BENEFICIAIRES);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          hadCustomColumns.current = true;
+          return sanitizeColumnPreferences(availableKeys, initialColumns, parsed, parsed);
+        }
+        if (parsed && typeof parsed === "object") {
+          hadCustomColumns.current = true;
+          return sanitizeColumnPreferences(
+            availableKeys,
+            initialColumns,
+            parsed.ordre,
+            parsed.visibles,
+          );
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+    return sanitizeColumnPreferences(availableKeys, initialColumns);
+  });
+
+  const serverPrefsLoaded = useRef(false);
+
+  // Synchronisation lors du chargement des préférences utilisateur
+  useEffect(() => {
+    if (!preferencesChargees || serverPrefsLoaded.current) return;
+    serverPrefsLoaded.current = true;
+
+    const availableKeys = colonnesDisponibles.map((c) => c.key);
+    const serverPref = getPreferenceJson?.(PREF_KEY_COLONNES_BENEFICIAIRES) as
+      | { ordre?: string[]; visibles?: string[] }
+      | undefined;
+
+    const hasServerPrefs =
+      serverPref && (Array.isArray(serverPref.ordre) || Array.isArray(serverPref.visibles));
+
+    if (hasServerPrefs) {
+      hadCustomColumns.current = true;
+      const sanitized = sanitizeColumnPreferences(
+        availableKeys,
+        initialColumns,
+        serverPref.ordre,
+        serverPref.visibles,
+      );
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setColumnPrefs(sanitized);
+      try {
+        localStorage.setItem(STORAGE_KEY_COLONNES_BENEFICIAIRES, JSON.stringify(sanitized));
+      } catch {
+        /* ignore */
+      }
+    } else if (hadCustomColumns.current) {
+      // Si l'utilisateur avait une personnalisation dans localStorage mais pas encore en base, migrer vers la base
+      setPreferenceJson?.(PREF_KEY_COLONNES_BENEFICIAIRES, columnPrefs);
+    }
+  }, [
+    preferencesChargees,
+    colonnesDisponibles,
+    initialColumns,
+    getPreferenceJson,
+    setPreferenceJson,
+    columnPrefs,
+  ]);
+
+  // Si l'utilisateur n'avait pas de personnalisation enregistrée, synchroniser avec initialColumns
+  // lors du chargement de auth.user
+  useEffect(() => {
+    const availableKeys = colonnesDisponibles.map((c) => c.key);
+    setColumnPrefs((prev) => {
+      const sanitized = sanitizeColumnPreferences(
+        availableKeys,
+        initialColumns,
+        hadCustomColumns.current ? prev.ordre : null,
+        hadCustomColumns.current ? prev.visibles : null,
+      );
+      if (
+        sanitized.ordre.join(",") === prev.ordre.join(",") &&
+        sanitized.visibles.join(",") === prev.visibles.join(",")
+      ) {
+        return prev;
+      }
+      return sanitized;
+    });
+  }, [colonnesDisponibles, initialColumns]);
+
+  // Persister en localStorage si personnalisé
+  useEffect(() => {
+    if (hadCustomColumns.current) {
+      try {
+        localStorage.setItem(STORAGE_KEY_COLONNES_BENEFICIAIRES, JSON.stringify(columnPrefs));
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [columnPrefs]);
+
+  const updateColumnPrefs = useCallback(
+    (newPrefs: { ordre: string[]; visibles: string[] }) => {
+      hadCustomColumns.current = true;
+      setColumnPrefs(newPrefs);
+      try {
+        localStorage.setItem(STORAGE_KEY_COLONNES_BENEFICIAIRES, JSON.stringify(newPrefs));
+      } catch {
+        /* ignore */
+      }
+      setPreferenceJson?.(PREF_KEY_COLONNES_BENEFICIAIRES, newPrefs);
+    },
+    [setPreferenceJson],
+  );
+
+  const handleChangeColonnesVisibles = (visibles: string[]) => {
+    const nom = BENEFICIAIRE_TABLE_COLUMNS_KEYS.NOM;
+    const ensured = visibles.includes(nom) ? visibles : [nom, ...visibles];
+    updateColumnPrefs({ ...columnPrefs, visibles: ensured });
+  };
+
+  const handleReorderColonnes = (nouvelOrdre: string[]) => {
+    updateColumnPrefs({ ...columnPrefs, ordre: nouvelOrdre });
+  };
+
+  const handleResetColonnes = () => {
+    const availableKeys = colonnesDisponibles.map((c) => c.key);
+    const newPrefs = sanitizeColumnPreferences(availableKeys, initialColumns, null, null);
+    updateColumnPrefs(newPrefs);
+  };
+
+  const colonnesOrdonnees = useMemo(() => {
+    const optionsMap = new Map(colonnesDisponibles.map((c) => [c.key, c]));
+    return columnPrefs.ordre
+      .map((key) => optionsMap.get(key))
+      .filter((c): c is TableColumnOption => c !== undefined);
+  }, [colonnesDisponibles, columnPrefs.ordre]);
+
+  const colonnesAffichees = useMemo(() => {
+    return columnPrefs.ordre.filter((key) => columnPrefs.visibles.includes(key));
+  }, [columnPrefs.ordre, columnPrefs.visibles]);
 
   // Capture si sessionStorage avait des données au montage (indépendamment de sessionEnabled,
   // car sessionEnabled peut être faux avant que les préférences ne chargent)
@@ -248,9 +447,20 @@ export default function BeneficiaireTable() {
                 </Button>
               </Space.Compact>
             )}
+            <BeneficiaireTableColumnsDropdown
+              colonnesDisponibles={colonnesOrdonnees}
+              colonnesVisibles={columnPrefs.visibles}
+              onChangeColonnesVisibles={handleChangeColonnesVisibles}
+              onReorderColonnes={handleReorderColonnes}
+              onReset={handleResetColonnes}
+              className={auth.user?.isGestionnaire ? "mr-1" : undefined}
+            />
             {auth.user?.isGestionnaire && (
               <>
-                <BeneficiaireTableExport filtreBeneficiaire={filtreBeneficiaire} />
+                <BeneficiaireTableExport
+                  filtreBeneficiaire={filtreBeneficiaire}
+                  colonnesVisibles={colonnesAffichees}
+                />
               </>
             )}
           </div>
@@ -279,6 +489,7 @@ export default function BeneficiaireTable() {
             user: auth.user,
             filter: filtreBeneficiaire,
             setFilter: setFiltreBeneficiaire,
+            colonnesVisibles: colonnesAffichees,
             onBeneficiaireSelected: (beneficiaire) => {
               onClick(beneficiaire);
             },
