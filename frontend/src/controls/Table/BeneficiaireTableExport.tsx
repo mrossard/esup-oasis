@@ -70,6 +70,13 @@ export function getBeneficiairesData(
   portee: PorteeExportInscriptions,
 ) {
   return beneficiaires.map((beneficiaire) => {
+    const infosCompData: Record<string, string> = {};
+    beneficiaire.infosComplementaires?.forEach((info) => {
+      if (info.libelle) {
+        infosCompData[info.libelle] = info.valeur ?? "";
+      }
+    });
+
     return {
       key: beneficiaire["@id"],
       "@id": beneficiaire["@id"],
@@ -91,6 +98,7 @@ export function getBeneficiairesData(
         ?.map((tag) => tags?.find((t) => t["@id"] === tag))
         .map((tag) => tag?.libelle?.replaceAll('"', '""'))
         .join(", "),
+      ...infosCompData,
     };
   });
 }
