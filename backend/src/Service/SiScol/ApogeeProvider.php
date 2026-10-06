@@ -34,6 +34,8 @@ class ApogeeProvider extends AbstractSiScolDataProvider
         private readonly string $requeteInscriptions,
         #[Autowire('%env(file:resolve:APOGEE_REQUETE_FORMATION)%')]
         private readonly string $requeteFormation,
+        #[Autowire('%env(file:resolve:APOGEE_REQUETE_INFOS_COMPLEMENTAIRES)%')]
+        private readonly string $requeteInfosComp,
         CacheInterface $cache,
     ) {
         parent::__construct($cache, $this->logger);
@@ -168,6 +170,10 @@ class ApogeeProvider extends AbstractSiScolDataProvider
 
     protected function infosComplementaires(iterable $etudiants): array
     {
+        if (empty($this->requeteInfosComp)) {
+            return [];
+        }
+
         $this->logger->debug('début récupération des infos complémentaires');
 
         try {
@@ -187,17 +193,25 @@ class ApogeeProvider extends AbstractSiScolDataProvider
         );
         $codEtus = implode(',', $codEtus);
 
-        $sql = 'select cod_etu, cod_nne_ind || cod_cle_nne_ind as ine
-                from individu i
-                where cod_etu in (' . $codEtus . ')';
+        $sql = str_replace(':codesEtudiants', $codEtus, $this->requeteInfosComp);
 
         $stmt = oci_parse($db, $sql);
 
         oci_execute($stmt);
 
         $data = [];
-        while ($row = oci_fetch_object($stmt)) {
-            $data[$row->COD_ETU] = ['ine' => $row->INE];
+        while ($row = oci_fetch_array($stmt, OCI_ASSOC)) {
+            $codEtu = $row['COD_ETU'] ?? null;
+            if (null === $codEtu) {
+                continue;
+            }
+            foreach ($row as $key => $value) {
+                if ($key == 'COD_ETU' || empty($value)) {
+                    continue;
+                }
+
+                $data[$codEtu][$key] = $value;
+            }
         }
 
         return $data;
