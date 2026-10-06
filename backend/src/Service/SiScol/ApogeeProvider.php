@@ -256,6 +256,9 @@ class ApogeeProvider extends AbstractSiScolDataProvider
         $id = 1;
         if ($row = oci_fetch_array($stmtInfos, OCI_ASSOC)) {
             foreach ($row as $key => $value) {
+                if ($key == 'COD_ETU') {
+                    continue;
+                }
                 $data[$id] = $key;
                 $id++;
             }
