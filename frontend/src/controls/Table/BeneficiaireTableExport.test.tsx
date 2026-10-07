@@ -27,6 +27,14 @@ vi.mock("@context/api/ApiProvider", () => ({
   }),
 }));
 
+vi.mock("@controls/Table/Export/useExportInscriptions", () => ({
+  useExportInscriptions: () => ({
+    portee: "toutes",
+    demanderPortee: vi.fn(),
+    modalPortee: null,
+  }),
+}));
+
 describe("BeneficiaireTableExport", () => {
   it("génère les headers CSV par défaut si aucune colonne visible n'est fournie", () => {
     mockCsvExportButton.mockClear();

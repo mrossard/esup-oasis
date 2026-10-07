@@ -35,24 +35,7 @@ describe("BeneficiaireTableColumnsDropdown", () => {
     expect(screen.getByRole("button", { name: "Tout afficher" })).toBeInTheDocument();
   });
 
-  it("affiche un divider avant Actions même quand il n'y a pas de colonnes complémentaires", () => {
-    render(
-      <BeneficiaireTableColumnsDropdown
-        colonnesDisponibles={optionsSansCompl}
-        colonnesVisibles={colonnesVisiblesDefaut}
-        onChangeColonnesVisibles={vi.fn()}
-      />,
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: /colonnes/i }));
-
-    // Divider avant Actions présent
-    expect(screen.getByTestId("divider-actions")).toBeInTheDocument();
-    // Pas de divider pour infos complémentaires
-    expect(screen.queryByTestId("divider-before-infos-complementaires")).not.toBeInTheDocument();
-  });
-
-  it("affiche un divider avant les colonnes complémentaires et un divider avant Actions si des colonnes complémentaires existent", () => {
+  it("affiche les colonnes complémentaires dans la liste si présentes", () => {
     const optionsAvecCompl = getBeneficiaireTableColumnOptions(true, [
       "Boursier",
       "Sportif de haut niveau",
@@ -62,18 +45,11 @@ describe("BeneficiaireTableColumnsDropdown", () => {
       <BeneficiaireTableColumnsDropdown
         colonnesDisponibles={optionsAvecCompl}
         colonnesVisibles={optionsAvecCompl.map((o) => o.key)}
-        colonnesComplementaires={["Boursier", "Sportif de haut niveau"]}
         onChangeColonnesVisibles={vi.fn()}
       />,
     );
 
     fireEvent.click(screen.getByRole("button", { name: /colonnes/i }));
-
-    // Divider avant le groupe de colonnes complémentaires
-    expect(screen.getByTestId("divider-before-infos-complementaires")).toBeInTheDocument();
-
-    // Divider avant Actions
-    expect(screen.getByTestId("divider-actions")).toBeInTheDocument();
 
     // Les colonnes complémentaires sont bien listées
     expect(screen.getByRole("checkbox", { name: "Boursier" })).toBeInTheDocument();

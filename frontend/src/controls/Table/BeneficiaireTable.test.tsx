@@ -1,10 +1,11 @@
 import { fireEvent, screen } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderWithProviders } from "@/test";
-import BeneficiaireTable, {
+import BeneficiaireTable from "./BeneficiaireTable";
+import {
   PREF_KEY_COLONNES_BENEFICIAIRES,
   STORAGE_KEY_COLONNES_BENEFICIAIRES,
-} from "./BeneficiaireTable";
+} from "./hooks/useBeneficiaireTableColumnPrefs";
 import { BENEFICIAIRE_TABLE_COLUMNS_KEYS } from "./BeneficiaireTableColumns";
 
 // --- Hoisted mocks ---
