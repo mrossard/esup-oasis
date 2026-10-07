@@ -12,6 +12,7 @@ import { useApi } from "@context/api/ApiProvider";
 import {
   CheckCircleFilled,
   EditOutlined,
+  ExclamationCircleOutlined,
   EyeOutlined,
   FileDoneOutlined,
   ReloadOutlined,
@@ -86,12 +87,21 @@ export function BoutonDecisionEtab(props: { utilisateurId: string }) {
     !utilisateur.decisionAmenagementAnneeEnCours.dateAvisMedecin;
   const messageDateManquante =
     "Veuillez saisir une date d'avis médical afin de générer le document.";
+  const alerteDateManquante = dateAvisMedecinManquante ? (
+    <Tooltip title={messageDateManquante}>
+      <Space className="text-danger mr-2">
+        <ExclamationCircleOutlined />
+        Date manquante
+      </Space>
+    </Tooltip>
+  ) : null;
 
   switch (utilisateur.decisionAmenagementAnneeEnCours.etat) {
     case EtatDecisionEtablissement.ATTENTE_VALIDATION_CAS:
       return (
         <>
           {observationsModal}
+          {alerteDateManquante}
           <Tooltip title="En attente validation CAS">
             <Dropdown
               menu={{
@@ -177,6 +187,7 @@ export function BoutonDecisionEtab(props: { utilisateurId: string }) {
       return (
         <>
           {observationsModal}
+          {alerteDateManquante}
           <Dropdown
             menu={{
               items: [

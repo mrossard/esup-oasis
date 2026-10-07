@@ -92,4 +92,32 @@ describe("BoutonDecisionEtab", () => {
 
     expect(await ouvrirLeMenu()).not.toHaveAttribute("aria-disabled", "true");
   });
+
+  it.each(["ATTENTE_VALIDATION_CAS", "VALIDE"])(
+    "signale la date manquante à côté du bouton : %s",
+    async (etat) => {
+      rendreAvecDecision({ etat, dateAvisMedecinRequise: true, dateAvisMedecin: null });
+
+      expect(await screen.findByText("Date manquante")).toBeInTheDocument();
+    },
+  );
+
+  it("ne signale rien quand la date est saisie", async () => {
+    rendreAvecDecision({ dateAvisMedecinRequise: true, dateAvisMedecin: "2026-09-01" });
+
+    await screen.findByRole("button", { name: /Décision d'établissement en attente/ });
+    expect(screen.queryByText("Date manquante")).not.toBeInTheDocument();
+  });
+
+  it("ne signale plus rien une fois la décision envoyée", async () => {
+    // l'alerte ne servirait plus : la date ne conditionne que l'envoi
+    rendreAvecDecision({
+      etat: "EDITION_DEMANDEE",
+      dateAvisMedecinRequise: true,
+      dateAvisMedecin: null,
+    });
+
+    await screen.findByRole("button", { name: /en cours d'envoi/ });
+    expect(screen.queryByText("Date manquante")).not.toBeInTheDocument();
+  });
 });
