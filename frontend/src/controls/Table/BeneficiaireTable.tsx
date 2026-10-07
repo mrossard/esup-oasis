@@ -30,13 +30,7 @@ import { FiltreSessionSwitch } from "@controls/Table/FiltreSessionSwitch";
 import { getCountLibelle } from "@utils/table";
 import dayjs from "dayjs";
 import { PARAMETRE_CONST_INFOS_COMPLEMENTAIRES } from "@/constants";
-import {
-  useBeneficiaireTableColumnPrefs,
-  STORAGE_KEY_COLONNES_BENEFICIAIRES,
-  PREF_KEY_COLONNES_BENEFICIAIRES,
-} from "./hooks/useBeneficiaireTableColumnPrefs";
-
-export { STORAGE_KEY_COLONNES_BENEFICIAIRES, PREF_KEY_COLONNES_BENEFICIAIRES };
+import { useBeneficiaireTableColumnPrefs } from "./hooks/useBeneficiaireTableColumnPrefs";
 
 export const FILTRE_BENEFICIAIRE_DEFAULT: FiltreBeneficiaire = {
   "order[nom]": "asc" as "asc" | "desc" | undefined,
@@ -105,13 +99,13 @@ export default function BeneficiaireTable() {
     onError: () => {},
   });
 
-  const colonnesComplementaires = useMemo(
-    () =>
-      parametresColonnesCompl?.valeursCourantes
-        ?.map((v) => v.valeur)
-        .filter((v): v is string => typeof v === "string" && v.length > 0) || [],
-    [parametresColonnesCompl],
-  );
+  // undefined tant que le paramètre n'est pas chargé (gestionnaire) ; [] pour les autres profils
+  const colonnesComplementaires = useMemo(() => {
+    if (!parametresColonnesCompl) return isGestionnaire ? undefined : [];
+    return (parametresColonnesCompl.valeursCourantes || [])
+      .map((v) => v.valeur)
+      .filter((v): v is string => typeof v === "string" && v.length > 0);
+  }, [parametresColonnesCompl, isGestionnaire]);
 
   // 2. Gestion des préférences de colonnes (sélection, ordre, persistance)
   const {
@@ -213,7 +207,7 @@ export default function BeneficiaireTable() {
   const count = dataBeneficiaires?.totalItems;
 
   const onClick = (record: IBeneficiaire) => {
-    if (auth.user?.isGestionnaire) {
+    if (isGestionnaire) {
       navigate(`/beneficiaires/${record.uid}`);
     } else {
       setDrawerUtilisateur({
@@ -281,16 +275,13 @@ export default function BeneficiaireTable() {
               onChangeColonnesVisibles={handleChangeColonnesVisibles}
               onReorderColonnes={handleReorderColonnes}
               onReset={handleResetColonnes}
-              colonnesComplementaires={colonnesComplementaires}
-              className={auth.user?.isGestionnaire ? "mr-1" : undefined}
+              className={isGestionnaire ? "mr-1" : undefined}
             />
-            {auth.user?.isGestionnaire && (
-              <>
-                <BeneficiaireTableExport
-                  filtreBeneficiaire={filtreBeneficiaire}
-                  colonnesVisibles={colonnesAffichees}
-                />
-              </>
+            {isGestionnaire && (
+              <BeneficiaireTableExport
+                filtreBeneficiaire={filtreBeneficiaire}
+                colonnesVisibles={colonnesAffichees}
+              />
             )}
           </div>
         </Space>
@@ -319,12 +310,8 @@ export default function BeneficiaireTable() {
             filter: filtreBeneficiaire,
             setFilter: setFiltreBeneficiaire,
             colonnesVisibles: colonnesAffichees,
-            onBeneficiaireSelected: (beneficiaire) => {
-              onClick(beneficiaire);
-            },
-            onImpersonate: (uid) => {
-              navigate(`/impersonate/${uid}`);
-            },
+            onBeneficiaireSelected: onClick,
+            onImpersonate: (uid) => navigate(`/impersonate/${uid}`),
             colonnesComplementaires,
           })}
           rowKey={(record) => record["@id"] as string}

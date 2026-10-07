@@ -33,7 +33,7 @@ import { removeAccents } from "@utils/string";
 import { DecisionEtablissementAvatar } from "@controls/Avatars/DecisionEtablissementAvatar";
 import { UseStateDispatch } from "@utils/utils";
 import { env } from "@/env";
-import dayjs from "dayjs";
+import { inscriptionsActives } from "@lib/Inscriptions";
 import { CopyableTextCell } from "@controls/Typography/CopyableTextCell";
 
 export interface TableColumnOption {
@@ -57,14 +57,9 @@ export const BENEFICIAIRE_TABLE_COLUMNS_KEYS = {
 } as const;
 
 export function getBeneficiaireTableColumnOptions(
-  userOrIsGestionnaire?: Utilisateur | boolean,
+  isGestionnaire?: boolean,
   colonnesComplementaires?: string[],
 ): TableColumnOption[] {
-  const isGestionnaire =
-    typeof userOrIsGestionnaire === "boolean"
-      ? userOrIsGestionnaire
-      : userOrIsGestionnaire?.isGestionnaire;
-
   const options: TableColumnOption[] = [
     { key: BENEFICIAIRE_TABLE_COLUMNS_KEYS.NOM, label: "Bénéficiaire" },
     { key: BENEFICIAIRE_TABLE_COLUMNS_KEYS.COMPOSANTE, label: "Composantes" },
@@ -100,14 +95,7 @@ export function getBeneficiaireTableColumnOptions(
   return options;
 }
 
-export function getBeneficiaireTableInitialColumns(
-  userOrIsGestionnaire?: Utilisateur | boolean,
-): string[] {
-  const isGestionnaire =
-    typeof userOrIsGestionnaire === "boolean"
-      ? userOrIsGestionnaire
-      : userOrIsGestionnaire?.isGestionnaire;
-
+export function getBeneficiaireTableInitialColumns(isGestionnaire?: boolean): string[] {
   return [
     BENEFICIAIRE_TABLE_COLUMNS_KEYS.NOM,
     BENEFICIAIRE_TABLE_COLUMNS_KEYS.INSCRIPTION,
@@ -119,12 +107,6 @@ export function getBeneficiaireTableInitialColumns(
     BENEFICIAIRE_TABLE_COLUMNS_KEYS.GESTIONNAIRE,
     BENEFICIAIRE_TABLE_COLUMNS_KEYS.ACTIONS,
   ];
-}
-
-export function getBeneficiaireTableDefaultColumns(
-  userOrIsGestionnaire?: Utilisateur | boolean,
-): string[] {
-  return getBeneficiaireTableInitialColumns(userOrIsGestionnaire);
 }
 
 // --- Composants de cellules réutilisables ---
@@ -155,8 +137,8 @@ function NomCell({ record, searchedNom }: { record: IBeneficiaire; searchedNom?:
 }
 
 function ComposantesCell({ record }: { record: IBeneficiaire }) {
-  const actives = record.inscriptions?.filter((i) => dayjs(i.fin).isAfter());
-  if (!actives || actives.length === 0) return <MinusOutlined />;
+  const actives = inscriptionsActives(record.inscriptions);
+  if (actives.length === 0) return <MinusOutlined />;
 
   return (
     <Space className="mt-05 mb-05" orientation="vertical" size={2}>
@@ -171,8 +153,8 @@ function ComposantesCell({ record }: { record: IBeneficiaire }) {
 }
 
 function InscriptionCell({ record }: { record: IBeneficiaire }) {
-  const actives = record.inscriptions?.filter((i) => dayjs(i.fin).isAfter());
-  if (!actives || actives.length === 0) return <MinusOutlined />;
+  const actives = inscriptionsActives(record.inscriptions);
+  if (actives.length === 0) return <MinusOutlined />;
 
   return (
     <>
@@ -394,15 +376,8 @@ export function beneficiaireTableColumns({
   });
 
   // 11. Colonnes complémentaires dynamiques
-  const standardKeys = new Set<string>(Object.values(BENEFICIAIRE_TABLE_COLUMNS_KEYS));
-  const dynamicKeys = Array.from(
-    new Set([
-      ...(colonnesComplementaires || []),
-      ...(colonnesVisibles || []).filter((k) => !standardKeys.has(k)),
-    ]),
-  );
-
-  dynamicKeys.forEach((cle) => {
+  colonnesComplementaires?.forEach((cle) => {
+    if (columnMap.has(cle)) return;
     columnMap.set(cle, {
       title: cle,
       key: cle,

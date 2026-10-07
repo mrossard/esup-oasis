@@ -23,39 +23,49 @@ import CsvExportButton from "@controls/Table/Export/CsvExportButton";
 import { composantesFromInscriptions } from "@lib/Inscriptions";
 import { BENEFICIAIRE_TABLE_COLUMNS_KEYS } from "@controls/Table/BeneficiaireTableColumns";
 
-const DEFAULT_HEADERS = [
-  { label: "Nom", key: "nom" },
-  { label: "Prénom", key: "prenom" },
-  { label: "Email", key: "email" },
-  { label: "Numéro étudiant", key: "numeroEtudiant" },
-  { label: "Composantes", key: "composantes" },
-  { label: "Formations", key: "formations" },
-  { label: "Gestionnaires", key: "gestionnaires" },
-  { label: "Tags", key: "tags" },
-  { label: `Avis ${env.REACT_APP_ESPACE_SANTE_ABV || "santé"}`, key: "avisESE" },
+const {
+  NOM,
+  COMPOSANTE,
+  INSCRIPTION,
+  TAGS,
+  PROFILS,
+  ETAT_AVIS_ESE,
+  DECISION_ETAB,
+  GESTIONNAIRE,
+  EMAIL,
+  NUM_ETUDIANT,
+  STATUT,
+  ACTIONS,
+} = BENEFICIAIRE_TABLE_COLUMNS_KEYS;
+
+const DEFAULT_COLUMNS: string[] = [
+  NOM,
+  EMAIL,
+  NUM_ETUDIANT,
+  COMPOSANTE,
+  INSCRIPTION,
+  GESTIONNAIRE,
+  TAGS,
+  ETAT_AVIS_ESE,
 ];
 
+// Colonnes sans entrée (actions, profils) : non exportées. Colonnes inconnues : informations complémentaires.
 const COLUMN_HEADERS_MAP: Record<string, { label: string; key: string }[]> = {
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.NOM]: [
+  [NOM]: [
     { label: "Nom", key: "nom" },
     { label: "Prénom", key: "prenom" },
   ],
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.COMPOSANTE]: [{ label: "Composantes", key: "composantes" }],
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.INSCRIPTION]: [{ label: "Formations", key: "formations" }],
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.TAGS]: [{ label: "Tags", key: "tags" }],
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.ETAT_AVIS_ESE]: [
-    { label: `Avis ${env.REACT_APP_ESPACE_SANTE_ABV || "santé"}`, key: "avisESE" },
-  ],
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.DECISION_ETAB]: [
-    { label: "Décision étab.", key: "decisionEtab" },
-  ],
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.GESTIONNAIRE]: [
-    { label: "Gestionnaires", key: "gestionnaires" },
-  ],
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.EMAIL]: [{ label: "Email", key: "email" }],
-  [BENEFICIAIRE_TABLE_COLUMNS_KEYS.NUM_ETUDIANT]: [
-    { label: "Numéro étudiant", key: "numeroEtudiant" },
-  ],
+  [COMPOSANTE]: [{ label: "Composantes", key: "composantes" }],
+  [INSCRIPTION]: [{ label: "Formations", key: "formations" }],
+  [TAGS]: [{ label: "Tags", key: "tags" }],
+  [ETAT_AVIS_ESE]: [{ label: `Avis ${env.REACT_APP_ESPACE_SANTE_ABV || "santé"}`, key: "avisESE" }],
+  [DECISION_ETAB]: [{ label: "Décision étab.", key: "decisionEtab" }],
+  [GESTIONNAIRE]: [{ label: "Gestionnaires", key: "gestionnaires" }],
+  [EMAIL]: [{ label: "Email", key: "email" }],
+  [NUM_ETUDIANT]: [{ label: "Numéro étudiant", key: "numeroEtudiant" }],
+  [STATUT]: [{ label: "Statut", key: "statut" }],
+  [PROFILS]: [],
+  [ACTIONS]: [],
 };
 
 function getBeneficiairesData(
@@ -79,28 +89,29 @@ function getBeneficiairesData(
       prenom: beneficiaire.prenom,
       email: beneficiaire.email,
       numeroEtudiant: beneficiaire.numeroEtudiant,
+      statut: beneficiaire.statutEtudiant,
       composantes: composantesFromInscriptions(beneficiaire.inscriptions || [], composantes || [])
         .map((composante) => composante?.libelle?.replaceAll('"', '""'))
         .join(", "),
       formations: beneficiaire.inscriptions
         ?.map((inscription) => inscription.formation)
-        ?.map((formation) => {
-          if (!formation) return null;
-          if (formation.codeExterne) {
-            return `[${formation.codeExterne}] ${formation.libelle?.replaceAll('"', '""')}`;
-          }
-          return `${formation.libelle?.replaceAll('"', '""')}`;
+        ?.filter((formation) => !!formation)
+        .map((formation) => {
+          const libelle = formation.libelle?.replaceAll('"', '""');
+          return formation.codeExterne ? `[${formation.codeExterne}] ${libelle}` : libelle;
         })
         .join(", "),
       gestionnaires: beneficiaire.gestionnairesActifs
         ?.map((gestionnaire) => gestionnaires?.find((g) => g["@id"] === gestionnaire))
-        .map((gestionnaire) => `${gestionnaire?.nom?.toLocaleUpperCase()} ${gestionnaire?.prenom}`)
+        .filter((gestionnaire) => !!gestionnaire)
+        .map((gestionnaire) => `${gestionnaire.nom?.toLocaleUpperCase()} ${gestionnaire.prenom}`)
         .join(", "),
       avisESE: beneficiaire.etatAvisEse,
       decisionEtab: beneficiaire.decisionAmenagementAnneeEnCours?.etat || "",
       tags: beneficiaire.tags
         ?.map((tag) => tags?.find((t) => t["@id"] === tag))
-        .map((tag) => tag?.libelle?.replaceAll('"', '""'))
+        .filter((tag) => !!tag)
+        .map((tag) => tag.libelle?.replaceAll('"', '""'))
         .join(", "),
       ...infosCompData,
     };
@@ -144,14 +155,13 @@ export default function BeneficiaireTableExport({
     enabled: exportSubmit,
   });
 
-  const headers = useMemo(() => {
-    if (!colonnesVisibles || colonnesVisibles.length === 0) {
-      return DEFAULT_HEADERS;
-    }
-    return colonnesVisibles
-      .filter((colKey) => colKey !== BENEFICIAIRE_TABLE_COLUMNS_KEYS.ACTIONS)
-      .flatMap((colKey) => COLUMN_HEADERS_MAP[colKey] || [{ label: colKey, key: colKey }]);
-  }, [colonnesVisibles]);
+  const headers = useMemo(
+    () =>
+      (colonnesVisibles?.length ? colonnesVisibles : DEFAULT_COLUMNS).flatMap(
+        (colKey) => COLUMN_HEADERS_MAP[colKey] || [{ label: colKey, key: colKey }],
+      ),
+    [colonnesVisibles],
+  );
 
   const refDataReady = !!(composantes?.items && gestionnaires?.items && tags?.items);
 

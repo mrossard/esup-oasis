@@ -8,6 +8,7 @@
  */
 
 import { IComposante, IInscription } from "@api";
+import dayjs from "dayjs";
 
 export function composantesFromInscriptions(
   inscriptions: IInscription[],
@@ -23,4 +24,8 @@ export function composantesFromInscriptions(
     .filter(
       (composante): composante is IComposante => composante !== null && composante !== undefined,
     );
+}
+
+export function inscriptionsActives(inscriptions?: IInscription[]): IInscription[] {
+  return (inscriptions || []).filter((inscription) => dayjs(inscription.fin).isAfter());
 }
