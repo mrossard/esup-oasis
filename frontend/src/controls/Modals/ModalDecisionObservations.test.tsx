@@ -188,6 +188,26 @@ describe("ModalDecisionObservations", () => {
     });
   });
 
+  // un clic écraserait les valeurs existantes par des champs vides
+  it.each([
+    ["décision en chargement", { data: undefined, isFetching: true }],
+    ["chargement de la décision échoué", { data: undefined, isFetching: false }],
+  ])("désactive l'enregistrement : %s", async (_cas, reponse) => {
+    mockUseGetItem.mockReturnValue(reponse);
+    renderModal();
+    await screen.findByRole("dialog");
+
+    expect(screen.getByRole("button", { name: /enregistrer/i })).toBeDisabled();
+  });
+
+  it("désactive l'enregistrement tant que les avis santé se chargent", async () => {
+    mockUseGetFullCollection.mockReturnValue({ data: undefined, isFetching: true });
+    renderModal();
+    await screen.findByRole("dialog");
+
+    expect(screen.getByRole("button", { name: /enregistrer/i })).toBeDisabled();
+  });
+
   it("suggère le début de l'avis santé en cours en placeholder, sans l'enregistrer d'office", async () => {
     const debut = dayjs().subtract(1, "month");
     mockUseGetFullCollection.mockReturnValue({

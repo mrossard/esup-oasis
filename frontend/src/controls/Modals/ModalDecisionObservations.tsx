@@ -101,7 +101,7 @@ export function ModalDecisionObservations({
       });
       initialisee.current = true;
     }
-  }, [open, decision, avis, avisEnChargement, form]);
+  }, [open, decision, avisEnChargement, form]);
 
   function handleSubmit(values: ObservationsForm) {
     const observations = values.observations?.trim() ? values.observations.trim() : null;
@@ -122,6 +122,7 @@ export function ModalDecisionObservations({
       okText="Enregistrer"
       cancelText="Annuler"
       confirmLoading={mutateDecision.isPending}
+      okButtonProps={{ disabled: !decision || isFetching || avisEnChargement }}
       title="Date de l'avis médical et observations particulières"
       width={640}
     >
