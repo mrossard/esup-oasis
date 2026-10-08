@@ -9,7 +9,7 @@
  */
 
 /**
-  -- ci-dessous un exemple qui récupère quelques informations complémentaires. cod_etu est un champ obligatoire!
+  -- ci-dessous un exemple qui récupère quelques informations complémentaires. /!\ cod_etu est obligatoire /!\
 select cod_etu,
        cod_nne_ind || cod_cle_nne_ind                      as ine,
        lib_pr1_ind                                         as "Prénom d'usage",

@@ -16,6 +16,7 @@ use App\Entity\Formation;
 use App\Entity\Utilisateur;
 use DateTimeInterface;
 use Monolog\Level;
+use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Stringable;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -65,6 +66,7 @@ abstract class AbstractSiScolDataProvider
      * Appelle l'implémentation sous-jacente et gère la mise en cache si disponible
      *
      * @return array<string, string>
+     * @throws InvalidArgumentException
      */
     public function getInfosComplementaires(Utilisateur $etudiant): array
     {
@@ -78,6 +80,7 @@ abstract class AbstractSiScolDataProvider
     /**
      * @param iterable<Utilisateur> $etudiants
      * @return array<string, array<string, string>> un tableau d'infos clé/valeur indexé par le numéro étudiant
+     * @throws InvalidArgumentException
      */
     public function getInfosComplementairesMultiple(iterable $etudiants): array
     {
