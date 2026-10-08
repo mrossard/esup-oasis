@@ -22,6 +22,19 @@ use SensitiveParameter;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Contracts\Cache\CacheInterface;
 
+use function array_filter;
+use function implode;
+use function iterator_to_array;
+use function oci_bind_by_name;
+use function oci_execute;
+use function oci_fetch_array;
+use function oci_fetch_object;
+use function oci_parse;
+use function oci_pconnect;
+use function preg_replace;
+use function str_replace;
+use function trim;
+
 class ApogeeProvider extends AbstractSiScolDataProvider
 {
     public function __construct(
