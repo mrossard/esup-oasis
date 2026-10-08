@@ -35,11 +35,12 @@ class ApogeeProvider extends AbstractSiScolDataProvider
         #[Autowire('%env(file:resolve:APOGEE_REQUETE_FORMATION)%')]
         private readonly string $requeteFormation,
         #[Autowire('%env(file:resolve:APOGEE_REQUETE_INFOS_COMPLEMENTAIRES)%')]
-        private readonly string $requeteInfosComp,
+        private string $requeteInfosComp,
         CacheInterface $cache,
         #[Autowire('%env(int:resolve:SI_SCOL_DUREE_VALIDITE_CACHE)%')]
         private readonly int $dureeValiditeCache,
     ) {
+        $this->requeteInfosComp = trim(preg_replace('#/\*.*?\*/#s', '', $this->requeteInfosComp));
         parent::__construct($cache, $this->logger, $this->dureeValiditeCache);
     }
 
@@ -229,6 +230,8 @@ class ApogeeProvider extends AbstractSiScolDataProvider
 
         if (empty($this->requeteInfosComp)) {
             return [];
+        } else {
+            $this->logger->debug($this->requeteInfosComp);
         }
 
         try {
