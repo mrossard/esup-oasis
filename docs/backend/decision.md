@@ -16,6 +16,10 @@ santé. Tant que la décision n'en porte pas, le début de l'avis santé en cour
 grisé dans le champ, qui reste vide : le gestionnaire saisit la date après l'avoir vérifiée sur
 le document de l'avis.
 
+Le gabarit livré imprime les deux champs quand ils sont renseignés : la date sous l'introduction,
+les observations après la liste des aménagements. Un gabarit propre à l'établissement les lit dans
+`data.dateAvisMedecin` et `data.observations`.
+
 Les établissements dont le visa cite cet avis ont besoin que la date soit renseignée avant
 l'édition, faute de quoi la mention légale s'imprime à trous sur une pièce qui fait courir un
 délai de recours.
