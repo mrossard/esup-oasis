@@ -8,6 +8,8 @@
  *
  */
 
+/**
+  -- ci-dessous un exemple qui récupère quelques informations complémentaires. cod_etu est un champ obligatoire!
 select cod_etu,
        cod_nne_ind || cod_cle_nne_ind                      as ine,
        lib_pr1_ind                                         as "Prénom d'usage",
@@ -15,3 +17,4 @@ select cod_etu,
        lib_pr_eta_civ                                      as "Prénom à l'état civil"
 from individu i
 where cod_etu in (:codesEtudiants)
+ */
