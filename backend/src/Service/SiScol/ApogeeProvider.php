@@ -37,8 +37,10 @@ class ApogeeProvider extends AbstractSiScolDataProvider
         #[Autowire('%env(file:resolve:APOGEE_REQUETE_INFOS_COMPLEMENTAIRES)%')]
         private readonly string $requeteInfosComp,
         CacheInterface $cache,
+        #[Autowire('%env(int:resolve:SI_SCOL_DUREE_VALIDITE_CACHE)%')]
+        private readonly int $dureeValiditeCache,
     ) {
-        parent::__construct($cache, $this->logger);
+        parent::__construct($cache, $this->logger, $this->dureeValiditeCache);
     }
 
     /**

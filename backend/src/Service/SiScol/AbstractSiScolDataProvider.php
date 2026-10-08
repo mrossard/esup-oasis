@@ -16,7 +16,6 @@ use App\Entity\Formation;
 use App\Entity\Utilisateur;
 use DateTimeInterface;
 use Monolog\Level;
-use Psr\Cache\InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Stringable;
 use Symfony\Component\DependencyInjection\Attribute\AutoconfigureTag;
@@ -29,6 +28,7 @@ abstract class AbstractSiScolDataProvider
     public function __construct(
         private readonly ?CacheInterface $cache = null,
         private readonly ?LoggerInterface $logger = null,
+        private readonly int $dureeValiditeCache = 3600,
     ) {}
 
     /**
@@ -113,8 +113,16 @@ abstract class AbstractSiScolDataProvider
                 $manquant,
                 $infosManquants,
             ) {
-                $item->expiresAfter(3600);
-                return $infosManquants[$manquant->getNumeroEtudiant()] ?? [];
+                $resultat = $infosManquants[$manquant->getNumeroEtudiant()] ?? null;
+                if ($resultat !== null) {
+                    $item->expiresAfter($this->dureeValiditeCache);
+                } else {
+                    // 5 minutes - si le SI d'origine est momentanément indisponible on veut réessayer plus rapidement
+                    $resultat = [];
+                    $item->expiresAfter(300);
+                }
+
+                return $resultat;
             });
         }
 
