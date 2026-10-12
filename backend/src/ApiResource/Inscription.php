@@ -86,6 +86,17 @@ final class Inscription
         }
     }
 
+    #[Groups([Utilisateur::GROUP_OUT, Demande::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
+    public bool $principale {
+        get {
+            $prop = new ReflectionProperty(self::class, 'principale');
+            if (!$prop->isInitialized($this) && $this->entity !== null) {
+                $this->principale = $this->entity->isPrincipale();
+            }
+            return $this->principale;
+        }
+    }
+
     public function __construct(
         private readonly ?\App\Entity\Inscription $entity = null,
     ) {}

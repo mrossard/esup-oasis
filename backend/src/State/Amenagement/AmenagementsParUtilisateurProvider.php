@@ -93,12 +93,16 @@ class AmenagementsParUtilisateurProvider implements ProviderInterface
             ));
         }
 
-        //        $resource->amenagements = array_values(array_map(function (Amenagement $amenagement) {
-        //            return new \App\ApiResource\Amenagement($amenagement);
-        //        }, $resource->amenagements));
-
-        //on ne veut que la dernière inscription
+        // TODO: si référent composante, on veut celle qui est sur la bonne composante même si ce n'est pas la première!
         $inscriptions = $resource->inscriptions;
+        if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_REFERENT_COMPOSANTE)) {
+            $user = $this->security->getUser();
+            $inscriptions = array_filter(array: $resource->inscriptions, callback: fn($inscription) => in_array(
+                $inscription->formation->composante->id,
+                array_map(callback: fn($cmp) => $cmp->getId(), array: $user->getComposantes()->toArray()),
+            ));
+        }
+
         usort($inscriptions, function (Inscription $a, Inscription $b) {
             return $b->debut <=> $a->debut;
         });
