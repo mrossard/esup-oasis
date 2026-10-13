@@ -67,7 +67,7 @@ export function InscriptionsGroupeesItem({
               )}
               <EllipsisMiddle
                 className="light"
-                style={{ maxWidth: 350 }}
+                style={{ maxWidth: 350, fontSize: 15 }}
                 suffixCount={12}
                 content={inscription.formation?.libelle as string}
                 expandable

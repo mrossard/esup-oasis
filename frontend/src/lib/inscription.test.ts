@@ -11,7 +11,12 @@
 import { describe, expect, it } from "vitest";
 import dayjs from "dayjs";
 import { IInscription } from "@api";
-import { comparerInscriptions, grouperInscriptionsParComposante } from "./inscription";
+import {
+  comparerInscriptions,
+  getAnneeUniversitaire,
+  grouperInscriptionsParComposante,
+  separerInscriptions,
+} from "./inscription";
 
 const now = dayjs("2026-10-12");
 
@@ -79,5 +84,40 @@ describe("grouperInscriptionsParComposante", () => {
     grouperInscriptionsParComposante(source, now);
 
     expect(source).toEqual([a, b]);
+  });
+});
+
+describe("getAnneeUniversitaire", () => {
+  it.each([
+    ["2025-09-01T00:00:00+00:00", "2025-2026"],
+    ["2025-08-15T12:00:00+00:00", "2025-2026"],
+    ["2026-01-05T00:00:00+00:00", "2025-2026"],
+    ["2026-06-30T00:00:00+00:00", "2025-2026"],
+  ])("rattache %s à l'année %s", (debut, attendu) => {
+    expect(getAnneeUniversitaire(inscription("/i/1", "/c/1", debut, false))).toBe(attendu);
+  });
+});
+
+describe("separerInscriptions", () => {
+  it("renvoie deux listes vides sans inscription", () => {
+    expect(separerInscriptions(undefined, now)).toEqual({ enCours: [], passees: [] });
+  });
+
+  it("sépare les inscriptions en cours des passées, ces dernières groupées par année décroissante", () => {
+    const enCours = inscription("/i/1", "/c/1", "2026-09-01T00:00:00+00:00", true);
+    const p2025a = inscription("/i/2", "/c/1", "2025-09-01T00:00:00+00:00", false, "2026-08-31");
+    const p2025b = inscription("/i/3", "/c/2", "2025-10-01T00:00:00+00:00", false, "2026-08-31");
+    const p2024 = inscription("/i/4", "/c/2", "2024-09-01T00:00:00+00:00", false, "2025-08-31");
+
+    const { enCours: groupes, passees } = separerInscriptions(
+      [p2024, p2025a, enCours, p2025b],
+      now,
+    );
+
+    expect(groupes).toEqual([{ composante: "/c/1", inscriptions: [enCours] }]);
+    expect(passees).toEqual([
+      { annee: "2025-2026", inscriptions: [p2025b, p2025a] },
+      { annee: "2024-2025", inscriptions: [p2024] },
+    ]);
   });
 });
