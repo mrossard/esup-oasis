@@ -13,6 +13,8 @@ import { IAmenagement, IComposante } from "@api";
 import { getAmenagementsData } from "./AmenagementTableExport";
 import { formatAmenagementsBeneficiaireData } from "./AmenagementsBeneficiaireTableExport";
 
+const FIN = "2999-08-31T00:00:00+00:00";
+
 const composantes = [
   { "@id": "/composantes/1", libelle: "Sciences" },
   { "@id": "/composantes/2", libelle: 'Droit "public"' },
@@ -24,12 +26,21 @@ const amenagement = (composante: string | undefined, libelle = "Licence") =>
     typeAmenagement: "/types_amenagements/1",
     beneficiaire: {
       nom: "dupont",
-      inscriptions: composante ? [{ formation: { composante, libelle } }] : [],
+      inscriptions: composante ? [{ fin: FIN, formation: { composante, libelle } }] : [],
     },
   }) as unknown as IAmenagement;
 
 const exportAmenagements = (am: IAmenagement, comps?: IComposante[]) =>
-  getAmenagementsData([am], undefined, undefined, undefined, undefined, undefined, comps)[0];
+  getAmenagementsData(
+    [am],
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    comps,
+    "en_cours",
+  )[0];
 
 describe("getAmenagementsData — composante", () => {
   it("résout le libellé de la composante à partir de l'IRI de l'inscription", () => {
@@ -73,7 +84,7 @@ describe("formatAmenagementsBeneficiaireData — composante", () => {
     key: "/amenagements/utilisateurs/1",
     nom: "dupont",
     tags: [],
-    inscription: composante ? { formation: { composante, libelle: "Licence" } } : undefined,
+    inscriptions: composante ? [{ fin: FIN, formation: { composante, libelle: "Licence" } }] : [],
   });
 
   it("résout le libellé de la composante à partir de l'IRI de l'inscription", () => {
@@ -82,6 +93,7 @@ describe("formatAmenagementsBeneficiaireData — composante", () => {
       [],
       [],
       composantes,
+      "en_cours",
     );
 
     expect(resultat.composante).toBe("Sciences");
@@ -89,12 +101,19 @@ describe("formatAmenagementsBeneficiaireData — composante", () => {
   });
 
   it("laisse la composante vide si les composantes ne sont pas chargées ou sans inscription", () => {
-    const [sansComposantes] = formatAmenagementsBeneficiaireData([ligne("/composantes/1")], [], []);
+    const [sansComposantes] = formatAmenagementsBeneficiaireData(
+      [ligne("/composantes/1")],
+      [],
+      [],
+      undefined,
+      "en_cours",
+    );
     const [sansInscription] = formatAmenagementsBeneficiaireData(
       [ligne(undefined)],
       [],
       [],
       composantes,
+      "en_cours",
     );
 
     expect(sansComposantes.composante).toBeUndefined();

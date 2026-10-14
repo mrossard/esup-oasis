@@ -8,12 +8,7 @@
  *
  */
 
-import {
-  IAmenagementsBenefificiaire,
-  ICategorieAmenagement,
-  IFormation,
-  ITypeAmenagement,
-} from "@api";
+import { IAmenagementsBenefificiaire, ICategorieAmenagement, ITypeAmenagement } from "@api";
 import { useApi } from "@context/api/ApiProvider";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FiltreAmenagement, filtreAmenagementToApi } from "@controls/Table/AmenagementTableLayout";
@@ -46,13 +41,6 @@ export type IAmenagementsBeneficiaireTableDataSource = {
   etatAvisEse: string | undefined;
   tags: string[];
   inscriptions: IAmenagementsBenefificiaire["inscriptions"];
-  inscription:
-    | {
-        formation: IFormation;
-        debut: string | undefined;
-        fin: string | undefined;
-      }
-    | undefined;
   [key: string]: unknown;
 };
 
@@ -71,14 +59,6 @@ export function buildAmenagementsBenefDatasource(
       etatAvisEse: rd.etatAvisEse,
       tags: rd.tags || [],
       inscriptions: rd.inscriptions,
-      inscription:
-        rd.inscriptions && rd.inscriptions.length > 0
-          ? {
-              formation: rd.inscriptions[0].formation as IFormation,
-              debut: rd.inscriptions[0].debut,
-              fin: rd.inscriptions[0].fin,
-            }
-          : undefined,
     };
 
     typesAmenagementsUtilises.forEach((ta) => {

@@ -13,6 +13,7 @@ import dayjs from "dayjs";
 import { IInscription } from "@api";
 import {
   comparerInscriptions,
+  formaterInscriptionsExport,
   getAnneeUniversitaire,
   grouperInscriptionsParComposante,
   separerInscriptions,
@@ -119,5 +120,113 @@ describe("separerInscriptions", () => {
       { annee: "2025-2026", inscriptions: [p2025b, p2025a] },
       { annee: "2024-2025", inscriptions: [p2024] },
     ]);
+  });
+});
+
+describe("formaterInscriptionsExport", () => {
+  const composantes = [
+    { "@id": "/c/licence", libelle: "Licence" },
+    { "@id": "/c/medecine", libelle: 'Médecine "santé"' },
+  ];
+  const avecFormation = (i: IInscription, libelle: string, codeExterne?: string): IInscription =>
+    ({ ...i, formation: { ...i.formation, libelle, codeExterne } }) as unknown as IInscription;
+
+  const principale = avecFormation(
+    inscription("/i/1", "/c/medecine", "2026-09-01T00:00:00+00:00", true),
+    "PASS",
+    "P1",
+  );
+  const secondaire = avecFormation(
+    inscription("/i/2", "/c/licence", "2026-09-01T00:00:00+00:00", false),
+    "Licence droit",
+  );
+  const passee = avecFormation(
+    inscription("/i/3", "/c/licence", "2025-09-01T00:00:00+00:00", false, "2026-08-31"),
+    "L1 droit",
+  );
+  const toutes = [passee, secondaire, principale];
+
+  it("exporte l'inscription principale dans composante / formation, échappée pour le CSV", () => {
+    const resultat = formaterInscriptionsExport(toutes, "en_cours", composantes, now);
+
+    expect(resultat.composante).toBe('Médecine ""santé""');
+    expect(resultat.formation).toBe("[P1] PASS");
+  });
+
+  it("en_cours : liste les autres inscriptions en cours, une par ligne, sans les passées", () => {
+    const resultat = formaterInscriptionsExport(toutes, "en_cours", composantes, now);
+
+    expect(resultat.autresInscriptionsEnCours).toBe("Licence | Licence droit | 2026-2027");
+    expect(resultat.autresInscriptionsPassees).toBe("");
+  });
+
+  it("toutes : sépare les autres inscriptions en cours et les passées", () => {
+    const resultat = formaterInscriptionsExport(toutes, "toutes", composantes, now);
+
+    expect(resultat.composante).toBe('Médecine ""santé""');
+    expect(resultat.autresInscriptionsEnCours).toBe("Licence | Licence droit | 2026-2027");
+    expect(resultat.autresInscriptionsPassees).toBe("Licence | L1 droit | 2025-2026");
+  });
+
+  it("toutes : sans inscription en cours, la principale de la ligne est une inscription passée", () => {
+    const autrePassee = avecFormation(
+      inscription("/i/4", "/c/licence", "2024-09-01T00:00:00+00:00", false, "2025-08-31"),
+      "L0 droit",
+    );
+    const resultat = formaterInscriptionsExport([autrePassee, passee], "toutes", composantes, now);
+
+    expect(resultat.formation).toBe("L1 droit");
+    expect(resultat.autresInscriptionsEnCours).toBe("");
+    expect(resultat.autresInscriptionsPassees).toBe("Licence | L0 droit | 2024-2025");
+  });
+
+  it("principale : n'exporte que l'inscription principale", () => {
+    const resultat = formaterInscriptionsExport(toutes, "principale", composantes, now);
+
+    expect(resultat.formation).toBe("[P1] PASS");
+    expect(resultat.autresInscriptionsEnCours).toBe("");
+    expect(resultat.autresInscriptionsPassees).toBe("");
+  });
+
+  it("choisit la plus récente quand aucune inscription en cours n'est principale", () => {
+    const resultat = formaterInscriptionsExport([secondaire], "en_cours", composantes, now);
+
+    expect(resultat.composante).toBe("Licence");
+    expect(resultat.autresInscriptionsEnCours).toBe("");
+  });
+
+  it("ignore le drapeau principale d'une inscription passée au profit d'une inscription en cours", () => {
+    // Côté API, `principale` n'est jamais remis à false à la fin de l'année : la passée l'est toujours.
+    const anciennePrincipale = avecFormation(
+      inscription("/i/5", "/c/licence", "2025-09-01T00:00:00+00:00", true, "2026-08-31"),
+      "L2 droit",
+    );
+    const resultat = formaterInscriptionsExport(
+      [anciennePrincipale, secondaire],
+      "toutes",
+      composantes,
+      now,
+    );
+
+    expect(resultat.formation).toBe("Licence droit");
+    expect(resultat.autresInscriptionsPassees).toBe("Licence | L2 droit | 2025-2026");
+  });
+
+  it("laisse les colonnes vides sans inscription en cours (portée en_cours)", () => {
+    const resultat = formaterInscriptionsExport([passee], "en_cours", composantes, now);
+
+    expect(resultat).toEqual({
+      composante: undefined,
+      formation: undefined,
+      autresInscriptionsEnCours: "",
+      autresInscriptionsPassees: "",
+    });
+  });
+
+  it("laisse la composante vide tant que le référentiel n'est pas chargé", () => {
+    const resultat = formaterInscriptionsExport([principale], "en_cours", undefined, now);
+
+    expect(resultat.composante).toBeUndefined();
+    expect(resultat.formation).toBe("[P1] PASS");
   });
 });

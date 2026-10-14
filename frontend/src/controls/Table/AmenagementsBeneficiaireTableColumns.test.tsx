@@ -112,17 +112,4 @@ describe("buildAmenagementsBenefDatasource — inscriptions", () => {
 
     expect(ligne(inscriptions).inscriptions).toEqual(inscriptions);
   });
-
-  it("garde l'inscription au singulier (première) pour l'export CSV", () => {
-    const resultat = ligne([
-      inscription(1, "/composantes/1", false),
-      inscription(2, "/composantes/2", true),
-    ]);
-
-    expect(resultat.inscription?.formation.libelle).toBe("Formation 1");
-  });
-
-  it("n'a pas d'inscription singulière sans inscription", () => {
-    expect(ligne([]).inscription).toBeUndefined();
-  });
 });

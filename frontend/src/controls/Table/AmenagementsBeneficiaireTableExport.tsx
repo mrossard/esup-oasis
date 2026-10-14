@@ -22,18 +22,21 @@ import { ModeAffichageAmenagement } from "@routes/gestionnaire/beneficiaires/Ame
 import { useAuth } from "@/auth/AuthProvider";
 import { env } from "@/env";
 import CsvExportButton from "@controls/Table/Export/CsvExportButton";
+import { getInscriptionsHeaders } from "@controls/Table/Export/inscriptionsExportHeaders";
+import { useExportInscriptions } from "@controls/Table/Export/useExportInscriptions";
+import { formaterInscriptionsExport, PorteeExportInscriptions } from "@lib/inscription";
 
 function getHeader(
   typesAmenagementsUtilises: TypesDomainesAmenagements[],
   user: Utilisateur | undefined,
+  portee: PorteeExportInscriptions,
 ) {
   const headers = [
     { label: "Nom", key: "nom" },
     { label: "Prénom", key: "prenom" },
     { label: "Email", key: "email" },
     { label: "Numéro étudiant", key: "numeroEtudiant" },
-    { label: "Composante", key: "composante" },
-    { label: "Formation", key: "formation" },
+    ...getInscriptionsHeaders(portee),
     user?.isGestionnaire ? { label: "Tags", key: "tags" } : null,
     user?.isGestionnaire
       ? { label: `Avis ${env.REACT_APP_ESPACE_SANTE_ABV || "santé"}`, key: "avisESE" }
@@ -71,8 +74,9 @@ function getHeader(
 export function formatAmenagementsBeneficiaireData(
   amenagements: any[],
   typesAmenagementsUtilises: TypesDomainesAmenagements[],
-  tags?: ITag[],
-  composantes?: IComposante[],
+  tags: ITag[] | undefined,
+  composantes: IComposante[] | undefined,
+  portee: PorteeExportInscriptions,
 ) {
   return amenagements.map((amenagement) => {
     const data: any = {
@@ -82,10 +86,7 @@ export function formatAmenagementsBeneficiaireData(
       prenom: amenagement.prenom,
       email: amenagement.email,
       numeroEtudiant: amenagement.numeroEtudiant,
-      composante: composantes
-        ?.find((c) => c["@id"] === amenagement.inscription?.formation?.composante)
-        ?.libelle?.replaceAll('"', '""'),
-      formation: amenagement.inscription?.formation?.libelle?.replaceAll('"', '""'),
+      ...formaterInscriptionsExport(amenagement.inscriptions, portee, composantes),
       tags:
         (amenagement.tags as string[])
           ?.map((tag) => tags?.find((t) => t["@id"] === tag))
@@ -184,23 +185,30 @@ export default function AmenagementsBeneficiaireTableExport({
   const globalFetchedCount = amFetchedCount + tagsFetchedCount;
   const globalTotalItems = amIsLoadingPage1 ? 0 : amTotalItems + tagsTotalItems;
 
+  const { portee, demanderPortee, modalPortee } = useExportInscriptions();
+
   return (
-    <CsvExportButton
-      key={exportKey}
-      getData={() =>
-        formatAmenagementsBeneficiaireData(
-          data || [],
-          typesAmenagementsUtilises,
-          tags?.items,
-          composantes?.items,
-        )
-      }
-      headers={getHeader(typesAmenagementsUtilises, user)}
-      filename="amenagements"
-      ready={refDataReady}
-      fetchedCount={globalFetchedCount}
-      totalItems={globalTotalItems}
-      onStart={() => setExportState((prev) => ({ ...prev, exportSubmit: true }))}
-    />
+    <>
+      <CsvExportButton
+        key={exportKey}
+        getData={() =>
+          formatAmenagementsBeneficiaireData(
+            data || [],
+            typesAmenagementsUtilises,
+            tags?.items,
+            composantes?.items,
+            portee,
+          )
+        }
+        headers={getHeader(typesAmenagementsUtilises, user, portee)}
+        filename="amenagements"
+        ready={refDataReady}
+        fetchedCount={globalFetchedCount}
+        totalItems={globalTotalItems}
+        onBeforeStart={demanderPortee}
+        onStart={() => setExportState((prev) => ({ ...prev, exportSubmit: true }))}
+      />
+      {modalPortee}
+    </>
   );
 }

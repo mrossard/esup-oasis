@@ -98,3 +98,109 @@ export function separerInscriptions(
 
   return { enCours: grouperInscriptionsParComposante(inscriptions, now), passees };
 }
+
+/** Inscriptions à reprendre dans un export : toutes (passées comprises), en cours, ou la seule principale. */
+export type PorteeExportInscriptions = "toutes" | "en_cours" | "principale";
+
+export const PORTEE_EXPORT_PAR_DEFAUT: PorteeExportInscriptions = "en_cours";
+
+export const estPorteeExportInscriptions = (valeur: unknown): valeur is PorteeExportInscriptions =>
+  valeur === "toutes" || valeur === "en_cours" || valeur === "principale";
+
+export interface InscriptionsExport {
+  /** Composante de l'inscription principale (libellé échappé pour le CSV). */
+  composante?: string;
+  /** Formation de l'inscription principale : `[code] libellé`. */
+  formation?: string;
+  /** Autres inscriptions en cours, une par ligne : `Composante | [code] Formation | 2025-2026`. */
+  autresInscriptionsEnCours: string;
+  /** Autres inscriptions passées, même format (uniquement pour la portée « toutes »). */
+  autresInscriptionsPassees: string;
+}
+
+const echapperCsv = (texte?: string): string | undefined => texte?.replaceAll('"', '""');
+
+const libelleFormation = (inscription: IInscription): string | undefined => {
+  const libelle = inscription.formation?.libelle;
+  if (!libelle) return undefined;
+  const codeExterne = inscription.formation?.codeExterne;
+  return codeExterne ? `[${codeExterne}] ${libelle}` : libelle;
+};
+
+interface InscriptionsExportSelectionnees {
+  principale?: IInscription;
+  autresEnCours: IInscription[];
+  autresPassees: IInscription[];
+}
+
+/**
+ * Répartit les inscriptions à exporter selon la portée (cf. {@link comparerInscriptions} pour l'ordre).
+ * L'inscription principale est la première inscription en cours ; seule la portée « toutes » retient,
+ * à défaut, une inscription passée.
+ */
+function selectionnerInscriptionsExport(
+  inscriptions: IInscription[],
+  portee: PorteeExportInscriptions,
+  now: Dayjs,
+): InscriptionsExportSelectionnees {
+  const trier = (liste: IInscription[]) => [...liste].sort(comparerInscriptions);
+  const enCours = trier(inscriptions.filter((inscription) => estEnCours(inscription, now)));
+  const passees = trier(inscriptions.filter((inscription) => !estEnCours(inscription, now)));
+
+  const [principale] = portee === "toutes" ? [...enCours, ...passees] : enCours;
+  const sansPrincipale = (liste: IInscription[]) =>
+    liste.filter((inscription) => inscription !== principale);
+
+  return {
+    principale,
+    autresEnCours: portee === "principale" ? [] : sansPrincipale(enCours),
+    autresPassees: portee === "toutes" ? sansPrincipale(passees) : [],
+  };
+}
+
+/**
+ * Met en forme les inscriptions d'une ligne d'export : l'inscription principale dans deux colonnes à
+ * valeur unique (filtrables dans un tableur), les autres inscriptions en cours et passées chacune dans
+ * une colonne texte.
+ *
+ * @param inscriptions
+ * @param portee
+ * @param composantes référentiel des composantes, pour résoudre le libellé à partir de l'IRI.
+ * @param now
+ */
+export function formaterInscriptionsExport(
+  inscriptions: IInscription[] | undefined,
+  portee: PorteeExportInscriptions,
+  composantes: { "@id"?: string; libelle?: string }[] | undefined,
+  now: Dayjs = dayjs(),
+): InscriptionsExport {
+  const { principale, autresEnCours, autresPassees } = selectionnerInscriptionsExport(
+    inscriptions ?? [],
+    portee,
+    now,
+  );
+  const libelleComposante = (inscription: IInscription) =>
+    composantes?.find((c) => c["@id"] === inscription.formation?.composante)?.libelle;
+
+  const listerInscriptions = (liste: IInscription[]) =>
+    echapperCsv(
+      liste
+        .map((inscription) =>
+          [
+            libelleComposante(inscription),
+            libelleFormation(inscription),
+            getAnneeUniversitaire(inscription),
+          ]
+            .filter(Boolean)
+            .join(" | "),
+        )
+        .join("\n"),
+    ) ?? "";
+
+  return {
+    composante: principale && echapperCsv(libelleComposante(principale)),
+    formation: principale && echapperCsv(libelleFormation(principale)),
+    autresInscriptionsEnCours: listerInscriptions(autresEnCours),
+    autresInscriptionsPassees: listerInscriptions(autresPassees),
+  };
+}
