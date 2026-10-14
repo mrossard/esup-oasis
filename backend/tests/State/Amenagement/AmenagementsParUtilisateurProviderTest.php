@@ -90,7 +90,7 @@ final class AmenagementsParUtilisateurProviderTest extends TestCase
         static::assertSame('2026-09-01', $transformed->inscriptions[0]->debut->format('Y-m-d'));
     }
 
-    public function testReferentComposanteGetsMostRecentInscriptionWithinTheirComposante(): void
+    public function testReferentComposanteGetsAllInscriptionsWithinTheirComposante(): void
     {
         $security = $this->createMock(Security::class);
         $referent = $this->createReferentUser([1]);
@@ -116,9 +116,11 @@ final class AmenagementsParUtilisateurProviderTest extends TestCase
 
         $transformed = $provider->transform($resource);
 
-        static::assertCount(1, $transformed->inscriptions);
+        static::assertCount(2, $transformed->inscriptions);
         static::assertSame(1, $transformed->inscriptions[0]->formation->composante->id);
-        static::assertSame('2026-09-01', $transformed->inscriptions[0]->debut->format('Y-m-d'));
+        static::assertSame('2025-09-01', $transformed->inscriptions[0]->debut->format('Y-m-d'));
+        static::assertSame(1, $transformed->inscriptions[1]->formation->composante->id);
+        static::assertSame('2026-09-01', $transformed->inscriptions[1]->debut->format('Y-m-d'));
     }
 
     public function testReferentComposanteWithNoMatchingInscriptionGetsEmptyArray(): void
@@ -149,7 +151,7 @@ final class AmenagementsParUtilisateurProviderTest extends TestCase
         static::assertEmpty($transformed->inscriptions);
     }
 
-    public function testNonReferentGetsMostRecentInscriptionOverall(): void
+    public function testNonReferentGetsAllInscriptions(): void
     {
         $security = $this->createMock(Security::class);
         $security->method('isGranted')->willReturn(false);
@@ -169,9 +171,43 @@ final class AmenagementsParUtilisateurProviderTest extends TestCase
 
         $transformed = $provider->transform($resource);
 
-        static::assertCount(1, $transformed->inscriptions);
-        static::assertSame(2, $transformed->inscriptions[0]->formation->composante->id);
-        static::assertSame('2026-09-15', $transformed->inscriptions[0]->debut->format('Y-m-d'));
+        static::assertCount(2, $transformed->inscriptions);
+        static::assertSame($inscriptionCmp1, $transformed->inscriptions[0]);
+        static::assertSame($inscriptionCmp2Recent, $transformed->inscriptions[1]);
+    }
+
+    public function testReferentComposanteWhoIsAlsoPlanificateurGetsAllInscriptions(): void
+    {
+        $security = $this->createMock(Security::class);
+        $referent = $this->createReferentUser([1]);
+
+        $security->method('isGranted')->willReturnCallback(
+            static fn(string $role): bool => match ($role) {
+                Utilisateur::ROLE_REFERENT_COMPOSANTE => true,
+                Utilisateur::ROLE_PLANIFICATEUR => true,
+                default => false,
+            },
+        );
+        $security->method('getUser')->willReturn($referent);
+
+        $provider = new AmenagementsParUtilisateurProvider(
+            $security,
+            $this->createMock(ProviderInterface::class),
+            $this->createMock(UtilisateurProvider::class),
+        );
+
+        $inscriptionCmp1 = $this->createInscription(1, '2026-09-01');
+        $inscriptionCmp2Recent = $this->createInscription(2, '2026-09-15');
+
+        $resource = new ApiUtilisateur();
+        $resource->inscriptions = [$inscriptionCmp1, $inscriptionCmp2Recent];
+        $resource->amenagements = [];
+
+        $transformed = $provider->transform($resource);
+
+        static::assertCount(2, $transformed->inscriptions);
+        static::assertSame($inscriptionCmp1, $transformed->inscriptions[0]);
+        static::assertSame($inscriptionCmp2Recent, $transformed->inscriptions[1]);
     }
 
     public function testUserWithNoInscriptionsReturnsEmptyArray(): void

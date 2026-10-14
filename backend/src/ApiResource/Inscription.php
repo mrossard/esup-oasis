@@ -65,7 +65,12 @@ final class Inscription
         }
     }
 
-    #[Groups([Utilisateur::GROUP_OUT, Demande::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
+    #[Groups([
+        Utilisateur::GROUP_OUT,
+        Demande::GROUP_OUT,
+        Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT,
+        Amenagement::GROUP_OUT,
+    ])]
     public DateTimeInterface $debut {
         get {
             $prop = new ReflectionProperty(self::class, 'debut');
@@ -75,7 +80,12 @@ final class Inscription
             return $this->debut;
         }
     }
-    #[Groups([Utilisateur::GROUP_OUT, Demande::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
+    #[Groups([
+        Utilisateur::GROUP_OUT,
+        Demande::GROUP_OUT,
+        Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT,
+        Amenagement::GROUP_OUT,
+    ])]
     public DateTimeInterface $fin {
         get {
             $prop = new ReflectionProperty(self::class, 'fin');
@@ -86,7 +96,12 @@ final class Inscription
         }
     }
 
-    #[Groups([Utilisateur::GROUP_OUT, Demande::GROUP_OUT, Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT])]
+    #[Groups([
+        Utilisateur::GROUP_OUT,
+        Demande::GROUP_OUT,
+        Utilisateur::AMENAGEMENTS_UTILISATEURS_OUT,
+        Amenagement::GROUP_OUT,
+    ])]
     public bool $principale {
         get {
             $prop = new ReflectionProperty(self::class, 'principale');

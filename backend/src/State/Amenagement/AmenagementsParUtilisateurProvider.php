@@ -93,20 +93,19 @@ class AmenagementsParUtilisateurProvider implements ProviderInterface
             ));
         }
 
-        // TODO: si référent composante, on veut celle qui est sur la bonne composante même si ce n'est pas la première!
-        $inscriptions = $resource->inscriptions;
-        if ($this->security->isGranted(\App\Entity\Utilisateur::ROLE_REFERENT_COMPOSANTE)) {
+        // Si référent composante, on filtre les inscriptions
+        if (
+            $this->security->isGranted(\App\Entity\Utilisateur::ROLE_REFERENT_COMPOSANTE)
+            && !$this->security->isGranted(\App\Entity\Utilisateur::ROLE_PLANIFICATEUR)
+        ) {
             $user = $this->security->getUser();
+            assert($user instanceof \App\Entity\Utilisateur);
             $inscriptions = array_filter(array: $resource->inscriptions, callback: fn($inscription) => in_array(
                 $inscription->formation->composante->id,
                 array_map(callback: fn($cmp) => $cmp->getId(), array: $user->getComposantes()->toArray()),
             ));
+            $resource->inscriptions = $inscriptions;
         }
-
-        usort($inscriptions, function (Inscription $a, Inscription $b) {
-            return $b->debut <=> $a->debut;
-        });
-        $resource->inscriptions = empty($inscriptions) ? [] : [array_shift($inscriptions)];
 
         return $resource;
     }
