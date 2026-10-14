@@ -8,7 +8,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ITag, ITypeAmenagement, PREFETCH_TAGS } from "@api";
+import { IComposante, ITag, ITypeAmenagement, PREFETCH_COMPOSANTES, PREFETCH_TAGS } from "@api";
 import { useMemo, useState } from "react";
 import { useApi } from "@context/api/ApiProvider";
 import { FiltreAmenagement, filtreAmenagementToApi } from "@controls/Table/AmenagementTableLayout";
@@ -68,10 +68,11 @@ function getHeader(
   return headers.filter((h) => h) as { label: string; key: string }[];
 }
 
-function formatAmenagementsBeneficiaireData(
+export function formatAmenagementsBeneficiaireData(
   amenagements: any[],
   typesAmenagementsUtilises: TypesDomainesAmenagements[],
   tags?: ITag[],
+  composantes?: IComposante[],
 ) {
   return amenagements.map((amenagement) => {
     const data: any = {
@@ -81,7 +82,9 @@ function formatAmenagementsBeneficiaireData(
       prenom: amenagement.prenom,
       email: amenagement.email,
       numeroEtudiant: amenagement.numeroEtudiant,
-      composante: amenagement.inscription?.formation?.composante?.libelle?.replaceAll('"', '""'),
+      composante: composantes
+        ?.find((c) => c["@id"] === amenagement.inscription?.formation?.composante)
+        ?.libelle?.replaceAll('"', '""'),
       formation: amenagement.inscription?.formation?.libelle?.replaceAll('"', '""'),
       tags:
         (amenagement.tags as string[])
@@ -159,6 +162,11 @@ export default function AmenagementsBeneficiaireTableExport({
     enabled: exportSubmit,
   });
 
+  const { data: composantes } = useApi().useGetFullCollection({
+    ...PREFETCH_COMPOSANTES,
+    enabled: exportSubmit,
+  });
+
   const typesAmenagementsUtilises = useMemo(
     () =>
       getTypesAmenagements(amenagements?.items || [], typesAmenagements).sort((a, b) =>
@@ -172,7 +180,7 @@ export default function AmenagementsBeneficiaireTableExport({
     [amenagements?.items, typesAmenagementsUtilises],
   );
 
-  const refDataReady = !!(amenagements?.items && tags?.items);
+  const refDataReady = !!(amenagements?.items && tags?.items && composantes?.items);
   const globalFetchedCount = amFetchedCount + tagsFetchedCount;
   const globalTotalItems = amIsLoadingPage1 ? 0 : amTotalItems + tagsTotalItems;
 
@@ -180,7 +188,12 @@ export default function AmenagementsBeneficiaireTableExport({
     <CsvExportButton
       key={exportKey}
       getData={() =>
-        formatAmenagementsBeneficiaireData(data || [], typesAmenagementsUtilises, tags?.items)
+        formatAmenagementsBeneficiaireData(
+          data || [],
+          typesAmenagementsUtilises,
+          tags?.items,
+          composantes?.items,
+        )
       }
       headers={getHeader(typesAmenagementsUtilises, user)}
       filename="amenagements"

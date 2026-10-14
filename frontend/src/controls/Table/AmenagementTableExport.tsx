@@ -9,12 +9,14 @@
 
 import {
   IAmenagement,
+  IComposante,
   ICategorieAmenagement,
   ITag,
   ITypeAmenagement,
   ITypeSuiviAmenagement,
   IUtilisateur,
   PREFETCH_CATEGORIES_AMENAGEMENTS,
+  PREFETCH_COMPOSANTES,
   PREFETCH_TAGS,
   PREFETCH_TYPES_AMENAGEMENTS,
   PREFETCH_TYPES_SUIVI_AMENAGEMENTS,
@@ -49,13 +51,14 @@ const headers = [
   { label: "Tags", key: "tags" },
 ];
 
-function getAmenagementsData(
+export function getAmenagementsData(
   amenagements: IAmenagement[],
   categories: ICategorieAmenagement[] | undefined,
   types: ITypeAmenagement[] | undefined,
   suivis: ITypeSuiviAmenagement[] | undefined,
   cas: IUtilisateur[] | undefined,
   tags: ITag[] | undefined,
+  composantes: IComposante[] | undefined,
 ) {
   return amenagements.map((amenagement) => {
     const beneficiaire = amenagement.beneficiaire;
@@ -87,10 +90,9 @@ function getAmenagementsData(
       fin: amenagement.fin ? dayjs(amenagement.fin).format("DD/MM/YYYY") : undefined,
       commentaire: amenagement.commentaire?.replaceAll('"', '""'),
       suivi: suivis?.find((s) => s["@id"] === amenagement.suivi)?.libelle?.replaceAll('"', '""'),
-      composante: (beneficiaire?.inscriptions || [])[0]?.formation?.composante?.libelle?.replaceAll(
-        '"',
-        '""',
-      ),
+      composante: composantes
+        ?.find((c) => c["@id"] === (beneficiaire?.inscriptions || [])[0]?.formation?.composante)
+        ?.libelle?.replaceAll('"', '""'),
       formation: (beneficiaire?.inscriptions || [])[0]?.formation?.libelle?.replaceAll('"', '""'),
       chargeAccompagnement: (beneficiaire?.gestionnairesActifs || [])
         .map((g) => {
@@ -150,12 +152,18 @@ export default function AmenagementTableExport({
     enabled: exportSubmit,
   });
 
+  const { data: composantes } = useApi().useGetFullCollection({
+    ...PREFETCH_COMPOSANTES,
+    enabled: exportSubmit,
+  });
+
   const refDataReady = !!(
     categories?.items &&
     types?.items &&
     suivis?.items &&
     cas?.items &&
-    tags?.items
+    tags?.items &&
+    composantes?.items
   );
 
   return (
@@ -174,6 +182,7 @@ export default function AmenagementTableExport({
           suivis?.items,
           cas?.items,
           tags?.items,
+          composantes?.items,
         )
       }
       ready={refDataReady}

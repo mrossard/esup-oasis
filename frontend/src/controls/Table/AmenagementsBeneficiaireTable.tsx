@@ -45,6 +45,7 @@ export type IAmenagementsBeneficiaireTableDataSource = {
   numeroEtudiant: number | null | undefined;
   etatAvisEse: string | undefined;
   tags: string[];
+  inscriptions: IAmenagementsBenefificiaire["inscriptions"];
   inscription:
     | {
         formation: IFormation;
@@ -69,6 +70,7 @@ export function buildAmenagementsBenefDatasource(
       numeroEtudiant: rd.numeroEtudiant,
       etatAvisEse: rd.etatAvisEse,
       tags: rd.tags || [],
+      inscriptions: rd.inscriptions,
       inscription:
         rd.inscriptions && rd.inscriptions.length > 0
           ? {

@@ -3285,22 +3285,10 @@ lire            /**
         "Composante-composante.in.jsonMergePatch": {
             referents?: string[];
         };
-        "Composante.html-amenagement.out": {
-            libelle?: string;
-        };
-        "Composante.html-amenagements_utilisateurs.out": {
-            libelle?: string;
-        };
         "Composante.html-composante.out": {
             id?: number;
             libelle?: string;
             referents?: string[];
-        };
-        "Composante.jsonld-amenagement.out": components["schemas"]["HydraItemBaseSchema"] & {
-            libelle?: string;
-        };
-        "Composante.jsonld-amenagements_utilisateurs.out": components["schemas"]["HydraItemBaseSchema"] & {
-            libelle?: string;
         };
         "Composante.jsonld-composante.out": components["schemas"]["HydraItemBaseSchema"] & {
             id?: number;
@@ -4027,11 +4015,19 @@ lire            /**
             diplome?: string | null;
         };
         "Formation.html-amenagement.out": {
-            composante?: components["schemas"]["Composante.html-amenagement.out"];
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            composante?: string;
             libelle?: string;
         };
         "Formation.html-amenagements_utilisateurs.out": {
-            composante?: components["schemas"]["Composante.html-amenagements_utilisateurs.out"];
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            composante?: string;
             libelle?: string;
         };
         "Formation.html-demande.out": {
@@ -4068,11 +4064,19 @@ lire            /**
             diplome?: string | null;
         };
         "Formation.jsonld-amenagement.out": components["schemas"]["HydraItemBaseSchema"] & {
-            composante?: components["schemas"]["Composante.jsonld-amenagement.out"];
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            composante?: string;
             libelle?: string;
         };
         "Formation.jsonld-amenagements_utilisateurs.out": components["schemas"]["HydraItemBaseSchema"] & {
-            composante?: components["schemas"]["Composante.jsonld-amenagements_utilisateurs.out"];
+            /**
+             * Format: iri-reference
+             * @example https://example.com/
+             */
+            composante?: string;
             libelle?: string;
         };
         "Formation.jsonld-demande.out": components["schemas"]["HydraItemBaseSchema"] & {
@@ -4147,6 +4151,11 @@ lire            /**
         };
         "Inscription.html-amenagement.out": {
             formation?: components["schemas"]["Formation.html-amenagement.out"];
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string;
+            principale?: boolean;
         };
         "Inscription.html-amenagements_utilisateurs.out": {
             formation?: components["schemas"]["Formation.html-amenagements_utilisateurs.out"];
@@ -4174,6 +4183,11 @@ lire            /**
         };
         "Inscription.jsonld-amenagement.out": components["schemas"]["HydraItemBaseSchema"] & {
             formation?: components["schemas"]["Formation.jsonld-amenagement.out"];
+            /** Format: date-time */
+            debut?: string;
+            /** Format: date-time */
+            fin?: string;
+            principale?: boolean;
         };
         "Inscription.jsonld-amenagements_utilisateurs.out": components["schemas"]["HydraItemBaseSchema"] & {
             formation?: components["schemas"]["Formation.jsonld-amenagements_utilisateurs.out"];
