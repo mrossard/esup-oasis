@@ -60,6 +60,12 @@ vi.mock("@controls/Table/FiltreSessionSwitch", () => ({
   FiltreSessionSwitch: () => null,
 }));
 
+vi.mock("@controls/Items/InscriptionsGroupeesItem", () => ({
+  InscriptionsGroupeesItem: ({ inscriptions }: { inscriptions?: { "@id": string }[] }) => (
+    <span data-testid="inscriptions">{(inscriptions ?? []).map((i) => i["@id"]).join(",")}</span>
+  ),
+}));
+
 vi.mock("@utils/logger", () => ({ logger: { error: vi.fn() } }));
 
 const testRefs = {
@@ -120,5 +126,29 @@ describe("DemandeTable", () => {
     expect(screen.getByText("En cours")).toBeInTheDocument();
     expect(screen.getByText("Réceptionnée")).toBeInTheDocument();
     expect(screen.getByText("Conforme")).toBeInTheDocument();
+  });
+
+  it("colonne inscription : transmet les inscriptions du demandeur à InscriptionsGroupeesItem", () => {
+    mockUseGetCollectionPaginated.mockReturnValue({
+      data: {
+        items: [
+          {
+            "@id": "/demandes/1",
+            id: 1,
+            etat: ETAT_DEMANDE_EN_COURS,
+            demandeur: { inscriptions: [{ "@id": "/i/1" }, { "@id": "/i/2" }] },
+          },
+          { "@id": "/demandes/2", id: 2, etat: ETAT_DEMANDE_RECEPTIONNEE },
+        ],
+        totalItems: 2,
+      } as never,
+      isFetching: false,
+    });
+    renderWithProviders(<DemandeTable refs={testRefs as never} />);
+    expect(screen.getByRole("columnheader", { name: /inscription/i })).toBeInTheDocument();
+    expect(screen.getAllByTestId("inscriptions").map((c) => c.textContent)).toEqual([
+      "/i/1,/i/2",
+      "",
+    ]);
   });
 });
