@@ -1,5 +1,5 @@
 import { screen } from "@testing-library/react";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { renderWithProviders } from "@/test";
 import DemandeTable from "./DemandeTable";
 import { ETAT_DEMANDE_EN_COURS, ETAT_DEMANDE_RECEPTIONNEE, ETAT_DEMANDE_CONFORME } from "@lib";
@@ -81,6 +81,10 @@ describe("DemandeTable", () => {
     mockUseGetCollectionPaginated.mockReturnValue({ data: undefined, isFetching: false });
   });
 
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
   it("rendu sans données : le tableau s'affiche sans erreur", () => {
     renderWithProviders(<DemandeTable refs={testRefs as never} />);
     expect(screen.getByRole("table", { name: /liste des demandes/i })).toBeInTheDocument();
@@ -129,6 +133,26 @@ describe("DemandeTable", () => {
   });
 
   it("colonne inscription : transmet les inscriptions du demandeur à InscriptionsGroupeesItem", () => {
+    // Les colonnes `responsive` d'Ant Design sont masquées tant qu'aucun breakpoint ne matche :
+    // on simule un écran de 1024px (breakpoints jusqu'à `lg`, sans `xl`)
+    const largeurEcran = 1024;
+    vi.stubGlobal("matchMedia", (query: string) => ({
+      matches: Number(/min-width:\s*(\d+)px/.exec(query)?.[1] ?? 0) <= largeurEcran,
+      media: query,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+    // L'avatar du demandeur (affiché à partir de `lg`) utilise `useInView`
+    vi.stubGlobal(
+      "IntersectionObserver",
+      class {
+        observe = vi.fn();
+        unobserve = vi.fn();
+        disconnect = vi.fn();
+      },
+    );
     mockUseGetCollectionPaginated.mockReturnValue({
       data: {
         items: [
