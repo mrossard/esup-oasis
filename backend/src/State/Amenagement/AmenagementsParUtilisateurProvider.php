@@ -104,7 +104,7 @@ class AmenagementsParUtilisateurProvider implements ProviderInterface
                 $inscription->formation->composante->id,
                 array_map(callback: fn($cmp) => $cmp->getId(), array: $user->getComposantes()->toArray()),
             ));
-            $resource->inscriptions = $inscriptions;
+            $resource->inscriptions = array_values($inscriptions);
         }
 
         return $resource;
