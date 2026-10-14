@@ -2609,7 +2609,7 @@ export interface components {
             tauxHoraire?: components["schemas"]["TauxHoraire.jsonld-ActiviteBeneficiaire.out"] | null;
         };
         "ActiviteBilanFinancier.customcsv": {
-lire            /**
+            /**
              * Format: iri-reference
              * @example https://example.com/
              */
@@ -3363,15 +3363,6 @@ lire            /**
             dateAvisMedecin?: string | null;
             /** @default false */
             dateAvisMedecinRequise: boolean;
-        };
-        "DecisionAmenagementExamens.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
-            etat?: string;
-            readonly urlContenu?: string | null;
-            observations?: string | null;
-            /** Format: date-time */
-            dateAvisMedecin?: string | null;
-            /** @default false */
-            readonly dateAvisMedecinRequise: boolean;
         };
         "DecisionAmenagementExamens.jsonld-decision.out": components["schemas"]["HydraItemBaseSchema"] & {
             etat?: string;
