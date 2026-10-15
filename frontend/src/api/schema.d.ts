@@ -4140,15 +4140,7 @@ export interface components {
             "@id": string;
             "@type": string;
         };
-        "InfoComplementaire.customcsv": {
-            libelle?: string;
-            valeur?: string;
-        };
         "InfoComplementaire.html-utilisateur.out": {
-            libelle?: string;
-            valeur?: string;
-        };
-        "InfoComplementaire.jsonld": {
             libelle?: string;
             valeur?: string;
         };
@@ -5407,50 +5399,6 @@ export interface components {
             abonneRecapHebdo?: boolean;
             numeroAnonyme?: number | null;
         };
-        "Utilisateur.customcsv": {
-            uid?: string;
-            roleId?: string | null;
-            email?: string;
-            nom?: string;
-            prenom?: string;
-            /** Format: date-time */
-            dateNaissance?: string | null;
-            genre?: string | null;
-            numeroEtudiant?: number | null;
-            /** Format: email */
-            emailPerso?: string | null;
-            telPerso?: string | null;
-            contactUrgence?: string | null;
-            roles?: ("ROLE_ADMIN" | "ROLE_GESTIONNAIRE" | "ROLE_RENFORT" | "ROLE_USER" | "ROLE_BENEFICIAIRE" | "ROLE_DEMANDEUR" | "ROLE_INTERVENANT" | "ROLE_PLANIFICATEUR" | "ROLE_ADMIN_TECHNIQUE" | "ROLE_MEMBRE_COMMISSION" | "ROLE_REFERENT_COMPOSANTE" | "ROLE_VALIDER_CONFORMITE_DEMANDE" | "ROLE_ATTRIBUER_PROFIL")[];
-            services?: string[];
-            campus?: string[];
-            competences?: string[];
-            typesEvenements?: string[];
-            profils?: string[];
-            etatAvisEse?: string;
-            amenagements?: string[];
-            tags?: string[];
-            gestionnairesActifs?: string[];
-            /** Format: date-time */
-            intervenantDebut?: string | null;
-            /** Format: date-time */
-            intervenantFin?: string | null;
-            inscriptions?: string[];
-            boursier?: boolean | null;
-            statutEtudiant?: string | null;
-            abonneImmediat?: boolean;
-            abonneVeille?: boolean;
-            abonneAvantVeille?: boolean;
-            abonneRecapHebdo?: boolean;
-            /**
-             * Format: iri-reference
-             * @example https://example.com/
-             */
-            decisionAmenagementAnneeEnCours?: string | null;
-            numeroAnonyme?: number | null;
-            infosComplementaires?: components["schemas"]["InfoComplementaire.customcsv"][];
-        };
-        "Utilisateur.customcsv-services_faits.out": Record<string, never>;
         "Utilisateur.html-ActiviteBeneficiaire.out": {
             email?: string;
             nom?: string;
@@ -5525,43 +5473,6 @@ export interface components {
             decisionAmenagementAnneeEnCours?: components["schemas"]["DecisionAmenagementExamens.html-utilisateur.out"] | null;
             numeroAnonyme?: number | null;
             infosComplementaires?: components["schemas"]["InfoComplementaire.html-utilisateur.out"][];
-        };
-        "Utilisateur.jsonld": components["schemas"]["HydraItemBaseSchema"] & {
-            readonly uid?: string;
-            readonly email?: string;
-            readonly nom?: string;
-            readonly prenom?: string;
-            /** Format: date-time */
-            readonly dateNaissance?: string | null;
-            readonly genre?: string | null;
-            readonly numeroEtudiant?: number | null;
-            /** Format: email */
-            emailPerso?: string | null;
-            telPerso?: string | null;
-            contactUrgence?: string | null;
-            roles?: ("ROLE_ADMIN" | "ROLE_GESTIONNAIRE" | "ROLE_RENFORT" | "ROLE_USER" | "ROLE_BENEFICIAIRE" | "ROLE_DEMANDEUR" | "ROLE_INTERVENANT" | "ROLE_PLANIFICATEUR" | "ROLE_ADMIN_TECHNIQUE" | "ROLE_MEMBRE_COMMISSION" | "ROLE_REFERENT_COMPOSANTE" | "ROLE_VALIDER_CONFORMITE_DEMANDE" | "ROLE_ATTRIBUER_PROFIL")[];
-            services?: string[];
-            campus?: string[];
-            competences?: string[];
-            typesEvenements?: string[];
-            profils?: string[];
-            readonly etatAvisEse?: string;
-            readonly tags?: string[];
-            readonly gestionnairesActifs?: string[];
-            /** Format: date-time */
-            intervenantDebut?: string | null;
-            /** Format: date-time */
-            intervenantFin?: string | null;
-            readonly inscriptions?: components["schemas"]["Inscription.jsonld"][];
-            readonly boursier?: boolean | null;
-            readonly statutEtudiant?: string | null;
-            abonneImmediat?: boolean;
-            abonneVeille?: boolean;
-            abonneAvantVeille?: boolean;
-            abonneRecapHebdo?: boolean;
-            readonly decisionAmenagementAnneeEnCours?: components["schemas"]["DecisionAmenagementExamens.jsonld"] | null;
-            numeroAnonyme?: number | null;
-            readonly infosComplementaires?: components["schemas"]["InfoComplementaire.jsonld"][];
         };
         "Utilisateur.jsonld-ActiviteBeneficiaire.out": components["schemas"]["HydraItemBaseSchema"] & {
             email?: string;

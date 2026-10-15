@@ -80,6 +80,32 @@ describe("BeneficiaireTableExport", () => {
     expect(headerKeys).toEqual(["nom", "prenom", "tags", "numeroEtudiant"]);
   });
 
+  it("demande la portée des inscriptions si la colonne Inscription est exportée", () => {
+    mockCsvExportButton.mockClear();
+    render(
+      <BeneficiaireTableExport
+        filtreBeneficiaire={FILTRE_BENEFICIAIRE_DEFAULT}
+        colonnesVisibles={["nom", "inscription"]}
+      />,
+    );
+
+    const lastProps = mockCsvExportButton.mock.calls[0]?.[0];
+    expect(lastProps.onBeforeStart).toEqual(expect.any(Function));
+  });
+
+  it("ne demande pas la portée des inscriptions si la colonne Inscription est masquée", () => {
+    mockCsvExportButton.mockClear();
+    render(
+      <BeneficiaireTableExport
+        filtreBeneficiaire={FILTRE_BENEFICIAIRE_DEFAULT}
+        colonnesVisibles={["nom", "email", "composantes"]}
+      />,
+    );
+
+    const lastProps = mockCsvExportButton.mock.calls[0]?.[0];
+    expect(lastProps.onBeforeStart).toBeUndefined();
+  });
+
   it("inclut les colonnes complémentaires dans les headers et mappe leurs valeurs dans getData", () => {
     mockCsvExportButton.mockClear();
     render(

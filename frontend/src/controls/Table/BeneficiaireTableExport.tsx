@@ -156,12 +156,14 @@ export default function BeneficiaireTableExport({
 
   const { portee, demanderPortee, modalPortee } = useExportInscriptions();
 
+  const colonnesExportees = colonnesVisibles?.length ? colonnesVisibles : DEFAULT_COLUMNS;
+  // La portée des inscriptions n'est demandée que si la colonne Inscription est exportée.
+  const exporteInscriptions = colonnesExportees.includes(INSCRIPTION);
+
   const headers = useMemo(() => {
     const map = getColumnHeadersMap(portee);
-    return (colonnesVisibles?.length ? colonnesVisibles : DEFAULT_COLUMNS).flatMap(
-      (colKey) => map[colKey] || [{ label: colKey, key: colKey }],
-    );
-  }, [colonnesVisibles, portee]);
+    return colonnesExportees.flatMap((colKey) => map[colKey] || [{ label: colKey, key: colKey }]);
+  }, [colonnesExportees, portee]);
 
   const refDataReady = !!(composantes?.items && gestionnaires?.items && tags?.items);
 
@@ -178,7 +180,7 @@ export default function BeneficiaireTableExport({
           getBeneficiairesData(items, composantes?.items, gestionnaires?.items, tags?.items, portee)
         }
         ready={refDataReady}
-        onBeforeStart={demanderPortee}
+        onBeforeStart={exporteInscriptions ? demanderPortee : undefined}
         onStart={() => setExportState((prev) => ({ ...prev, exportSubmit: true }))}
       />
       {modalPortee}
