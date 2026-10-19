@@ -69,7 +69,7 @@ class ServicesFaitsTest extends ApiTestCaseCustom
 
         $data = $client->getResponse()->toArray();
         $this->assertCount(2, $data['lignes']);
-        
+
         // On vérifie les deux intervenants (triés par nom)
         // intervenant (intervenant1) et intervenant2
         $this->assertJsonContains([
@@ -106,5 +106,15 @@ class ServicesFaitsTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'text/csv; charset=utf-8');
+    }
+
+    public function testServicesFaitsOrder(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('GET', '/intervenants/intervenant2/services_faits?order[debut]=desc');
+        $this->assertResponseIsSuccessful();
+
+        $client->request('GET', '/intervenants/intervenant2/services_faits?order[debut]=asc');
+        $this->assertResponseIsSuccessful();
     }
 }

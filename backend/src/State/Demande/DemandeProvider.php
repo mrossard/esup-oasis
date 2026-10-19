@@ -22,10 +22,10 @@ use App\ApiResource\QuestionDemande;
 use App\ApiResource\ReponseDemande;
 use App\ApiResource\TypeDemande;
 use App\ApiResource\Utilisateur;
+use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\Entity\OptionReponse;
 use App\Entity\Question;
 use App\Entity\Reponse;
-use App\Filter\PreloadAssociationsFilter;
 use App\Repository\QuestionRepository;
 use App\Repository\ReponseRepository;
 use App\Repository\TypeDemandeRepository;
@@ -82,10 +82,11 @@ class DemandeProvider implements ResetInterface, ProviderInterface
      */
     private function addFilters(array $context): array
     {
+        $context['filters'] ??= [];
         /**
          * préchargement de relations utilisées dans tous les cas : inscription, beneficiaire, type de demande
          */
-        $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+        $context[PreloadAssociationsExtension::PROPERTY] = [
             'demandeur' => [
                 'sourceEntity' => 'root',
                 'relationName' => 'demandeur',

@@ -107,4 +107,23 @@ class PeriodesRhTest extends ApiTestCaseCustom
 
         $this->assertResponseStatusCodeSame(422);
     }
+
+    public function testFilterAndSortPeriodes(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        // Test sort ASC
+        $response = $client->request('GET', '/periodes?order[debut]=asc');
+        $this->assertResponseIsSuccessful();
+        $data = $response->toArray();
+        $this->assertSame('2012-01-01T00:00:00+00:00', $data['hydra:member'][0]['debut']);
+
+        // Test filter butoir[before]
+        $response = $client->request('GET', '/periodes?butoir[before]=2022-01-01');
+        $this->assertResponseIsSuccessful();
+        $data = $response->toArray();
+        $this->assertCount(2, $data['hydra:member']);
+        $this->assertSame('2021-01-01T00:00:00+00:00', $data['hydra:member'][0]['debut']);
+        $this->assertSame('2012-01-01T00:00:00+00:00', $data['hydra:member'][1]['debut']);
+    }
 }

@@ -12,11 +12,11 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Filter\ServicesFaitsPeriodeOrderFilter;
 use App\State\PeriodeRH\IntervenantServicesFaitsProvider;
 use App\State\PeriodeRH\ServicesFaitsProvider;
@@ -27,6 +27,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new GetCollection(
             uriTemplate: '/intervenants/{uid}/services_faits',
             uriVariables: ['uid'],
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new ServicesFaitsPeriodeOrderFilter(),
+                    properties: ['debut'],
+                ),
+            ],
             security: "is_granted('ROLE_ADMIN') or request.attributes.get('uid') == user.getUid()",
             provider: IntervenantServicesFaitsProvider::class,
         ),
@@ -46,7 +52,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
 )]
-#[ApiFilter(ServicesFaitsPeriodeOrderFilter::class)]
 class ServicesFaits
 {
     public const string GROUP_OUT = 'services_faits:out';

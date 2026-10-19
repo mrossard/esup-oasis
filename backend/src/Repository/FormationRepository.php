@@ -65,10 +65,6 @@ class FormationRepository extends ServiceEntityRepository
      */
     public function incompletes(): array
     {
-        return $this
-            ->createQueryBuilder('f')
-            ->andWhere('f.diplome is null')
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('f')->andWhere('f.diplome is null')->getQuery()->getResult();
     }
 }

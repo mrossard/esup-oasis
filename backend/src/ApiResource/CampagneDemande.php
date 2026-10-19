@@ -12,17 +12,16 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
-use App\Filter\TypeDemandeCampagneFilter;
 use App\State\CampagneDemande\CampagneDemandeProcessor;
 use App\State\CampagneDemande\CampagneDemandeProvider;
 use DateTimeInterface;
@@ -33,7 +32,14 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 #[ApiResource(
     operations: [
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id', 'typeId'], map: false),
-        new GetCollection(uriTemplate: self::COLLECTION_URI, uriVariables: ['typeId'], map: false),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            uriVariables: ['typeId'],
+            parameters: [
+                'order[:property]' => new QueryParameter(filter: new SortFilter(), properties: ['debut']),
+            ],
+            map: false,
+        ),
         new Post(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: ['typeId'],
@@ -55,8 +61,6 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     processor: CampagneDemandeProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\CampagneDemande::class),
 )]
-#[ApiFilter(TypeDemandeCampagneFilter::class)]
-#[ApiFilter(OrderFilter::class, properties: ['debut'])]
 class CampagneDemande
 {
     public const string COLLECTION_URI = '/types_demandes/{typeId}/campagnes';

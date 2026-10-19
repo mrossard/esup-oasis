@@ -13,15 +13,14 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
-use App\Filter\PreloadAssociationsFilter;
 use App\State\Composante\ComposanteProvider;
 use App\State\Composante\PatchComposanteProcessor;
 use ReflectionProperty;
@@ -30,7 +29,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     operations: [
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
-        new GetCollection(uriTemplate: self::COLLECTION_URI, map: false),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['libelle'],
+                ),
+            ],
+            map: false,
+        ),
         new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id'], security: "is_granted('ROLE_ADMIN')"),
     ],
     normalizationContext: ['groups' => [self::GROUP_OUT]],
@@ -40,8 +48,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
     processor: PatchComposanteProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\Composante::class),
 )]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
-#[ApiFilter(PreloadAssociationsFilter::class)]
 final class Composante
 {
     public const string COLLECTION_URI = '/composantes';

@@ -12,9 +12,7 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -66,7 +64,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: BeneficiaireProfilProcessor::class,
     stateOptions: new Options(entityClass: Beneficiaire::class),
 )]
-#[ApiFilter(SearchFilter::class, properties: ['profil'])]
 #[ProfilAvecTypologieConstraint(groups: [self::GROUP_VALIDATION_IN])]
 #[BeneficiaireDifferentGestionnaireContraint(groups: [self::GROUP_VALIDATION_IN])]
 #[BeneficiaireSupprimableConstraint(groups: [self::GROUP_VALIDATION_DELETE])]

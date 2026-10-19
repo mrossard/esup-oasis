@@ -12,15 +12,15 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\TypeAmenagement\TypeAmenagementProcessor;
@@ -30,7 +30,30 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, parameters: [
+            'examens' => new QueryParameter(
+                filter: new ExactFilter(),
+                property: 'examens',
+                schema: ['type' => 'boolean'],
+                castToNativeType: true,
+                castToArray: false,
+            ),
+            'pedagogique' => new QueryParameter(
+                filter: new ExactFilter(),
+                property: 'pedagogique',
+                schema: ['type' => 'boolean'],
+                castToNativeType: true,
+                castToArray: false,
+            ),
+            'aideHumaine' => new QueryParameter(
+                filter: new ExactFilter(),
+                property: 'aideHumaine',
+                schema: ['type' => 'boolean'],
+                castToNativeType: true,
+                castToArray: false,
+            ),
+            'order[:property]' => new QueryParameter(filter: new CaseInsensitiveOrderFilter(), properties: ['libelle']),
+        ]),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
         new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_ADMIN')", map: false),
         new Patch(uriTemplate: self::ITEM_URI, security: "is_granted('ROLE_ADMIN')", map: false),
@@ -41,8 +64,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: TypeAmenagementProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\TypeAmenagement::class),
 )]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
-#[ApiFilter(BooleanFilter::class, properties: ['examens', 'pedagogique', 'aideHumaine'])]
 class TypeAmenagement
 {
     public const string COLLECTION_URI = '/types_amenagements';

@@ -19,7 +19,7 @@ class DecisionEditionDemandeeMessageHandlerTest extends KernelTestCase
 
         // On cherche une décision existante pour le test
         $decision = $em->getRepository(DecisionAmenagementExamens::class)->findOneBy([]);
-        
+
         if (null === $decision) {
             $this->markTestSkipped('No decision found in DB');
         }

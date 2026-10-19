@@ -121,7 +121,7 @@ class SecurityAuditTest extends ApiTestCaseCustom
     /**
      * Vérifie la sécurité du state OAuth contre les attaques CSRF
      */
-     public function testOAuthStateSecurity(): void
+    public function testOAuthStateSecurity(): void
     {
         $client = static::createClient();
 
@@ -160,9 +160,6 @@ class SecurityAuditTest extends ApiTestCaseCustom
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Invalid redirect URI');
 
-        $oauthService->getAccessToken(
-            new \Symfony\Component\HttpFoundation\Request(),
-            'https://attacker.com/callback'
-        );
+        $oauthService->getAccessToken(new \Symfony\Component\HttpFoundation\Request(), 'https://attacker.com/callback');
     }
 }

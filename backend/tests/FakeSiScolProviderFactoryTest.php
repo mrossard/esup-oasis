@@ -2,10 +2,10 @@
 
 namespace App\Tests;
 
+use App\Service\SiScol\AbstractSiScolDataProvider;
 use App\Service\SiScol\FakeSiScolDataProvider;
 use App\Service\SiScol\SiScolDataProviderFactory;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
-use App\Service\SiScol\AbstractSiScolDataProvider;
 
 /**
  * Test si la classe retourner est bien FakeSiScolDataProvider

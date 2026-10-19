@@ -16,8 +16,8 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Utilisateur;
+use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\Filter\IntervenantFilter;
-use App\Filter\PreloadAssociationsFilter;
 
 readonly class IntervenantProvider implements ProviderInterface
 {
@@ -35,7 +35,7 @@ readonly class IntervenantProvider implements ProviderInterface
         /**
          * Préchargement campus, service, competences, inscriptions, types événements, decisions
          */
-        $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+        $context[PreloadAssociationsExtension::PROPERTY] = [
             'beneficiaires' => [
                 'sourceEntity' => 'root',
                 'relationName' => 'beneficiaires',

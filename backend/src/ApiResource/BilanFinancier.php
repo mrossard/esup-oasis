@@ -14,13 +14,12 @@ namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\BilanFinancierProfilBeneficiairesFilter;
-use App\Filter\PeriodeDansIntervalleFilter;
 use App\State\Evenement\BilanFinancierProvider;
 use DateTimeInterface;
 
@@ -31,14 +30,21 @@ use DateTimeInterface;
         uriVariables: ['debut', 'fin'],
         openapi: new Operation(tags: ['Suivis'], description: 'Bilan financier'),
         paginationEnabled: false,
+        parameters: [
+            'profil' => new QueryParameter(
+                filter: BilanFinancierProfilBeneficiairesFilter::class,
+                property: 'profil',
+            ),
+            'exists[dateAnnulation]' => new QueryParameter(
+                filter: new ExistsFilter(),
+                property: 'dateAnnulation',
+            ),
+        ],
         security: "is_granted('ROLE_GESTIONNAIRE')",
         provider: BilanFinancierProvider::class,
         stateOptions: new Options(entityClass: \App\Entity\Evenement::class),
     ),
 ])]
-#[ApiFilter(PeriodeDansIntervalleFilter::class, properties: ['intervalle'])]
-#[ApiFilter(BilanFinancierProfilBeneficiairesFilter::class)]
-#[ApiFilter(ExistsFilter::class, properties: ['dateAnnulation'])]
 class BilanFinancier
 {
     public DateTimeInterface $debut;

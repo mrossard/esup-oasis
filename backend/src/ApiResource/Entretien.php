@@ -12,9 +12,8 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
@@ -22,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use App\State\Entretien\EntretienProcessor;
 use App\State\Entretien\EntretienProvider;
 use DateTimeInterface;
@@ -34,6 +34,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: self::COLLECTION_URI,
             uriVariables: [
                 'uid' => new Link(fromProperty: 'uid', toProperty: 'utilisateur', fromClass: Utilisateur::class),
+            ],
+            parameters: [
+                'order[:property]' => new QueryParameter(filter: new SortFilter(), properties: ['date']),
             ],
             security: "is_granted('ROLE_GESTIONNAIRE') or request.attributes.get('uid') == user.getUid()",
             map: false,
@@ -66,7 +69,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
     processor: EntretienProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\Entretien::class),
 )]
-#[ApiFilter(OrderFilter::class, properties: ['date'])]
 class Entretien
 {
     public const string COLLECTION_URI = Utilisateur::ITEM_URI . '/entretiens';

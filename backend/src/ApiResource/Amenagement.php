@@ -30,7 +30,6 @@ use App\Filter\BeneficiaireActifTagFilter;
 use App\Filter\CaseInsensitiveSearchFilter;
 use App\Filter\ComposanteFormationFilter;
 use App\Filter\NestedFieldSearchFilter;
-use App\Filter\PreloadAssociationsFilter;
 use App\State\Amenagement\AmenagementProcessor;
 use App\State\Amenagement\AmenagementProvider;
 use App\State\Amenagement\AmenagementSansFiltreProvider;
@@ -123,7 +122,6 @@ use Symfony\Component\Validator\Constraints as Assert;
         'desc' => "gestionnaire du bénéficiaire de l'aménagement",
     ],
 ])]
-#[ApiFilter(PreloadAssociationsFilter::class)]
 #[AmenagementDatesConstraint]
 class Amenagement
 {

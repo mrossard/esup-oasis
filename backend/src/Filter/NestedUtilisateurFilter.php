@@ -12,112 +12,184 @@
 
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
-use ApiPlatform\Doctrine\Orm\PropertyHelperTrait;
+use ApiPlatform\Doctrine\Common\Filter\PropertyAwareFilterInterface;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class NestedUtilisateurFilter extends AbstractFilter
+class NestedUtilisateurFilter implements FilterInterface, PropertyAwareFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
-    use PropertyHelperTrait;
-
+    /**
+     * @param array<string, string>|null $properties
+     */
     public function __construct(
         private readonly IriConverterInterface $iriConverter,
-        ManagerRegistry $managerRegistry,
+        protected ?ManagerRegistry $managerRegistry = null,
         ?LoggerInterface $logger = null,
-        ?array $properties = null,
+        protected ?array $properties = null,
         ?NameConverterInterface $nameConverter = null,
-    ) {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+    ) {}
+
+    public function getProperties(): ?array
+    {
+        return $this->properties;
     }
 
-    /**
-     * @param string $property
-     * @param                             $value
-     * @param QueryBuilder $queryBuilder
-     * @param QueryNameGeneratorInterface $queryNameGenerator
-     * @param string $resourceClass
-     * @param Operation|null $operation
-     * @param array $context
-     * @return void
-     */
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function setProperties(array $properties): void
+    {
+        $this->properties = $properties;
+    }
+
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if (!in_array($property, array_keys($this->getProperties()))) {
+        if (isset($context['parameter'])) {
+            $parameter = $context['parameter'];
+            $value = $parameter->getValue();
+            if (null === $value) {
+                return;
+            }
+            $propertyKey = $parameter->getKey();
+            $targetField = $parameter->getProperty() ?? ($this->properties[$propertyKey] ?? $propertyKey);
+            $this->filterByTargetField($propertyKey, $targetField, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation);
             return;
         }
+
+        if (empty($context['filters']) || empty($this->properties)) {
+            return;
+        }
+
+        foreach ($this->properties as $property => $targetField) {
+            if (isset($context['filters'][$property])) {
+                $this->filterByTargetField($property, $targetField, $context['filters'][$property], $queryBuilder, $queryNameGenerator, $resourceClass, $operation);
+            }
+        }
+    }
+
+    private function filterByTargetField(
+        string $property,
+        string $targetField,
+        mixed $value,
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+    ): void {
         if (!is_array($value)) {
             $value = [$value];
         }
         if (empty($value)) {
             return;
         }
-        $utilisateurs = array_map(fn($val) => $this->iriConverter->getResourceFromIri($val), $value);
 
-        $alias = $queryBuilder->getRootAliases()[0];
-        $joinAlias = $queryNameGenerator->generateJoinAlias($property);
-        //$queryBuilder->join($alias . '.' . $property, $joinAlias);
+        $utilisateurs = [];
+        foreach ($value as $val) {
+            try {
+                $utilisateurs[] = $this->iriConverter->getResourceFromIri($val);
+            } catch (\Throwable) {
+                // Ignore invalid IRIs
+            }
+        }
+        if (empty($utilisateurs)) {
+            return;
+        }
+
         $uidParams = [];
         foreach ($utilisateurs as $utilisateur) {
             $uidParam = $queryNameGenerator->generateParameterName('uid');
             $uidParams[] = $uidParam;
             $queryBuilder->setParameter($uidParam, $utilisateur->uid);
         }
-        $uidInList = implode(' , ', array_map(fn($uidParam) => ':' . $uidParam, $uidParams));
+        $uidInList = implode(' , ', array_map(static fn($p) => ':' . $p, $uidParams));
 
-        $targetField = $this->getProperties()[$property];
-        $currentResourceClass = $resourceClass;
+        $em = $queryBuilder->getEntityManager();
+        $entityClass = $operation?->getStateOptions()?->getEntityClass() ?? $resourceClass;
+        $currentEntityClass = $entityClass;
+        $alias = $queryBuilder->getRootAliases()[0];
 
-        while ($this->isPropertyNested($targetField, $currentResourceClass)) {
-            $metadata = $this->getClassMetadata($currentResourceClass);
-            $parts = explode('.', $targetField);
-            $current = array_shift($parts);
+        $parts = explode('.', $targetField);
+        $finalField = array_pop($parts);
 
-            $nextAlias = $queryNameGenerator->generateJoinAlias($current);
-            $queryBuilder->join(sprintf('%s.%s', $alias, $current), $nextAlias);
-
+        foreach ($parts as $part) {
+            $nextAlias = $queryNameGenerator->generateJoinAlias($part);
+            $queryBuilder->join(sprintf('%s.%s', $alias, $part), $nextAlias);
+            $metadata = $em->getClassMetadata($currentEntityClass);
+            $currentEntityClass = $metadata->getAssociationTargetClass($part);
             $alias = $nextAlias;
-            $targetField = implode('.', $parts);
-            $currentResourceClass = $metadata->getAssociationTargetClass($current);
         }
-        $queryBuilder->join(sprintf('%s.%s', $alias, $targetField), $joinAlias);
 
+        $joinAlias = $queryNameGenerator->generateJoinAlias($property);
+        $queryBuilder->join(sprintf('%s.%s', $alias, $finalField), $joinAlias);
         $queryBuilder->andWhere($joinAlias . '.uid in (' . $uidInList . ')');
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): array
+    {
+        $key = $parameter->getKey();
+        return [
+            new OpenApiParameter(
+                name: $key,
+                in: 'query',
+                description: 'IRI utilisateur',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+            new OpenApiParameter(
+                name: $key . '[]',
+                in: 'query',
+                description: 'IRIs utilisateur',
+                required: false,
+                schema: [
+                    'type' => 'array',
+                    'items' => ['type' => 'string'],
+                ],
+                style: 'form',
+                explode: true,
+            ),
+        ];
     }
 
     public function getDescription(string $resourceClass): array
     {
         $description = [];
-        foreach ($this->getProperties() as $property => $value) {
+        foreach ($this->properties ?? [] as $property => $value) {
             $description[$property] = [
                 'property' => $property,
                 'type' => TypeIdentifier::STRING->value,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => new Parameter(name: $property, in: 'query', description: 'IRI utilisateur'),
+                'openapi' => new OpenApiParameter(name: $property, in: 'query', description: 'IRI utilisateur'),
             ];
             $description[$property . '[]'] = [
                 'property' => $property,
                 'type' => TypeIdentifier::STRING->value,
                 'required' => false,
                 'is_collection' => true,
-                'openapi' => new Parameter(name: $property, in: 'query', description: 'IRIs utilisateur'),
+                'openapi' => new OpenApiParameter(name: $property, in: 'query', description: 'IRIs utilisateur'),
             ];
         }
         return $description;
     }
 }
+

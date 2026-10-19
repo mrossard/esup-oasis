@@ -19,7 +19,6 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\CharteUtilisateur;
 use App\Entity\CharteDemandeur;
-use App\Filter\CharteUtilisateurFilter;
 use App\State\MappedCollectionPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -35,8 +34,7 @@ readonly class CharteUtilisateurProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            //ajout d'un filtre sur utilisateur!
-            $context['filters'][CharteUtilisateurFilter::PROPERTY] = $uriVariables['uid'];
+            $context['charte_utilisateur_uid'] = $uriVariables['uid'];
             unset($uriVariables['uid']);
 
             $results = $this->collectionProvider->provide($operation, $uriVariables, $context);

@@ -18,7 +18,6 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\CampagneDemande;
-use App\Filter\TypeDemandeCampagneFilter;
 use App\State\MappedCollectionPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -41,7 +40,7 @@ readonly class CampagneDemandeProvider implements ProviderInterface
         $operationUriVariables = [$operation->getUriVariables()['id'] ?? null];
 
         if ($operation instanceof GetCollection) {
-            $context['filters'][TypeDemandeCampagneFilter::PROPERTY] = $typeId;
+            $context['type_demande_id'] = $typeId;
 
             $results = $this->collectionProvider->provide(
                 $operation->withUriVariables($operationUriVariables),

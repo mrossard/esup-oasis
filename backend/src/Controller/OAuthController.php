@@ -44,7 +44,8 @@ class OAuthController extends AbstractController
     #[Route(path: '/accessToken', name: 'accesstoken')]
     public function getAccessToken(
         Request $request,
-        #[Autowire('%env(JWT_COOKIE_DOMAIN)%')] string $cookieDomain,
+        #[Autowire('%env(JWT_COOKIE_DOMAIN)%')]
+        string $cookieDomain,
     ): Response {
         $cookieDomainNorm = empty($cookieDomain) ? null : $cookieDomain;
         if ($cookieDomainNorm !== null) {
@@ -55,20 +56,34 @@ class OAuthController extends AbstractController
             }
         }
         try {
-            $token = $this->oauthService->getAccessToken($request, $this->generateUrl(
-                'connect_oauth_accesstoken',
-                [],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            ), $cookieDomainNorm);
+            $token = $this->oauthService->getAccessToken(
+                $request,
+                $this->generateUrl('connect_oauth_accesstoken', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                $cookieDomainNorm,
+            );
             if ($token instanceof Response) {
                 return $token;
             }
             $response = new JsonResponse(['token' => $token]);
-            $response->headers->clearCookie('oauth_state', '/', $cookieDomainNorm, $request->isSecure(), true, Cookie::SAMESITE_LAX);
+            $response->headers->clearCookie(
+                'oauth_state',
+                '/',
+                $cookieDomainNorm,
+                $request->isSecure(),
+                true,
+                Cookie::SAMESITE_LAX,
+            );
             return $response;
         } catch (IdentityProviderException|UnexpectedValueException $exception) {
             $response = new Response($exception->getMessage(), 500);
-            $response->headers->clearCookie('oauth_state', '/', $cookieDomainNorm, $request->isSecure(), true, Cookie::SAMESITE_LAX);
+            $response->headers->clearCookie(
+                'oauth_state',
+                '/',
+                $cookieDomainNorm,
+                $request->isSecure(),
+                true,
+                Cookie::SAMESITE_LAX,
+            );
             return $response;
         }
     }
@@ -81,9 +96,12 @@ class OAuthController extends AbstractController
     public function fullAuthentication(
         Request $request,
         UtilisateurManager $utilisateurManager,
-        #[Autowire('%env(JWT_TOKEN_TTL)%')] int $ttl,
-        #[Autowire('%env(JWT_COOKIE_NAME)%')] string $cookieName,
-        #[Autowire('%env(JWT_COOKIE_DOMAIN)%')] string $cookieDomain,
+        #[Autowire('%env(JWT_TOKEN_TTL)%')]
+        int $ttl,
+        #[Autowire('%env(JWT_COOKIE_NAME)%')]
+        string $cookieName,
+        #[Autowire('%env(JWT_COOKIE_DOMAIN)%')]
+        string $cookieDomain,
     ): Response {
         /**
          * https://oauth2-client.thephpleague.com/usage/
@@ -98,11 +116,11 @@ class OAuthController extends AbstractController
             }
         }
         try {
-            $token = $this->oauthService->getAccessToken($request, $this->generateUrl(
-                'connect_oauth_login',
-                [],
-                UrlGeneratorInterface::ABSOLUTE_URL,
-            ), $cookieDomainNorm);
+            $token = $this->oauthService->getAccessToken(
+                $request,
+                $this->generateUrl('connect_oauth_login', [], UrlGeneratorInterface::ABSOLUTE_URL),
+                $cookieDomainNorm,
+            );
 
             if ($token instanceof Response) {
                 return $token;
@@ -129,12 +147,26 @@ class OAuthController extends AbstractController
                 Cookie::SAMESITE_STRICT,
             ));
 
-            $jsonResponse->headers->clearCookie('oauth_state', '/', $cookieDomainNorm, $request->isSecure(), true, Cookie::SAMESITE_LAX);
+            $jsonResponse->headers->clearCookie(
+                'oauth_state',
+                '/',
+                $cookieDomainNorm,
+                $request->isSecure(),
+                true,
+                Cookie::SAMESITE_LAX,
+            );
 
             return $jsonResponse;
         } catch (IdentityProviderException|UnexpectedValueException $exception) {
             $response = new Response($exception->getMessage(), 500);
-            $response->headers->clearCookie('oauth_state', '/', $cookieDomainNorm, $request->isSecure(), true, Cookie::SAMESITE_LAX);
+            $response->headers->clearCookie(
+                'oauth_state',
+                '/',
+                $cookieDomainNorm,
+                $request->isSecure(),
+                true,
+                Cookie::SAMESITE_LAX,
+            );
             return $response;
         }
     }
@@ -154,9 +186,12 @@ class OAuthController extends AbstractController
     public function getApiJwtFromCasAccessToken(
         Request $request,
         UtilisateurManager $utilisateurManager,
-        #[Autowire('%env(JWT_TOKEN_TTL)%')] int $ttl,
-        #[Autowire('%env(JWT_COOKIE_NAME)%')] string $cookieName,
-        #[Autowire('%env(JWT_COOKIE_DOMAIN)%')] string $cookieDomain,
+        #[Autowire('%env(JWT_TOKEN_TTL)%')]
+        int $ttl,
+        #[Autowire('%env(JWT_COOKIE_NAME)%')]
+        string $cookieName,
+        #[Autowire('%env(JWT_COOKIE_DOMAIN)%')]
+        string $cookieDomain,
     ): Response {
         $isJson = null !== $request->query->get('json');
         if (!$isJson) {

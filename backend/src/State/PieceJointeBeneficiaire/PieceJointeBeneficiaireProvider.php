@@ -17,9 +17,7 @@ use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
-use App\ApiResource\Charte;
 use App\ApiResource\PieceJointeBeneficiaire;
-use App\Filter\PieceJointeBeneficiaireUidFilter;
 use App\State\MappedCollectionPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -35,8 +33,7 @@ class PieceJointeBeneficiaireProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            //ajout d'un filtre sur utilisateur!
-            $context['filters'][PieceJointeBeneficiaireUidFilter::PROPERTY] = $uriVariables['uid'];
+            $context['piece_jointe_beneficiaire_uid'] = $uriVariables['uid'];
             unset($uriVariables['uid']);
 
             $results = $this->collectionProvider->provide($operation, $uriVariables, $context);

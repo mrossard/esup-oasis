@@ -27,7 +27,6 @@ use App\Entity\Beneficiaire;
 use App\Filter\InterventionForfaitNomIntervenantOrderFilter;
 use App\Filter\NestedUtilisateurFilter;
 use App\Filter\NomIntervenantFilter;
-use App\Filter\PreloadAssociationsFilter;
 use App\State\InterventionForfait\InterventionForfaitProcessor;
 use App\State\InterventionForfait\InterventionForfaitProvider;
 use DateTimeInterface;
@@ -71,7 +70,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(InterventionForfaitNomIntervenantOrderFilter::class, properties: ['intervenant.utilisateur.nom'])]
 #[ApiFilter(DateFilter::class, properties: ['periode.debut', 'periode.fin'])]
 #[Assert\Expression(expression: 'this.type.forfait == true', message: "Type d'événement incompatible")]
-#[ApiFilter(PreloadAssociationsFilter::class)]
 class InterventionForfait
 {
     public const string COLLECTION_URI = '/interventions_forfait';

@@ -13,14 +13,14 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\State\Demande\ModificationEtatDemandeProvider;
 use DateTimeInterface;
@@ -34,6 +34,20 @@ use Symfony\Component\Serializer\Attribute\Ignore;
             uriVariables: [
                 'demandeId' => new Link(fromProperty: 'id', toProperty: 'demande', fromClass: Demande::class),
             ],
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new SortFilter(),
+                    properties: ['dateModification', 'id'],
+                ),
+                'dateModification' => new QueryParameter(
+                    filter: new DateFilter(),
+                    property: 'dateModification',
+                ),
+                'demande' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'demande',
+                ),
+            ],
             map: false,
         ),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: [
@@ -45,9 +59,6 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     provider: ModificationEtatDemandeProvider::class,
     stateOptions: new Options(entityClass: \App\Entity\ModificationEtatDemande::class),
 )]
-#[ApiFilter(OrderFilter::class, properties: ['dateModification', 'id'])]
-#[ApiFilter(DateFilter::class, properties: ['dateModification'])]
-#[ApiFilter(SearchFilter::class, properties: ['demande'])]
 class ModificationEtatDemande
 {
     public const string COLLECTION_URI = '/demandes/{demandeId}/modifications';

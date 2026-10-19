@@ -59,20 +59,12 @@ class EvenementRepository extends ServiceEntityRepository
 
     public function findAllNotLocked(?Utilisateur $utilisateur = null): array
     {
-        return $this
-            ->createQueryBuilder('e')
-            ->where('e.periodePriseEnCompteRH is null')
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('e')->where('e.periodePriseEnCompteRH is null')->getQuery()->getResult();
     }
 
     public function findAllLocked(): array
     {
-        return $this
-            ->createQueryBuilder('e')
-            ->where('e.periodePriseEnCompteRH is not null')
-            ->getQuery()
-            ->getResult();
+        return $this->createQueryBuilder('e')->where('e.periodePriseEnCompteRH is not null')->getQuery()->getResult();
     }
 
     /**

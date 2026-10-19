@@ -18,8 +18,8 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Evenement;
 use App\ApiResource\Utilisateur;
+use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\Entity\ApplicationCliente;
-use App\Filter\PreloadAssociationsFilter;
 use App\State\MappedCollectionPaginator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -49,7 +49,7 @@ readonly class EvenementProvider implements ProviderInterface
             /**
              * préchargements intervenant, bénéficiaires/profils, type équipement
              */
-            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+            $context[PreloadAssociationsExtension::PROPERTY] = [
                 'beneficiaires' => [
                     'sourceEntity' => 'root',
                     'relationName' => 'beneficiaires',

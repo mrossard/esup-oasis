@@ -33,10 +33,14 @@ class DateAvisMedecinRequiseConstraintValidator extends ConstraintValidator
         }
 
         // la demande du gestionnaire comme l'envoi par l'administrateur
-        if (!in_array($value->etat, [
-            DecisionAmenagementExamens::ETAT_VALIDE,
-            DecisionAmenagementExamens::ETAT_EDITION_DEMANDEE,
-        ], true)) {
+        if (!in_array(
+            $value->etat,
+            [
+                DecisionAmenagementExamens::ETAT_VALIDE,
+                DecisionAmenagementExamens::ETAT_EDITION_DEMANDEE,
+            ],
+            true,
+        )) {
             return;
         }
 
@@ -44,8 +48,6 @@ class DateAvisMedecinRequiseConstraintValidator extends ConstraintValidator
             return;
         }
 
-        $this->context->buildViolation($constraint->message)
-            ->atPath('dateAvisMedecin')
-            ->addViolation();
+        $this->context->buildViolation($constraint->message)->atPath('dateAvisMedecin')->addViolation();
     }
 }

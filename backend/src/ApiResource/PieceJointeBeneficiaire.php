@@ -13,14 +13,12 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\OpenApi\Model\Operation;
-use App\Filter\PieceJointeBeneficiaireUidFilter;
 use App\State\PieceJointeBeneficiaire\PieceJointeBeneficiaireProcessor;
 use App\State\PieceJointeBeneficiaire\PieceJointeBeneficiaireProvider;
 use DateTimeInterface;
@@ -43,7 +41,6 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     processor: PieceJointeBeneficiaireProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\PieceJointeBeneficiaire::class),
 )]
-#[ApiFilter(PieceJointeBeneficiaireUidFilter::class)]
 class PieceJointeBeneficiaire
 {
     public const string COLLECTION_URI = '/beneficiaires/{uid}/pieces_jointes';

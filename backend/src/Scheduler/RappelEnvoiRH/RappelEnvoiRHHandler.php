@@ -49,9 +49,9 @@ class RappelEnvoiRHHandler
         $dateButoirPeriode = $periodeRH->getButoir();
 
         if (
-            $now->format('Y-m-d') == (clone $dateButoirPeriode)->modify('-'
-            . self::DECLENCHER_J_MOINS
-            . 'days')->format('Y-m-d')
+            $now->format('Y-m-d') == (clone $dateButoirPeriode)->modify(
+                '-' . self::DECLENCHER_J_MOINS . 'days',
+            )->format('Y-m-d')
         ) {
             //on est dans la fenêtre de déclenchement
             $this->mailService->envoyerRappelsEnvoiRH($periodeRH);

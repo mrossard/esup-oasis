@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright (c) 2024-2026. Esup - Université de Bordeaux.
  *
@@ -19,12 +20,11 @@ use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 class SiScolDataProviderFactory
 {
-
     public function __construct(
         #[Autowire(env: 'resolve:SI_SCOL')]
         private string $siScol,
         #[AutowireIterator('oasis.siscol_provider')]
-        private iterable $providers
+        private iterable $providers,
     ) {}
 
     /**
@@ -42,8 +42,6 @@ class SiScolDataProviderFactory
             }
         }
 
-        throw new InvalidArgumentException(
-            sprintf('Le provider "%s" n\'existe pas.', $this->siScol)
-        );
+        throw new InvalidArgumentException(sprintf('Le provider "%s" n\'existe pas.', $this->siScol));
     }
 }

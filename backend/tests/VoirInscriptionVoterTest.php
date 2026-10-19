@@ -180,7 +180,7 @@ class VoirInscriptionVoterTest extends TestCase
 
         $userCourant = $this->createMock(Utilisateur::class);
         $userCourant->method('getInscriptions')->willReturn(new ArrayCollection());
-        
+
         $composanteEntity = $this->createMock(Composante::class);
         $composanteEntity->method('getId')->willReturn(10);
         $userCourant->method('getComposantes')->willReturn(new ArrayCollection([$composanteEntity]));
@@ -215,7 +215,7 @@ class VoirInscriptionVoterTest extends TestCase
 
         $userCourant = $this->createMock(Utilisateur::class);
         $userCourant->method('getInscriptions')->willReturn(new ArrayCollection());
-        
+
         $composanteEntity = $this->createMock(Composante::class);
         $composanteEntity->method('getId')->willReturn(20); // Different ID
         $userCourant->method('getComposantes')->willReturn(new ArrayCollection([$composanteEntity]));

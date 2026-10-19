@@ -74,4 +74,18 @@ class ProfilsTest extends ApiTestCaseCustom
             'libelle' => 'Profil Modifié',
         ]);
     }
+
+    public function testProfilsOrder(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $response = $client->request('GET', '/profils?order[libelle]=asc');
+        $this->assertResponseIsSuccessful();
+        $dataAsc = $response->toArray()['hydra:member'];
+
+        $response = $client->request('GET', '/profils?order[libelle]=desc');
+        $this->assertResponseIsSuccessful();
+        $dataDesc = $response->toArray()['hydra:member'];
+
+        $this->assertSame($dataAsc[0]['libelle'], $dataDesc[array_key_last($dataDesc)]['libelle']);
+    }
 }

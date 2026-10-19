@@ -20,7 +20,7 @@ class FakeLdapService extends LdapService
                 'mail' => [$uid . '@test.fr'],
                 'supannetuid' => ['123456'],
                 'count' => 1,
-            ]
+            ],
         ];
     }
 

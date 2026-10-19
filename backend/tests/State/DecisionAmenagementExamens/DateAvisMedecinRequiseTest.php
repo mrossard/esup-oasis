@@ -55,9 +55,7 @@ final class DateAvisMedecinRequiseTest extends TestCase
     public function testProfilOutsideDecisionPeriodDoesNotCount(): void
     {
         // profil de handicap clos avant l'année de la décision
-        $decision = $this->decisionPour(
-            $this->profil(avisMedicalRequis: true, debut: '2023-09-01', fin: '2024-08-31'),
-        );
+        $decision = $this->decisionPour($this->profil(avisMedicalRequis: true, debut: '2023-09-01', fin: '2024-08-31'));
 
         self::assertFalse($this->manager()->dateAvisMedecinRequise($decision));
     }
@@ -73,9 +71,7 @@ final class DateAvisMedecinRequiseTest extends TestCase
     public function testProfilCountsWithoutAccompagnement(): void
     {
         // des aménagements d'examens sans accompagnement restent soumis à l'avis médical
-        $decision = $this->decisionPour(
-            $this->profil(avisMedicalRequis: true, avecAccompagnement: false),
-        );
+        $decision = $this->decisionPour($this->profil(avisMedicalRequis: true, avecAccompagnement: false));
 
         self::assertTrue($this->manager()->dateAvisMedecinRequise($decision));
     }
@@ -87,11 +83,11 @@ final class DateAvisMedecinRequiseTest extends TestCase
         bool $avecAccompagnement = true,
         bool $avecTypologie = true,
     ): Beneficiaire {
-        $profil = (new ProfilBeneficiaire())
+        $profil = new ProfilBeneficiaire()
             ->setAvisMedicalRequis($avisMedicalRequis)
             ->setAvecTypologie($avecTypologie);
 
-        return (new Beneficiaire())
+        return new Beneficiaire()
             ->setProfil($profil)
             ->setDebut(new DateTime($debut))
             ->setFin(null === $fin ? null : new DateTime($fin))
@@ -105,7 +101,7 @@ final class DateAvisMedecinRequiseTest extends TestCase
             $utilisateur->addBeneficiaire($profil);
         }
 
-        return (new DecisionAmenagementExamens())
+        return new DecisionAmenagementExamens()
             ->setBeneficiaire($utilisateur)
             ->setDebut(new DateTime('2025-09-01'))
             ->setFin(new DateTime('2026-08-31'));

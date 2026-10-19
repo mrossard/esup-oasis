@@ -96,12 +96,12 @@ class TauxHorairesTest extends ApiTestCaseCustom
     public function testFilterByDate(): void
     {
         $client = $this->createClientWithCredentials('admin');
-        
+
         // Taux 1 for TypeEvenement 1 exists in fixtures, let's find its dates
         $client->request('GET', '/types_evenements/1/taux/1');
         $data = $client->getResponse()->toArray();
         $debut = $data['debut'];
-        
+
         $client->request('GET', '/types_evenements/1/taux?date=' . urlencode($debut));
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains([

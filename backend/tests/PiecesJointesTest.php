@@ -46,11 +46,17 @@ class PiecesJointesTest extends ApiTestCaseCustom
     public function testGestionnaireCanUploadAndDeletePieceJointe(): void
     {
         $client = $this->createClientWithCredentials('gestionnaire');
-        
+
         // 1. Upload a file first
         $tempFile = tempnam(sys_get_temp_dir(), 'test_pj');
         file_put_contents($tempFile, 'contenu pj');
-        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile($tempFile, 'pj.txt', 'text/plain', null, true);
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(
+            $tempFile,
+            'pj.txt',
+            'text/plain',
+            null,
+            true,
+        );
 
         $client->request('POST', '/telechargements', [
             'headers' => ['Content-Type' => 'multipart/form-data'],

@@ -10,54 +10,61 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
-use App\ApiResource\ProfilBeneficiaire;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\Entity\Evenement;
 use App\Entity\InterventionForfait;
+use App\Filter\Util\IriToIdResolver;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\TypeInfo\TypeIdentifier;
-use Symfony\Contracts\Service\Attribute\Required;
 
-class BilanFinancierProfilBeneficiairesFilter extends AbstractFilter
+final readonly class BilanFinancierProfilBeneficiairesFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
-    protected IriConverterInterface $iriConverter;
+    private IriToIdResolver $resolver;
 
-    #[Required]
-    public function setIriConverter(IriConverterInterface $converter): void
+    public function __construct(IriConverterInterface $iriConverter)
     {
-        $this->iriConverter = $converter;
+        $this->resolver = new IriToIdResolver($iriConverter);
     }
 
-    /**
-     * @inheritDoc
-     */
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== 'profil' || !in_array($resourceClass, [Evenement::class, InterventionForfait::class])) {
+        if (!in_array($resourceClass, [Evenement::class, InterventionForfait::class], true)) {
             return;
         }
-        if (!is_array($value)) {
-            $value = [$value];
+
+        $value = $this->extractValue($context);
+        if ($value === null) {
+            return;
         }
 
-        /**
-         * @var ProfilBeneficiaire[] $profils
-         */
-        $profils = array_map(fn($val) => $this->iriConverter->getResourceFromIri($val), $value);
+        $rawValues = is_array($value) ? $value : [$value];
+        $profilIds = array_values(array_filter(
+            array_map($this->resolver->resolve(...), $rawValues),
+            static fn(?int $id): bool => $id !== null,
+        ));
+
+        if ($profilIds === []) {
+            return;
+        }
 
         $alias = $queryBuilder->getRootAliases()[0];
         $benefAlias = $queryNameGenerator->generateJoinAlias('beneficiaires');
@@ -68,33 +75,41 @@ class BilanFinancierProfilBeneficiairesFilter extends AbstractFilter
             ->join(sprintf('%s.beneficiaires', $alias), $benefAlias)
             ->join(sprintf('%s.profil', $benefAlias), $profilAlias)
             ->andWhere(sprintf('%s.id in (:%s)', $profilAlias, $profilIdsParam))
-            ->setParameter(
-                $profilIdsParam,
-                array_map(fn($profil) => $profil->id, $profils),
-                ArrayParameterType::INTEGER,
-            );
+            ->setParameter($profilIdsParam, $profilIds, ArrayParameterType::INTEGER);
     }
 
-    /**
-     * @inheritDoc
-     */
+    private function extractValue(array $context): mixed
+    {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter !== null) {
+            return $parameter->getValue();
+        }
+
+        return $context['filters']['profil'] ?? null;
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): array
+    {
+        return [
+            new OpenApiParameter(
+                name: 'profil',
+                in: 'query',
+                description: 'IRI profil',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+        ];
+    }
+
     public function getDescription(string $resourceClass): array
     {
-        $property = 'profil';
-        $description[$property] = [
-            'property' => $property,
-            'type' => TypeIdentifier::STRING->value,
-            'required' => false,
-            'is_collection' => false,
-            'openapi' => new Parameter(name: $property, in: 'query', description: 'IRI profil'),
-        ];
-        $description[$property . '[]'] = [
-            'property' => $property,
-            'type' => TypeIdentifier::STRING->value,
-            'required' => false,
-            'is_collection' => true,
-            'openapi' => new Parameter(name: $property, in: 'query', description: 'IRIs profil'),
-        ];
-        return $description;
+        return [];
     }
 }

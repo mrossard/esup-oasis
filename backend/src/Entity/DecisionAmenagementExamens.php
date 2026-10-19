@@ -164,9 +164,7 @@ class DecisionAmenagementExamens
 
     public function setDateAvisMedecin(?DateTimeInterface $dateAvisMedecin): static
     {
-        $this->dateAvisMedecin = $dateAvisMedecin === null
-            ? null
-            : DateTime::createFromInterface($dateAvisMedecin);
+        $this->dateAvisMedecin = $dateAvisMedecin === null ? null : DateTime::createFromInterface($dateAvisMedecin);
 
         return $this;
     }

@@ -12,9 +12,8 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -22,6 +21,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\IriConverterInterface;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Entity\Bilan;
 use App\Filter\NestedUtilisateurFilter;
@@ -38,6 +38,16 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'demandeur' => new QueryParameter(
+                    filter: NestedUtilisateurFilter::class,
+                    property: 'demandeur',
+                ),
+                'order[:property]' => new QueryParameter(
+                    filter: new SortFilter(),
+                    properties: ['dateDemande'],
+                ),
+            ],
             security: "is_granted('" . \App\Entity\Utilisateur::ROLE_GESTIONNAIRE . "')",
             map: false,
         ),
@@ -63,8 +73,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: BilanActiviteProcessor::class,
     stateOptions: new Options(entityClass: Bilan::class),
 )]
-#[ApiFilter(OrderFilter::class, properties: ['dateDemande'])]
-#[ApiFilter(NestedUtilisateurFilter::class, properties: ['demandeur' => 'demandeur'])]
 class BilanActivite
 {
     public const string COLLECTION_URI = '/suivis/activite';

@@ -75,7 +75,10 @@ class DateAvisMedecinRequiseConstraintValidatorTest extends ConstraintValidatorT
     public function testOtherStatesAreNotConcerned(): void
     {
         // une décision en attente, ou déjà éditée, ne produit pas de document
-        foreach ([DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS, DecisionAmenagementExamens::ETAT_EDITE] as $etat) {
+        foreach ([
+            DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS,
+            DecisionAmenagementExamens::ETAT_EDITE,
+        ] as $etat) {
             $this->validator->validate(
                 $this->decision(etat: $etat, requise: true),
                 new DateAvisMedecinRequiseConstraint(),

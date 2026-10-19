@@ -6,7 +6,9 @@
  *
  *  @author Manuel Rossard <manuel.rossard@u-bordeaux.fr>
  *
- *//*
+ */
+
+/*
  * Copyright (c) 2026. Esup - Université de Bordeaux.
  *
  * This file is part of the Esup-Oasis project (https://github.com/EsupPortail/esup-oasis).

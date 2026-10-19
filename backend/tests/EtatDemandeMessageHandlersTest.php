@@ -38,7 +38,7 @@ class EtatDemandeMessageHandlersTest extends KernelTestCase
             idEtat: 1, // dummy
             uidUtilisateurModif: $demande->getDemandeur()->getUid(),
             commentaire: $commentaire,
-            idProfil: $idProfil
+            idProfil: $idProfil,
         );
 
         return [$etatMessage, $demandeManager];
@@ -49,16 +49,18 @@ class EtatDemandeMessageHandlersTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
         $em = $container->get('doctrine')->getManager();
-        
-        $demande = $em->getRepository(Demande::class)->createQueryBuilder('d')
+
+        $demande = $em
+            ->getRepository(Demande::class)
+            ->createQueryBuilder('d')
             ->leftJoin(\App\Entity\Beneficiaire::class, 'b', 'WITH', 'b.demande = d')
             ->where('b.id IS NULL')
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();
-        
+
         $profil = $em->getRepository(ProfilBeneficiaire::class)->findOneBy([]);
-        
+
         if (!$demande || !$profil) {
             $this->markTestSkipped('No suitable demande or profil found');
         }
@@ -85,9 +87,9 @@ class EtatDemandeMessageHandlersTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
         $em = $container->get('doctrine')->getManager();
-        
+
         $demande = $em->getRepository(Demande::class)->findOneBy([]);
-        
+
         [$etatMessage, $demandeManager] = $this->getMessage($demande, null, 'Pas bien');
         $message = new DemandeNonConformeMessage($etatMessage, $demandeManager);
 
@@ -102,9 +104,9 @@ class EtatDemandeMessageHandlersTest extends KernelTestCase
         self::bootKernel();
         $container = self::getContainer();
         $em = $container->get('doctrine')->getManager();
-        
+
         $demande = $em->getRepository(Demande::class)->findOneBy([]);
-        
+
         [$etatMessage, $demandeManager] = $this->getMessage($demande);
         $message = new DemandeAttenteValidationCharteMessage($etatMessage, $demandeManager);
 

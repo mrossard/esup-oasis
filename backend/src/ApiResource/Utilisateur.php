@@ -41,7 +41,6 @@ use App\Filter\LibCampusIntervenantFilter;
 use App\Filter\LibComposanteBeneficiaireFilter;
 use App\Filter\NestedFieldSearchFilter;
 use App\Filter\NomGestionnaireFilter;
-use App\Filter\PreloadAssociationsFilter;
 use App\Filter\RenfortFilter;
 use App\Filter\TypeAmenagementEnCoursFilter;
 use App\Filter\UtilisateurExistantSearchFilter;
@@ -164,7 +163,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiFilter(EtatAvisEseUtilisateurFilter::class)]
 #[ApiFilter(EtatDecisionAmenagementFilter::class)]
 #[ApiFilter(UtilisateurRoleFilter::class)]
-#[ApiFilter(PreloadAssociationsFilter::class)]
 #[NumeroAnonymeUniqueConstraint]
 final class Utilisateur
 {

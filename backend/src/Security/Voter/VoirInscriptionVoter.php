@@ -22,8 +22,10 @@ class VoirInscriptionVoter extends Voter
 {
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return $attribute === Inscription::VOIR_INSCRIPTION
-            && ($subject instanceof Inscription || $subject instanceof \App\Entity\Inscription);
+        return (
+            $attribute === Inscription::VOIR_INSCRIPTION
+            && ($subject instanceof Inscription || $subject instanceof \App\Entity\Inscription)
+        );
     }
 
     protected function voteOnAttribute(

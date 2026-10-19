@@ -19,7 +19,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\CampagneDemande;
 use App\ApiResource\Charte;
 use App\ApiResource\TypeDemande;
-use App\Filter\PreloadAssociationsFilter;
+use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\State\MappedCollectionPaginator;
 use Exception;
 use Symfony\Component\Clock\ClockAwareTrait;
@@ -43,7 +43,7 @@ class TypeDemandeProvider implements ProviderInterface
              * préchargement des profils liés, des campagnes et des étapes/questions
              */
 
-            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+            $context[PreloadAssociationsExtension::PROPERTY] = [
                 'campagnes' => [
                     'sourceEntity' => 'root',
                     'relationName' => 'campagnes',

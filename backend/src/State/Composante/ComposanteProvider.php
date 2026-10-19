@@ -18,7 +18,7 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Charte;
 use App\ApiResource\Composante;
-use App\Filter\PreloadAssociationsFilter;
+use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\State\MappedCollectionPaginator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
@@ -37,7 +37,7 @@ readonly class ComposanteProvider implements ProviderInterface
             /**
              * préchargement des référents
              */
-            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+            $context[PreloadAssociationsExtension::PROPERTY] = [
                 'referents' => [
                     'sourceEntity' => 'root',
                     'relationName' => 'referents',

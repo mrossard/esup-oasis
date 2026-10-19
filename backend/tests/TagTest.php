@@ -45,4 +45,26 @@ class TagTest extends ApiTestCaseCustom
 
         $this->assertResponseStatusCodeSame(401);
     }
+
+    public function testSortTagsWorks(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        $client->request('GET', '/tags?order[libelle]=asc');
+        $this->assertResponseIsSuccessful();
+        $dataAsc = $client->getResponse()->toArray();
+        $itemsAsc = $dataAsc['hydra:member'];
+
+        $client->request('GET', '/tags?order[libelle]=desc');
+        $this->assertResponseIsSuccessful();
+        $dataDesc = $client->getResponse()->toArray();
+        $itemsDesc = $dataDesc['hydra:member'];
+
+        if (count($itemsAsc) >= 2) {
+            $firstAsc = $itemsAsc[0]['libelle'];
+            $lastAsc = $itemsAsc[count($itemsAsc) - 1]['libelle'];
+            $firstDesc = $itemsDesc[0]['libelle'];
+            $this->assertEquals($lastAsc, $firstDesc);
+        }
+    }
 }

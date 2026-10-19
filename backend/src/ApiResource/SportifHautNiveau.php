@@ -12,9 +12,8 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -22,6 +21,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use ReflectionProperty;
@@ -31,7 +31,27 @@ use Symfony\Component\Serializer\Attribute\Ignore;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['nom'],
+                ),
+                'nom' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'nom',
+                ),
+                'prenom' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'prenom',
+                ),
+                'identifiantExterne' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'identifiantExterne',
+                ),
+            ],
+        ),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['identifiantExterne']),
         new Post(
             uriTemplate: self::COLLECTION_URI,
@@ -50,12 +70,6 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     security: "is_granted('ROLE_ADMIN')",
     stateOptions: new Options(entityClass: \App\Entity\SportifHautNiveau::class),
 )]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['nom'])]
-#[ApiFilter(SearchFilter::class, properties: [
-    'nom' => 'ipartial',
-    'prenom' => 'ipartial',
-    'identifiantExterne' => 'ipartial',
-])]
 #[Map(target: \App\Entity\SportifHautNiveau::class)]
 class SportifHautNiveau
 {

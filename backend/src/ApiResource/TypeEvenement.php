@@ -12,15 +12,15 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\State\TypeEvenement\TypeEvenementProcessor;
 use App\State\TypeEvenement\TypeEvenementProvider;
@@ -33,6 +33,15 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'forfait' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'forfait',
+                    schema: ['type' => 'boolean'],
+                    castToNativeType: true,
+                    castToArray: false,
+                ),
+            ],
             openapi: new Operation(
                 tags: ['Referentiel'],
                 summary: "Liste des types d'événements",
@@ -59,7 +68,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: TypeEvenementProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\TypeEvenement::class),
 )]
-#[ApiFilter(BooleanFilter::class, properties: ['forfait'])]
 final class TypeEvenement
 {
     public const string ITEM_URI = '/types_evenements/{id}';

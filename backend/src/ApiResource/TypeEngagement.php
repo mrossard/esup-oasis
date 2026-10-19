@@ -13,13 +13,13 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\TypeEngagement\TypeEngagementProcessor;
@@ -33,6 +33,12 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['libelle'],
+                ),
+            ],
             openapi: new Operation(
                 tags: ['Referentiel'],
                 summary: "Liste des types d'engagements",
@@ -56,7 +62,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     openapi: new Operation(tags: ['Referentiel']),
     stateOptions: new Options(entityClass: \App\Entity\TypeEngagement::class),
 )]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
 #[Map(target: \App\Entity\TypeEngagement::class)]
 final class TypeEngagement
 {

@@ -13,13 +13,13 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\TypologieHandicap\TypologieProcessor;
@@ -30,7 +30,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['libelle'],
+                ),
+            ],
+        ),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
         new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
         new Post(uriTemplate: self::COLLECTION_URI),
@@ -41,7 +49,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
     security: 'is_granted("' . BeneficiaireProfil::VOIR_PROFILS . '")',
     stateOptions: new Options(entityClass: \App\Entity\TypologieHandicap::class),
 )]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
 #[Map(target: \App\Entity\TypologieHandicap::class)]
 class TypologieHandicap
 {

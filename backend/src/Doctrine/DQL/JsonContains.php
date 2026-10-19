@@ -6,7 +6,9 @@
  *
  *  @author Manuel Rossard <manuel.rossard@u-bordeaux.fr>
  *
- *//*
+ */
+
+/*
  * Copyright (c) 2026. Esup - Université de Bordeaux.
  *
  * This file is part of the Esup-Oasis project (https://github.com/EsupPortail/esup-oasis).
@@ -35,11 +37,7 @@ class JsonContains extends FunctionNode
     {
         //$str = $this->string->dispatch($sqlWalker) . "::jsonb \? " . $this->string->dispatch($sqlWalker);
         return (
-            'jsonb_exists('
-            . $this->string1->dispatch($sqlWalker)
-            . ', '
-            . $this->string2->dispatch($sqlWalker)
-            . ')'
+            'jsonb_exists(' . $this->string1->dispatch($sqlWalker) . ', ' . $this->string2->dispatch($sqlWalker) . ')'
         );
     }
 

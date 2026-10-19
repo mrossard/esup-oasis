@@ -17,8 +17,8 @@ use App\Entity\Commission;
 use App\Entity\Demande;
 use App\Entity\MembreCommission;
 use App\Entity\Utilisateur;
-use App\State\Utilisateur\UtilisateurManager;
 use App\Security\Voter\VoirPhotoVoter;
+use App\State\Utilisateur\UtilisateurManager;
 use Doctrine\Common\Collections\ArrayCollection;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -27,8 +27,9 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 
 readonly class TestUtilisateurManager extends UtilisateurManager
 {
-    public function __construct(private Utilisateur $userToReturn)
-    {
+    public function __construct(
+        private Utilisateur $userToReturn,
+    ) {
         // No parent constructor call to avoid mocking dependencies of readonly class
     }
 
@@ -57,15 +58,9 @@ class VoirPhotoVoterTest extends TestCase
 
         $subject = new Photo();
 
-        $this->assertSame(
-            VoterInterface::ACCESS_DENIED,
-            $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO])
-        );
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO]));
 
-        $this->assertSame(
-            VoterInterface::ACCESS_ABSTAIN,
-            $voter->vote($this->token, $subject, ['OTHER_ATTRIBUTE'])
-        );
+        $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $voter->vote($this->token, $subject, ['OTHER_ATTRIBUTE']));
     }
 
     public function testGestionnaireCanSeePhoto(): void
@@ -81,10 +76,7 @@ class VoirPhotoVoterTest extends TestCase
             ->method('isGranted')
             ->willReturnCallback(fn($attribute) => $attribute === Utilisateur::ROLE_GESTIONNAIRE);
 
-        $this->assertSame(
-            VoterInterface::ACCESS_GRANTED,
-            $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO])
-        );
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO]));
     }
 
     public function testMembreCommissionCanSeePhotoIfDemandeurInTheirCommission(): void
@@ -94,10 +86,10 @@ class VoirPhotoVoterTest extends TestCase
 
         // Current user setup
         $currentUser = $this->createMock(Utilisateur::class);
-        
+
         // Mock commission and campaign
         $campaign = new \App\Entity\CampagneDemande();
-        
+
         $commission = $this->createMock(Commission::class);
         $commission->method('getCampagnes')->willReturn(new ArrayCollection([$campaign]));
 
@@ -126,10 +118,7 @@ class VoirPhotoVoterTest extends TestCase
                 default => false,
             });
 
-        $this->assertSame(
-            VoterInterface::ACCESS_GRANTED,
-            $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO])
-        );
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO]));
     }
 
     public function testMembreCommissionCannotSeePhotoIfDemandeurNotInTheirCommission(): void
@@ -139,11 +128,11 @@ class VoirPhotoVoterTest extends TestCase
 
         // Current user setup
         $currentUser = $this->createMock(Utilisateur::class);
-        
+
         // Mock commission and campaign
         $campaign = new \App\Entity\CampagneDemande();
         $otherCampaign = new \App\Entity\CampagneDemande();
-        
+
         $commission = $this->createMock(Commission::class);
         $commission->method('getCampagnes')->willReturn(new ArrayCollection([$campaign]));
 
@@ -172,10 +161,7 @@ class VoirPhotoVoterTest extends TestCase
                 default => false,
             });
 
-        $this->assertSame(
-            VoterInterface::ACCESS_DENIED,
-            $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO])
-        );
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO]));
     }
 
     public function testOtherUsersAccessDenied(): void
@@ -187,13 +173,8 @@ class VoirPhotoVoterTest extends TestCase
         $subject = new Photo();
         $subject->uid = 'demandeur123';
 
-        $this->security
-            ->method('isGranted')
-            ->willReturn(false);
+        $this->security->method('isGranted')->willReturn(false);
 
-        $this->assertSame(
-            VoterInterface::ACCESS_DENIED,
-            $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO])
-        );
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $voter->vote($this->token, $subject, [Photo::VOIR_PHOTO]));
     }
 }

@@ -18,6 +18,25 @@ class SiScolTest extends ApiTestCaseCustom
         ]);
     }
 
+    public function testSortComposantesWorks(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+
+        $client->request('GET', '/composantes?order[libelle]=asc');
+        $this->assertResponseIsSuccessful();
+        $ascData = $client->getResponse()->toArray();
+        $ascLibelles = array_map(fn($item) => $item['libelle'], $ascData['hydra:member']);
+
+        $client->request('GET', '/composantes?order[libelle]=desc');
+        $this->assertResponseIsSuccessful();
+        $descData = $client->getResponse()->toArray();
+        $descLibelles = array_map(fn($item) => $item['libelle'], $descData['hydra:member']);
+
+        if (count($ascLibelles) >= 2) {
+            $this->assertEquals($ascLibelles[0], $descLibelles[count($descLibelles) - 1]);
+        }
+    }
+
     public function testGetFormations(): void
     {
         $client = $this->createClientWithCredentials('gestionnaire');
@@ -69,4 +88,29 @@ class SiScolTest extends ApiTestCaseCustom
         $userData = $client->getResponse()->toArray();
         $this->assertNotContains('ROLE_REFERENT_COMPOSANTE', $userData['roles']);
     }
+
+    public function testFilterAndSortFormations(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        // Sort asc
+        $response = $client->request('GET', '/formations?order[libelle]=asc');
+        $this->assertResponseIsSuccessful();
+
+        // Sort desc
+        $response = $client->request('GET', '/formations?order[libelle]=desc');
+        $this->assertResponseIsSuccessful();
+
+        // Filter composante by id and by IRI
+        $response = $client->request('GET', '/formations?composante=1');
+        $this->assertResponseIsSuccessful();
+
+        $response = $client->request('GET', '/formations?composante=/composantes/1');
+        $this->assertResponseIsSuccessful();
+
+        // Filter avecInscriptions
+        $response = $client->request('GET', '/formations?avecInscriptions=true');
+        $this->assertResponseIsSuccessful();
+    }
 }
+

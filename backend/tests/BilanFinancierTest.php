@@ -34,4 +34,17 @@ class BilanFinancierTest extends ApiTestCaseCustom
 
         $this->assertResponseStatusCodeSame(403);
     }
+
+    public function testFilterBilanFinancierByProfil(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        $client->request('GET', '/suivis/financiers/debut/2020-01-01/fin/2030-12-31', [
+            'headers' => ['Accept' => 'text/csv'],
+            'query' => [
+                'profil' => '/profils/1',
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+    }
 }

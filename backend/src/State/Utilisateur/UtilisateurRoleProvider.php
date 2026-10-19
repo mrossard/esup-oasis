@@ -14,7 +14,7 @@ namespace App\State\Utilisateur;
 
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
-use App\Filter\PreloadAssociationsFilter;
+use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\Service\ErreurLdapException;
 
 readonly class UtilisateurRoleProvider implements ProviderInterface
@@ -37,7 +37,7 @@ readonly class UtilisateurRoleProvider implements ProviderInterface
         /**
          * On veut toujours les inscriptions, les tags, les profils...on les charge dès la première requête
          */
-        $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+        $context[PreloadAssociationsExtension::PROPERTY] = [
             'beneficiaires' => [
                 'sourceEntity' => 'root',
                 'relationName' => 'beneficiaires',

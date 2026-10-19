@@ -13,17 +13,15 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
-use App\Filter\PeriodeEnvoyeeFilter;
-use App\Filter\PeriodeIntervenantFilter;
 use App\State\PeriodeRH\PeriodeProcessor;
 use App\State\PeriodeRH\PeriodeProvider;
 use App\Validator\PeriodesSansChevauchementConstraint;
@@ -34,7 +32,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, parameters: [
+            'order[:property]' => new QueryParameter(filter: new SortFilter(), properties: ['debut']),
+            'butoir' => new QueryParameter(filter: new DateFilter(), property: 'butoir'),
+        ]),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
         new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_ADMIN')", map: false),
         new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id'], security: "is_granted('ROLE_ADMIN')"),
@@ -48,11 +49,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: PeriodeProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\PeriodeRH::class),
 )]
-#[ApiFilter(OrderFilter::class, properties: ['debut'])]
-#[ApiFilter(DateFilter::class, properties: ['butoir'])]
 #[PeriodesSansChevauchementConstraint]
-#[ApiFilter(PeriodeIntervenantFilter::class)]
-#[ApiFilter(PeriodeEnvoyeeFilter::class)]
 final class PeriodeRH
 {
     public const string COLLECTION_URI = '/periodes';

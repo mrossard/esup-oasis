@@ -12,40 +12,34 @@
 
 declare(strict_types=1);
 
-namespace App\Filter;
+namespace App\Doctrine\Extension;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
-class TypeDemandeCampagneFilter extends AbstractFilter
+final class TypeDemandeCampagneExtension implements QueryCollectionExtensionInterface
 {
-    public const string PROPERTY = 'typedemandeid';
-
-    protected function filterProperty(
-        string $property,
-        mixed $value,
+    public function applyToCollection(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== self::PROPERTY) {
+        $typeDemandeId = $context['type_demande_id'] ?? $context['filters']['typedemandeid'] ?? null;
+        if (null === $typeDemandeId) {
             return;
         }
 
         $rootAlias = $queryBuilder->getRootAliases()[0];
-        $queryBuilder
-            ->join($rootAlias . '.typeDemande', 'td')
-            ->andWhere('td.id = :typedemande')
-            ->setParameter('typedemande', $value);
-    }
+        $tdAlias = $queryNameGenerator->generateJoinAlias('typeDemande');
+        $paramName = $queryNameGenerator->generateParameterName('typedemande');
 
-    public function getDescription(string $resourceClass): array
-    {
-        // filtre purement interne
-        return [];
+        $queryBuilder
+            ->join($rootAlias . '.typeDemande', $tdAlias)
+            ->andWhere(sprintf('%s.id = :%s', $tdAlias, $paramName))
+            ->setParameter($paramName, $typeDemandeId);
     }
 }

@@ -101,6 +101,34 @@ class ReferentielTest extends ApiTestCaseCustom
         ]);
     }
 
+    public function testFilterAndSortTypesAmenagements(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+
+        // Test filter by examens=true
+        $client->request('GET', '/types_amenagements?examens=true');
+        $this->assertResponseIsSuccessful();
+        $data = $client->getResponse()->toArray();
+        foreach ($data['hydra:member'] as $item) {
+            $this->assertTrue($item['examens']);
+        }
+
+        // Test sorting
+        $client->request('GET', '/types_amenagements?order[libelle]=asc');
+        $this->assertResponseIsSuccessful();
+        $ascData = $client->getResponse()->toArray();
+        $ascLibelles = array_map(fn($item) => $item['libelle'], $ascData['hydra:member']);
+
+        $client->request('GET', '/types_amenagements?order[libelle]=desc');
+        $this->assertResponseIsSuccessful();
+        $descData = $client->getResponse()->toArray();
+        $descLibelles = array_map(fn($item) => $item['libelle'], $descData['hydra:member']);
+
+        if (count($ascLibelles) >= 2) {
+            $this->assertEquals($ascLibelles[0], $descLibelles[count($descLibelles) - 1]);
+        }
+    }
+
     public function testAdminCanCreateTypeAmenagement(): void
     {
         $client = $this->createClientWithCredentials('admin');

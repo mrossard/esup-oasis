@@ -13,12 +13,12 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\TypeSuiviAmenagement\TypeSuiviAmenagementProcessor;
@@ -28,7 +28,15 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['libelle'],
+                ),
+            ],
+        ),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
         new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_ADMIN')", map: false),
         new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id'], security: "is_granted('ROLE_ADMIN')", map: false),
@@ -39,7 +47,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: TypeSuiviAmenagementProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\TypeSuiviAmenagement::class),
 )]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
 class TypeSuiviAmenagement
 {
     public const string COLLECTION_URI = '/types_suivi_amenagements';

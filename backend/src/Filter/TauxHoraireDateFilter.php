@@ -10,34 +10,38 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use DateTime;
 use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class TauxHoraireDateFilter extends AbstractFilter
+class TauxHoraireDateFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== 'date') {
+        $parameter = $context['parameter'] ?? null;
+        $value = $parameter instanceof Parameter ? $parameter->getValue() : $context['filters']['date'] ?? null;
+
+        if (null === $value || '' === $value) {
             return;
         }
-
-        $rootAlias = $queryBuilder->getRootAliases()[0];
 
         try {
             $date = new DateTime($value);
@@ -45,10 +49,30 @@ class TauxHoraireDateFilter extends AbstractFilter
             throw new HttpException(400, 'date mal formée');
         }
 
+        $rootAlias = $queryBuilder->getRootAliases()[0];
+        $paramName = $queryNameGenerator->generateParameterName('date');
+
         $queryBuilder->andWhere(sprintf(
-            '%1$s.debut <= :date AND (%1$s.fin >= :date or %1$s.fin is null)',
+            '%1$s.debut <= :%2$s AND (%1$s.fin >= :%2$s or %1$s.fin is null)',
             $rootAlias,
-        ))->setParameter('date', $date);
+            $paramName,
+        ))->setParameter($paramName, $date);
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return new OpenApiParameter(
+            name: $parameter->getKey(),
+            in: 'query',
+            description: 'date pour laquelle on veut le taux valide',
+            required: false,
+            schema: ['type' => 'string'],
+        );
     }
 
     public function getDescription(string $resourceClass): array
@@ -58,7 +82,7 @@ class TauxHoraireDateFilter extends AbstractFilter
                 'property' => 'date',
                 'type' => TypeIdentifier::STRING->value,
                 'required' => false,
-                'openapi' => new Parameter(
+                'openapi' => new OpenApiParameter(
                     name: 'date',
                     in: 'query',
                     description: 'date pour laquelle on veut le taux valide',

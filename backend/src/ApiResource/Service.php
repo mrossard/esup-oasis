@@ -12,17 +12,16 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\Service\ServiceProcessor;
 use App\State\Service\ServiceProvider;
@@ -33,20 +32,24 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI, openapi: new Operation(
-            tags: ['Referentiel'],
-            summary: 'Liste des services',
-            description: 'Retourne la liste des services',
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
             parameters: [
-                new Parameter(
-                    name: 'libelle',
-                    in: 'query',
-                    description: 'Recherche sur le libellé (partiel, insensible à la casse)',
-                    required: false,
-                    schema: ['type' => 'string'],
+                'libelle' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'libelle',
+                ),
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['libelle'],
                 ),
             ],
-        )),
+            openapi: new Operation(
+                tags: ['Referentiel'],
+                summary: 'Liste des services',
+                description: 'Retourne la liste des services',
+            ),
+        ),
         new Get(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['id'],
@@ -64,8 +67,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     openapi: new Operation(tags: ['Referentiel']),
     stateOptions: new Options(entityClass: \App\Entity\Service::class),
 )]
-#[ApiFilter(SearchFilter::class, properties: ['libelle' => 'ipartial'])]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
 #[Map(target: \App\Entity\Service::class)]
 final class Service
 {

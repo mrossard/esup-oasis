@@ -46,14 +46,14 @@ class ChartesTest extends ApiTestCaseCustom
         $client = $this->createClientWithCredentials('demandeur');
         $response = $client->request('GET', '/utilisateurs/demandeur/chartes');
         $data = $response->toArray();
-        
+
         $this->assertGreaterThan(0, $data['hydra:totalItems']);
         $charteId = $data['hydra:member'][0]['@id'];
-        
+
         $client->request('PATCH', $charteId, [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
-                'dateValidation' => (new \DateTime())->format(\DateTimeInterface::RFC3339),
+                'dateValidation' => new \DateTime()->format(\DateTimeInterface::RFC3339),
             ],
         ]);
 
@@ -112,7 +112,7 @@ class ChartesTest extends ApiTestCaseCustom
         $client2->request('PATCH', $charteId, [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
-                'dateValidation' => (new \DateTime())->format(\DateTimeInterface::RFC3339),
+                'dateValidation' => new \DateTime()->format(\DateTimeInterface::RFC3339),
             ],
         ]);
         $this->assertResponseStatusCodeSame(403);
@@ -128,7 +128,7 @@ class ChartesTest extends ApiTestCaseCustom
         $client2->request('PATCH', $charteId, [
             'headers' => ['Content-Type' => 'application/merge-patch+json'],
             'json' => [
-                'dateValidation' => (new \DateTime())->format(\DateTimeInterface::RFC3339),
+                'dateValidation' => new \DateTime()->format(\DateTimeInterface::RFC3339),
             ],
         ]);
         $this->assertResponseIsSuccessful();

@@ -12,32 +12,26 @@
 
 declare(strict_types=1);
 
-namespace App\Filter;
+namespace App\Doctrine\Extension;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
 use Doctrine\ORM\QueryBuilder;
 
-class PreloadAssociationsFilter extends AbstractFilter
+final class PreloadAssociationsExtension implements QueryCollectionExtensionInterface
 {
-    public const string PROPERTY = 'preloadAssociations';
+    public const string PROPERTY = 'preload_associations';
 
-    protected function filterProperty(
-        string $property,
-        mixed $value,
+    public function applyToCollection(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== self::PROPERTY) {
-            return;
-        }
-
-        //On parcourt les valeurs et on ajout des join() et des select() pour forcer le chargement des données des associations
-        if (!is_array($value)) {
+        $associations = $context[self::PROPERTY] ?? $context['filters']['preloadAssociations'] ?? null;
+        if (!is_array($associations)) {
             return;
         }
 
@@ -45,7 +39,7 @@ class PreloadAssociationsFilter extends AbstractFilter
             'root' => $queryBuilder->getRootAliases()[0],
         ];
 
-        foreach ($value as $associationName => $association) {
+        foreach ($associations as $associationName => $association) {
             $aliases[$associationName] = $queryNameGenerator->generateJoinAlias($associationName);
             if (($association['joinType'] ?? 'LEFT') === 'LEFT') {
                 $queryBuilder->leftJoin(
@@ -60,12 +54,5 @@ class PreloadAssociationsFilter extends AbstractFilter
             }
             $queryBuilder->addSelect($aliases[$associationName]);
         }
-
-        return;
-    }
-
-    public function getDescription(string $resourceClass): array
-    {
-        return []; //tambouille interne
     }
 }

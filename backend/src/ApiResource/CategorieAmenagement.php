@@ -12,15 +12,15 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\CategorieAmenagement\CategorieAmenagementProcessor;
@@ -30,7 +30,36 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['libelle'],
+                ),
+                'typesAmenagement.examens' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'typesAmenagement.examens',
+                    schema: ['type' => 'boolean'],
+                    castToNativeType: true,
+                    castToArray: false,
+                ),
+                'typesAmenagement.pedagogique' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'typesAmenagement.pedagogique',
+                    schema: ['type' => 'boolean'],
+                    castToNativeType: true,
+                    castToArray: false,
+                ),
+                'typesAmenagement.aideHumaine' => new QueryParameter(
+                    filter: new ExactFilter(),
+                    property: 'typesAmenagement.aideHumaine',
+                    schema: ['type' => 'boolean'],
+                    castToNativeType: true,
+                    castToArray: false,
+                ),
+            ],
+        ),
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
         new Post(uriTemplate: self::COLLECTION_URI, security: "is_granted('ROLE_ADMIN')", map: false),
         new Patch(uriTemplate: self::ITEM_URI, uriVariables: ['id'], security: "is_granted('ROLE_ADMIN')", map: false),
@@ -40,12 +69,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
     processor: CategorieAmenagementProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\CategorieAmenagement::class),
 )]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
-#[ApiFilter(BooleanFilter::class, properties: [
-    'typesAmenagement.examens',
-    'typesAmenagement.pedagogique',
-    'typesAmenagement.aideHumaine',
-])]
 class CategorieAmenagement
 {
     public const string COLLECTION_URI = '/categories_amenagements';

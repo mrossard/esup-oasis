@@ -13,13 +13,13 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\State\Tag\TagProcessor;
@@ -31,11 +31,26 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI, map: false),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['libelle'],
+                ),
+            ],
+            map: false,
+        ),
         new GetCollection(
             uriTemplate: CategorieTag::ITEM_URI . self::COLLECTION_URI,
             uriVariables: [
                 'id' => new Link(fromProperty: 'id', toProperty: 'categorie', fromClass: CategorieTag::class),
+            ],
+            parameters: [
+                'order[:property]' => new QueryParameter(
+                    filter: new CaseInsensitiveOrderFilter(),
+                    properties: ['libelle'],
+                ),
             ],
             map: false,
         ),
@@ -58,7 +73,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: TagProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\Tag::class),
 )]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
 #[Map(target: \App\Entity\Tag::class)]
 class Tag
 {

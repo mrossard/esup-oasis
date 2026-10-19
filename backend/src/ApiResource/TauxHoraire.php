@@ -13,7 +13,6 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -22,6 +21,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\TauxHoraireDateFilter;
 use App\State\TauxHoraire\TauxHoraireCollectionProvider;
@@ -38,6 +38,13 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: self::COLLECTION_URI,
             uriVariables: [
                 'typeId' => new Link(fromProperty: 'id', toProperty: 'typeEvenement', fromClass: TypeEvenement::class),
+            ],
+            parameters: [
+                'date' => new QueryParameter(
+                    filter: new TauxHoraireDateFilter(),
+                    property: 'date',
+                    description: 'date pour laquelle on veut le taux valide',
+                ),
             ],
             provider: TauxHoraireCollectionProvider::class,
         ),
@@ -82,7 +89,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: TauxHoraireProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\TauxHoraire::class),
 )]
-#[ApiFilter(TauxHoraireDateFilter::class)]
 class TauxHoraire
 {
     public const string COLLECTION_URI = '/types_evenements/{typeId}/taux';

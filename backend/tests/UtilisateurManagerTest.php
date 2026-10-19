@@ -20,14 +20,14 @@ class UtilisateurManagerTest extends ApiTestCaseCustom
         $container = static::getContainer();
         $em = $container->get('doctrine')->getManager();
         $user = $em->getRepository(Utilisateur::class)->findOneBy(['uid' => 'beneficiaire']);
-        
+
         /** @var UtilisateurManager $manager */
         $manager = $container->get(UtilisateurManager::class);
-        
+
         $manager->initNumeroAnonyme($user);
-        
+
         $this->assertNotNull($user->getNumeroAnonyme());
-        $this->assertStringStartsWith(date('Y'), (string)$user->getNumeroAnonyme());
+        $this->assertStringStartsWith(date('Y'), (string) $user->getNumeroAnonyme());
     }
 
     public function testParRole(): void
@@ -35,7 +35,7 @@ class UtilisateurManagerTest extends ApiTestCaseCustom
         $container = static::getContainer();
         /** @var UtilisateurManager $manager */
         $manager = $container->get(UtilisateurManager::class);
-        
+
         $admins = $manager->parRole('ROLE_ADMIN');
         $this->assertNotEmpty($admins);
         // Find 'admin' in the list
@@ -47,26 +47,26 @@ class UtilisateurManagerTest extends ApiTestCaseCustom
     {
         $container = static::getContainer();
         $em = $container->get('doctrine')->getManager();
-        
+
         // On crée une demande pour un type qui n'a qu'un profil (artiste, id 2)
         $typeDemande = $em->getRepository(\App\Entity\TypeDemande::class)->find(2);
         $campagne = $typeDemande->getCampagnes()->first();
         $demandeur = $em->getRepository(Utilisateur::class)->findOneBy(['uid' => 'demandeur2']);
-        
+
         $demande = new \App\Entity\Demande();
         $demande->setCampagne($campagne);
         $demande->setDemandeur($demandeur);
         $demande->setEtat($em->getRepository(\App\Entity\EtatDemande::class)->find(\App\Entity\EtatDemande::RECEPTIONNEE));
         $demande->setDateDepot(new \DateTime());
-        
+
         $em->persist($demande);
         $em->flush();
-        
+
         /** @var UtilisateurManager $manager */
         $manager = $container->get(UtilisateurManager::class);
-        
+
         $beneficiaire = $manager->creerBeneficiairePourDemande($demande, null, 'gestionnaire');
-        
+
         $this->assertNotNull($beneficiaire);
         $this->assertEquals($demandeur, $beneficiaire->getUtilisateur());
         $this->assertEquals(6, $beneficiaire->getProfil()->getId()); // profil6 for artistes
@@ -105,50 +105,52 @@ class UtilisateurManagerTest extends ApiTestCaseCustom
         $this->assertEmpty($user->getInscriptions());
 
         $scolProvider = $this->createMock(AbstractSiScolDataProvider::class);
-        $scolProvider->method('getInscriptions')->willReturn([
-            [
-                'codeFormation' => 'CODE_F_1',
-                'libFormation' => 'formation 1',
-                'codeComposante' => 'CODE_C_1',
-                'libComposante' => 'composante 1',
-                'debut' => new DateTime('2026-09-01'),
-                'fin' => new DateTime('2027-08-31'),
-                'principale' => true,
-                'boursier' => false,
-                'statut' => 'FI',
-                'niveau' => 'L1',
-                'discipline' => 'Info',
-                'diplome' => 'Licence',
-            ],
-            [
-                'codeFormation' => 'CODE_F_2',
-                'libFormation' => 'formation 2',
-                'codeComposante' => 'CODE_C_2',
-                'libComposante' => 'composante 2',
-                'debut' => new DateTime('2026-09-01'),
-                'fin' => new DateTime('2027-08-31'),
-                'principale' => false,
-                'boursier' => false,
-                'statut' => 'FI',
-                'niveau' => 'L1',
-                'discipline' => 'Math',
-                'diplome' => 'Licence',
-            ],
-            [
-                'codeFormation' => 'CODE_F_3',
-                'libFormation' => 'formation defaut',
-                'codeComposante' => 'CODE_C_1',
-                'libComposante' => 'composante 1',
-                'debut' => new DateTime('2025-09-01'),
-                'fin' => new DateTime('2026-08-31'),
-                // 'principale' not specified, must default to true
-                'boursier' => false,
-                'statut' => 'FI',
-                'niveau' => 'L1',
-                'discipline' => 'Info',
-                'diplome' => 'Licence',
-            ],
-        ]);
+        $scolProvider
+            ->method('getInscriptions')
+            ->willReturn([
+                [
+                    'codeFormation' => 'CODE_F_1',
+                    'libFormation' => 'formation 1',
+                    'codeComposante' => 'CODE_C_1',
+                    'libComposante' => 'composante 1',
+                    'debut' => new DateTime('2026-09-01'),
+                    'fin' => new DateTime('2027-08-31'),
+                    'principale' => true,
+                    'boursier' => false,
+                    'statut' => 'FI',
+                    'niveau' => 'L1',
+                    'discipline' => 'Info',
+                    'diplome' => 'Licence',
+                ],
+                [
+                    'codeFormation' => 'CODE_F_2',
+                    'libFormation' => 'formation 2',
+                    'codeComposante' => 'CODE_C_2',
+                    'libComposante' => 'composante 2',
+                    'debut' => new DateTime('2026-09-01'),
+                    'fin' => new DateTime('2027-08-31'),
+                    'principale' => false,
+                    'boursier' => false,
+                    'statut' => 'FI',
+                    'niveau' => 'L1',
+                    'discipline' => 'Math',
+                    'diplome' => 'Licence',
+                ],
+                [
+                    'codeFormation' => 'CODE_F_3',
+                    'libFormation' => 'formation defaut',
+                    'codeComposante' => 'CODE_C_1',
+                    'libComposante' => 'composante 1',
+                    'debut' => new DateTime('2025-09-01'),
+                    'fin' => new DateTime('2026-08-31'),
+                    // 'principale' not specified, must default to true
+                    'boursier' => false,
+                    'statut' => 'FI',
+                    'niveau' => 'L1',
+                    'discipline' => 'Info',
+                    'diplome' => 'Licence',
+                ],
+            ]);
 
         $ref = new ReflectionClass(UtilisateurManager::class);
         /** @var UtilisateurManager $manager */

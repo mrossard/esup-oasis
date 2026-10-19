@@ -197,10 +197,12 @@ class DecisionObservationsTest extends ApiTestCaseCustom
         $manager->clear();
         $beneficiaire = $manager->getRepository(Utilisateur::class)->findOneBy(['uid' => 'beneficiaire-decision']);
 
-        return $manager->getRepository(DecisionAmenagementExamens::class)->findOneBy([
-            'beneficiaire' => $beneficiaire,
-            'debut' => new DateTime('2025-09-01'),
-        ]);
+        return $manager
+            ->getRepository(DecisionAmenagementExamens::class)
+            ->findOneBy([
+                'beneficiaire' => $beneficiaire,
+                'debut' => new DateTime('2025-09-01'),
+            ]);
     }
 
     /** Active ou non l'exigence sur le profil du bénéficiaire (un profil de handicap, avec typologie). */

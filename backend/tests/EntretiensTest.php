@@ -72,4 +72,29 @@ class EntretiensTest extends ApiTestCaseCustom
 
         $this->assertResponseStatusCodeSame(403);
     }
+
+    public function testSortEntretiens(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        // Create an earlier entretien
+        $client->request('POST', '/utilisateurs/beneficiaire/entretiens', [
+            'json' => [
+                'commentaire' => 'Entretien antérieur',
+                'date' => '2025-01-01T10:00:00+00:00',
+            ],
+        ]);
+        $this->assertResponseStatusCodeSame(201);
+
+        // Sort asc
+        $response = $client->request('GET', '/utilisateurs/beneficiaire/entretiens?order[date]=asc');
+        $this->assertResponseIsSuccessful();
+        $data = $response->toArray();
+        $this->assertSame('2025-01-01T00:00:00+00:00', $data['hydra:member'][0]['date']);
+
+        // Sort desc
+        $response = $client->request('GET', '/utilisateurs/beneficiaire/entretiens?order[date]=desc');
+        $this->assertResponseIsSuccessful();
+        $data = $response->toArray();
+        $this->assertSame('2026-03-11T00:00:00+00:00', $data['hydra:member'][0]['date']);
+    }
 }

@@ -41,10 +41,14 @@ class ModifierDecisionVoter extends Voter
 
         // état inchangé : saisie des observations, possible tant que la décision n'est pas envoyée
         if ($avant->etat === $subject->etat) {
-            return in_array($avant->etat, [
-                \App\Entity\DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS,
-                \App\Entity\DecisionAmenagementExamens::ETAT_VALIDE,
-            ], true);
+            return in_array(
+                $avant->etat,
+                [
+                    \App\Entity\DecisionAmenagementExamens::ETAT_ATTENTE_VALIDATION_CAS,
+                    \App\Entity\DecisionAmenagementExamens::ETAT_VALIDE,
+                ],
+                true,
+            );
         }
 
         if (

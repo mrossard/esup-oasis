@@ -27,7 +27,8 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
         }
 
         $qb = $repository->createQueryBuilder('e');
-        $qb->select('distinct e.id')
+        $qb
+            ->select('distinct e.id')
             ->leftJoin('e.intervenant', 'i')
             ->leftJoin('i.utilisateur', 'iu')
             ->leftJoin('e.beneficiaires', 'b')
@@ -46,7 +47,7 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => count($ids)]);
-        
+
         if (!empty($ids)) {
             $client->request('GET', '/evenements/' . $ids[0]);
             $this->assertResponseIsSuccessful();
@@ -61,7 +62,7 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => count($ids)]);
-        
+
         if (!empty($ids)) {
             $client->request('GET', '/evenements/' . $ids[0]);
             $this->assertResponseIsSuccessful();
@@ -76,7 +77,7 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => count($ids)]);
-        
+
         if (!empty($ids)) {
             $client->request('GET', '/evenements/' . $ids[0]);
             $this->assertResponseIsSuccessful();
@@ -91,7 +92,7 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => count($ids)]);
-        
+
         if (!empty($ids)) {
             $client->request('GET', '/evenements/' . $ids[0]);
             $this->assertResponseIsSuccessful();
@@ -110,7 +111,7 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => count($ownIds)]);
-        
+
         if (!empty($ownIds)) {
             $client->request('GET', '/evenements/' . $ownIds[0]);
             $this->assertResponseIsSuccessful();
@@ -134,7 +135,7 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => count($ownIds)]);
-        
+
         if (!empty($ownIds)) {
             $client->request('GET', '/evenements/' . $ownIds[0]);
             $this->assertResponseIsSuccessful();
@@ -155,7 +156,7 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => count($ownIds)]);
-        
+
         if (!empty($ownIds)) {
             $client->request('GET', '/evenements/' . $ownIds[0]);
             $this->assertResponseIsSuccessful();
@@ -173,7 +174,7 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
 
         $this->assertResponseIsSuccessful();
         $this->assertJsonContains(['hydra:totalItems' => count($ownIds)]);
-        
+
         if (!empty($allIds)) {
             // Should not be able to see an event he is not part of
             $client->request('GET', '/evenements/' . $allIds[0]);
@@ -205,13 +206,13 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
         // Try to bypass by requesting admin's events
         $client->request('GET', '/evenements?utilisateurConcerne=/utilisateurs/admin');
         $this->assertResponseIsSuccessful();
-        
+
         $ownIds = $this->getEventIds('intervenant');
         $this->assertJsonContains(['hydra:totalItems' => count($ownIds)]);
 
         $data = $client->getResponse()->toArray();
         foreach ($data['hydra:member'] as $member) {
-            $id = (int)str_replace('/evenements/', '', $member['@id']);
+            $id = (int) str_replace('/evenements/', '', $member['@id']);
             $this->assertContains($id, $ownIds);
         }
     }
@@ -222,13 +223,13 @@ class EvenementsVisibilityTest extends ApiTestCaseCustom
         // Try to bypass by requesting admin's events
         $client->request('GET', '/evenements?utilisateurConcerne=/utilisateurs/admin');
         $this->assertResponseIsSuccessful();
-        
+
         $ownIds = $this->getEventIds('beneficiaire');
         $this->assertJsonContains(['hydra:totalItems' => count($ownIds)]);
 
         $data = $client->getResponse()->toArray();
         foreach ($data['hydra:member'] as $member) {
-            $id = (int)str_replace('/evenements/', '', $member['@id']);
+            $id = (int) str_replace('/evenements/', '', $member['@id']);
             $this->assertContains($id, $ownIds);
         }
     }

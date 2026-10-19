@@ -36,9 +36,7 @@ class BeneficiaireDifferentGestionnaireContraintValidator extends ConstraintVali
         }
 
         if (!isset($value->uid)) {
-            $value->uid = $this
-                ->request->getCurrentRequest()
-                ->attributes->get('uid');
+            $value->uid = $this->request->getCurrentRequest()->attributes->get('uid');
         }
 
         if ($value->uid === $value->gestionnaire->uid) {

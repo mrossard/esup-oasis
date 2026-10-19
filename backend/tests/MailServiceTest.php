@@ -26,7 +26,9 @@ class MailServiceTest extends ApiTestCaseCustom
     {
         $container = static::getContainer();
         $em = $container->get('doctrine')->getManager();
-        $evenement = $em->getRepository(\App\Entity\Evenement::class)->createQueryBuilder('e')
+        $evenement = $em
+            ->getRepository(\App\Entity\Evenement::class)
+            ->createQueryBuilder('e')
             ->where('e.intervenant IS NOT NULL')
             ->setMaxResults(1)
             ->getQuery()
@@ -47,7 +49,9 @@ class MailServiceTest extends ApiTestCaseCustom
     {
         $container = static::getContainer();
         $em = $container->get('doctrine')->getManager();
-        $evenement = $em->getRepository(\App\Entity\Evenement::class)->createQueryBuilder('e')
+        $evenement = $em
+            ->getRepository(\App\Entity\Evenement::class)
+            ->createQueryBuilder('e')
             ->join('e.beneficiaires', 'b')
             ->setMaxResults(1)
             ->getQuery()
@@ -64,6 +68,7 @@ class MailServiceTest extends ApiTestCaseCustom
         $mailService->envoyerRappelBeneficiaire($beneficiaire, [$evenement]);
         $this->assertTrue(true);
     }
+
     public function testEnvoyerRapportMajInscriptions(): void
     {
         $container = static::getContainer();

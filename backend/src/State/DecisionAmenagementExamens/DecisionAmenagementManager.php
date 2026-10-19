@@ -145,8 +145,10 @@ class DecisionAmenagementManager
         return array_any(
             $profils,
             // l'option ne vaut que pour un profil de handicap, celui qui porte une typologie
-            fn(Beneficiaire $profil) => true === $profil->getProfil()?->isAvecTypologie()
-                && true === $profil->getProfil()->isAvisMedicalRequis(),
+            fn(Beneficiaire $profil) => (
+                true === $profil->getProfil()?->isAvecTypologie()
+                && true === $profil->getProfil()->isAvisMedicalRequis()
+            ),
         );
     }
 }

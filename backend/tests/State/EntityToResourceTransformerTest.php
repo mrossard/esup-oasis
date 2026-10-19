@@ -21,7 +21,7 @@ class EntityToResourceTransformerTest extends TestCase
         // construction utilisée à la purge du cache HTTP : la ressource ne doit pas exiger d'autre argument
         $resource = EntityToResourceTransformer::entityToResource(
             new DecisionResource(),
-            (new DecisionAmenagementExamens())->setEtat(DecisionAmenagementExamens::ETAT_VALIDE),
+            new DecisionAmenagementExamens()->setEtat(DecisionAmenagementExamens::ETAT_VALIDE),
         );
 
         $this->assertInstanceOf(DecisionResource::class, $resource);

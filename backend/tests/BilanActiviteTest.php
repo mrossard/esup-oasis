@@ -92,4 +92,17 @@ class BilanActiviteTest extends ApiTestCaseCustom
         $client->request('DELETE', $id);
         $this->assertResponseStatusCodeSame(403);
     }
+
+    public function testFilterAndOrderBilanActivite(): void
+    {
+        $client = $this->createClientWithCredentials('gestionnaire');
+        $client->request('GET', '/suivis/activite', [
+            'query' => [
+                'demandeur' => '/utilisateurs/gestionnaire',
+                'order' => ['dateDemande' => 'desc'],
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+    }
 }

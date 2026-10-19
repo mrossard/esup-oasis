@@ -67,10 +67,7 @@ class DemandeWorkflowConstraintValidator extends ConstraintValidator
 
         $etatOrigine = match ($value->id) {
             null => PHP_INT_MIN,
-            default => $this->demandeManager
-                ->getDemande($value->id)
-                ->getEtat()
-                ->getId(),
+            default => $this->demandeManager->getDemande($value->id)->getEtat()->getId(),
         };
 
         $nouvelEtat = $value->etat?->id ?? EtatDemande::EN_COURS;

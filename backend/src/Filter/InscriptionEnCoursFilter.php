@@ -12,31 +12,43 @@
 
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\Entity\Formation;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class InscriptionEnCoursFilter extends AbstractFilter
+class InscriptionEnCoursFilter implements FilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
 {
     use ClockAwareTrait;
 
     public const string PROPERTY = 'avecInscriptions';
 
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== self::PROPERTY || $value !== 'true' || $resourceClass !== Formation::class) {
+        $value = null;
+        if (isset($context['parameter'])) {
+            $value = $context['parameter']->getValue();
+        } elseif (isset($context['filters'][self::PROPERTY])) {
+            $value = $context['filters'][self::PROPERTY];
+        }
+
+        if ($value !== true && $value !== 'true' && $value !== 1 && $value !== '1') {
+            return;
+        }
+
+        if ($resourceClass !== Formation::class) {
             return;
         }
 
@@ -47,8 +59,27 @@ class InscriptionEnCoursFilter extends AbstractFilter
 
         $queryBuilder
             ->join(sprintf('%s.inscriptions', $alias), $inscriptionsAlias)
-            ->andWhere(sprintf('%1$s.fin > :%2$s', $inscriptionsAlias, $nowParam))
+            ->andWhere(sprintf('%s.debut <= :%s', $inscriptionsAlias, $nowParam))
+            ->andWhere(sprintf('%s.fin >= :%s', $inscriptionsAlias, $nowParam))
             ->setParameter($nowParam, $now);
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'boolean'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return new OpenApiParameter(
+            name: self::PROPERTY,
+            in: 'query',
+            description: 'uniquement les formations avec inscription',
+            required: false,
+            schema: ['type' => 'boolean'],
+            style: 'form',
+            explode: true,
+        );
     }
 
     public function getDescription(string $resourceClass): array
@@ -58,10 +89,11 @@ class InscriptionEnCoursFilter extends AbstractFilter
                 'property' => self::PROPERTY,
                 'type' => TypeIdentifier::BOOL->value,
                 'required' => false,
-                'openapi' => new Parameter(
+                'openapi' => new OpenApiParameter(
                     name: 'avecInscriptions',
                     in: 'query',
                     description: 'uniquement les formations avec inscription',
+                    allowReserved: false,
                     schema: ['type' => 'boolean'],
                 ),
             ],

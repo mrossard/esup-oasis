@@ -17,7 +17,7 @@ class ParametreUITest extends ApiTestCaseCustom
     public function testUserCanSetParametreUI(): void
     {
         $client = $this->createClientWithCredentials('beneficiaire');
-        
+
         $client->request('PUT', '/utilisateurs/beneficiaire/parametres_ui/THEME', [
             'json' => [
                 'valeur' => 'dark',
@@ -33,7 +33,7 @@ class ParametreUITest extends ApiTestCaseCustom
     public function testUserCanGetOwnParametresUI(): void
     {
         $client = $this->createClientWithCredentials('beneficiaire');
-        
+
         // On s'assure qu'il y en a au moins un (ceux créés par les tests précédents sont persistés!)
         $client->request('PUT', '/utilisateurs/beneficiaire/parametres_ui/LANG', [
             'json' => [
@@ -51,7 +51,7 @@ class ParametreUITest extends ApiTestCaseCustom
     public function testUserCanGetSpecificParametreUI(): void
     {
         $client = $this->createClientWithCredentials('beneficiaire');
-        
+
         $client->request('PUT', '/utilisateurs/beneficiaire/parametres_ui/FONT_SIZE', [
             'json' => [
                 'valeur' => '14px',
@@ -89,7 +89,7 @@ class ParametreUITest extends ApiTestCaseCustom
     public function testUserCanDeleteOwnParametreUI(): void
     {
         $client = $this->createClientWithCredentials('beneficiaire');
-        
+
         $client->request('PUT', '/utilisateurs/beneficiaire/parametres_ui/TO_DELETE', [
             'json' => [
                 'valeur' => 'bye',

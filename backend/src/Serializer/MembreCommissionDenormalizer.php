@@ -29,9 +29,7 @@ readonly class MembreCommissionDenormalizer implements DenormalizerInterface
         private MembreCommissionRepository $membreCommissionRepository,
         private CommissionRepository $commissionRepository,
         private UtilisateurManager $utilisateurManager,
-    )
-    {
-    }
+    ) {}
 
     public function denormalize(mixed $data, string $type, ?string $format = null, array $context = []): mixed
     {
@@ -64,8 +62,7 @@ readonly class MembreCommissionDenormalizer implements DenormalizerInterface
         string $type,
         ?string $format = null,
         array $context = [],
-    ): bool
-    {
+    ): bool {
         return MembreCommission::class === $type;
     }
 

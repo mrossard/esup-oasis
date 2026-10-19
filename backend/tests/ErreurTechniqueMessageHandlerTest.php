@@ -23,9 +23,9 @@ class ErreurTechniqueMessageHandlerTest extends KernelTestCase
     {
         self::bootKernel();
         $container = self::getContainer();
-        
+
         $handler = $container->get(ErreurTechniqueMessageHandler::class);
-        
+
         $exception = new Exception('Exception test');
         $message = new ErreurTechniqueMessage($exception, 'Message d\'erreur technique');
 

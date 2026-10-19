@@ -19,7 +19,7 @@ use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Charte;
 use App\ApiResource\InterventionForfait;
 use App\ApiResource\Utilisateur;
-use App\Filter\PreloadAssociationsFilter;
+use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\State\MappedCollectionPaginator;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -47,7 +47,7 @@ readonly class InterventionForfaitProvider implements ProviderInterface
             }
 
             //preload
-            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+            $context[PreloadAssociationsExtension::PROPERTY] = [
                 'intervenant' => [
                     'sourceEntity' => 'root',
                     'relationName' => 'intervenant',

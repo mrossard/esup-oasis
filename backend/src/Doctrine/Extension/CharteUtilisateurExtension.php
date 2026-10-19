@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Copyright (c) 2024-2026. Esup - Université de Bordeaux.
+ * Copyright (c) 2026. Esup - Université de Bordeaux.
  *
  * This file is part of the Esup-Oasis project (https://github.com/EsupPortail/esup-oasis).
  *  For full copyright and license information please view the LICENSE file distributed with the source code.
@@ -10,47 +10,44 @@
  *
  */
 
-namespace App\Filter;
+declare(strict_types=1);
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+namespace App\Doctrine\Extension;
+
+use ApiPlatform\Doctrine\Orm\Extension\QueryCollectionExtensionInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Operation;
-use App\Entity\PieceJointeBeneficiaire;
+use App\Entity\CharteDemandeur;
 use Doctrine\ORM\QueryBuilder;
-use Override;
 
-class PieceJointeBeneficiaireUidFilter extends AbstractFilter
+final class CharteUtilisateurExtension implements QueryCollectionExtensionInterface
 {
-    public const string PROPERTY = 'uidBeneficiaire';
-
-    #[Override]
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function applyToCollection(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        $entityClass = $operation->getStateOptions()?->getEntityClass() ?? $operation->getClass();
-        if (!$entityClass == PieceJointeBeneficiaire::class || $property !== self::PROPERTY) {
+        $entityClass = $operation?->getStateOptions()?->getEntityClass() ?? $resourceClass;
+        if ($entityClass !== CharteDemandeur::class) {
+            return;
+        }
+
+        $uid = $context['charte_utilisateur_uid'] ?? null;
+        if (null === $uid) {
             return;
         }
 
         $alias = $queryBuilder->getRootAliases()[0];
+        $demandeAlias = $queryNameGenerator->generateJoinAlias('demande');
         $utilisateurAlias = $queryNameGenerator->generateJoinAlias('utilisateur');
         $uidParam = $queryNameGenerator->generateParameterName('uid');
 
         $queryBuilder
-            ->innerJoin(sprintf('%s.beneficiaire', $alias), $utilisateurAlias)
+            ->join($alias . '.demande', $demandeAlias)
+            ->innerJoin(sprintf('%s.demandeur', $demandeAlias), $utilisateurAlias)
             ->andWhere(sprintf('%s.uid = :%s', $utilisateurAlias, $uidParam))
-            ->setParameter($uidParam, $value);
-    }
-
-    #[Override]
-    public function getDescription(string $resourceClass): array
-    {
-        return [];
+            ->setParameter($uidParam, $uid);
     }
 }

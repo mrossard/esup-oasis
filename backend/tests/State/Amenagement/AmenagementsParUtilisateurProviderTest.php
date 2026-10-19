@@ -65,9 +65,9 @@ final class AmenagementsParUtilisateurProviderTest extends TestCase
         $security = $this->createMock(Security::class);
         $referent = $this->createReferentUser([1]);
 
-        $security->method('isGranted')->willReturnCallback(
-            static fn(string $role): bool => $role === Utilisateur::ROLE_REFERENT_COMPOSANTE,
-        );
+        $security
+            ->method('isGranted')
+            ->willReturnCallback(static fn(string $role): bool => $role === Utilisateur::ROLE_REFERENT_COMPOSANTE);
         $security->method('getUser')->willReturn($referent);
 
         $provider = new AmenagementsParUtilisateurProvider(
@@ -95,9 +95,9 @@ final class AmenagementsParUtilisateurProviderTest extends TestCase
         $security = $this->createMock(Security::class);
         $referent = $this->createReferentUser([1]);
 
-        $security->method('isGranted')->willReturnCallback(
-            static fn(string $role): bool => $role === Utilisateur::ROLE_REFERENT_COMPOSANTE,
-        );
+        $security
+            ->method('isGranted')
+            ->willReturnCallback(static fn(string $role): bool => $role === Utilisateur::ROLE_REFERENT_COMPOSANTE);
         $security->method('getUser')->willReturn($referent);
 
         $provider = new AmenagementsParUtilisateurProvider(
@@ -128,9 +128,9 @@ final class AmenagementsParUtilisateurProviderTest extends TestCase
         $security = $this->createMock(Security::class);
         $referent = $this->createReferentUser([3]);
 
-        $security->method('isGranted')->willReturnCallback(
-            static fn(string $role): bool => $role === Utilisateur::ROLE_REFERENT_COMPOSANTE,
-        );
+        $security
+            ->method('isGranted')
+            ->willReturnCallback(static fn(string $role): bool => $role === Utilisateur::ROLE_REFERENT_COMPOSANTE);
         $security->method('getUser')->willReturn($referent);
 
         $provider = new AmenagementsParUtilisateurProvider(
@@ -181,13 +181,13 @@ final class AmenagementsParUtilisateurProviderTest extends TestCase
         $security = $this->createMock(Security::class);
         $referent = $this->createReferentUser([1]);
 
-        $security->method('isGranted')->willReturnCallback(
-            static fn(string $role): bool => match ($role) {
+        $security
+            ->method('isGranted')
+            ->willReturnCallback(static fn(string $role): bool => match ($role) {
                 Utilisateur::ROLE_REFERENT_COMPOSANTE => true,
                 Utilisateur::ROLE_PLANIFICATEUR => true,
                 default => false,
-            },
-        );
+            });
         $security->method('getUser')->willReturn($referent);
 
         $provider = new AmenagementsParUtilisateurProvider(

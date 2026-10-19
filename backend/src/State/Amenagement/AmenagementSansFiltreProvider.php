@@ -18,9 +18,9 @@ use ApiPlatform\State\Pagination\PaginatorInterface;
 use ApiPlatform\State\ProviderInterface;
 use App\ApiResource\Amenagement;
 use App\ApiResource\Composante;
+use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\Entity\Utilisateur;
 use App\Filter\AmenagementBeneficiaireActifFilter;
-use App\Filter\PreloadAssociationsFilter;
 use App\State\MappedCollectionPaginator;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -44,7 +44,7 @@ class AmenagementSansFiltreProvider implements ProviderInterface
             $context['filters'][AmenagementBeneficiaireActifFilter::PROPERTY] = true;
 
             //preload
-            $context['filters'][PreloadAssociationsFilter::PROPERTY] = [
+            $context[PreloadAssociationsExtension::PROPERTY] = [
                 'beneficiaires' => ['sourceEntity' => 'root', 'relationName' => 'beneficiaires'],
                 'beneficiaireUtilisateur' => ['sourceEntity' => 'beneficiaires', 'relationName' => 'utilisateur'],
                 'intervenant' => ['sourceEntity' => 'beneficiaireUtilisateur', 'relationName' => 'intervenant'],

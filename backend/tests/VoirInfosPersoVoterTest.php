@@ -36,10 +36,7 @@ class VoirInfosPersoVoterTest extends TestCase
         $token = $this->createMock(TokenInterface::class);
         $subject = new Utilisateur();
 
-        $this->assertSame(
-            VoterInterface::ACCESS_ABSTAIN,
-            $this->voter->vote($token, $subject, ['OTHER_ATTRIBUTE']),
-        );
+        $this->assertSame(VoterInterface::ACCESS_ABSTAIN, $this->voter->vote($token, $subject, ['OTHER_ATTRIBUTE']));
     }
 
     public function testPlanificateurCanSeeInfosPerso(): void
@@ -53,10 +50,11 @@ class VoirInfosPersoVoterTest extends TestCase
             ->with(\App\Entity\Utilisateur::ROLE_PLANIFICATEUR)
             ->willReturn(true);
 
-        $this->assertSame(
-            VoterInterface::ACCESS_GRANTED,
-            $this->voter->vote($token, $subject, [Utilisateur::VOIR_INFOS_PERSO]),
-        );
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->voter->vote(
+            $token,
+            $subject,
+            [Utilisateur::VOIR_INFOS_PERSO],
+        ));
     }
 
     public function testUserCanSeeOwnInfosPerso(): void
@@ -72,14 +70,13 @@ class VoirInfosPersoVoterTest extends TestCase
             ->method('isGranted')
             ->with(\App\Entity\Utilisateur::ROLE_PLANIFICATEUR)
             ->willReturn(false);
-        $this->security
-            ->method('getUser')
-            ->willReturn($currentUser);
+        $this->security->method('getUser')->willReturn($currentUser);
 
-        $this->assertSame(
-            VoterInterface::ACCESS_GRANTED,
-            $this->voter->vote($token, $subject, [Utilisateur::VOIR_INFOS_PERSO]),
-        );
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $this->voter->vote(
+            $token,
+            $subject,
+            [Utilisateur::VOIR_INFOS_PERSO],
+        ));
     }
 
     public function testOtherUserCannotSeeInfosPerso(): void
@@ -95,13 +92,12 @@ class VoirInfosPersoVoterTest extends TestCase
             ->method('isGranted')
             ->with(\App\Entity\Utilisateur::ROLE_PLANIFICATEUR)
             ->willReturn(false);
-        $this->security
-            ->method('getUser')
-            ->willReturn($currentUser);
+        $this->security->method('getUser')->willReturn($currentUser);
 
-        $this->assertSame(
-            VoterInterface::ACCESS_DENIED,
-            $this->voter->vote($token, $subject, [Utilisateur::VOIR_INFOS_PERSO]),
-        );
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $this->voter->vote(
+            $token,
+            $subject,
+            [Utilisateur::VOIR_INFOS_PERSO],
+        ));
     }
 }

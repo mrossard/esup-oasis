@@ -13,14 +13,12 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Entity\CharteDemandeur;
-use App\Filter\CharteUtilisateurFilter;
 use App\State\Charte\CharteUtilisateurProcessor;
 use App\State\Charte\CharteUtilisateurProvider;
 use DateTimeInterface;
@@ -33,19 +31,25 @@ use Symfony\Component\Serializer\Attribute\Ignore;
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: ['uid'],
-            security: "is_granted('" . \App\Entity\Utilisateur::ROLE_PLANIFICATEUR . "') or request.attributes.get('uid') == user.getUid()",
+            security: "is_granted('"
+            . \App\Entity\Utilisateur::ROLE_PLANIFICATEUR
+            . "') or request.attributes.get('uid') == user.getUid()",
             map: false,
         ),
         new Get(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
-            security: "is_granted('" . \App\Entity\Utilisateur::ROLE_PLANIFICATEUR . "') or object.uid == user.getUid()",
+            security: "is_granted('"
+            . \App\Entity\Utilisateur::ROLE_PLANIFICATEUR
+            . "') or object.uid == user.getUid()",
         ),
         new Patch(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['uid', 'id'],
             denormalizationContext: ['groups' => [self::GROUP_IN]],
-            securityPostDenormalize: "is_granted('" . \App\Entity\Utilisateur::ROLE_ADMIN . "') or object.uid == user.getUid()",
+            securityPostDenormalize: "is_granted('"
+            . \App\Entity\Utilisateur::ROLE_ADMIN
+            . "') or object.uid == user.getUid()",
         ),
     ],
     openapi: new Operation(tags: ['Utilisateurs']),
@@ -53,7 +57,6 @@ use Symfony\Component\Serializer\Attribute\Ignore;
     processor: CharteUtilisateurProcessor::class,
     stateOptions: new Options(entityClass: CharteDemandeur::class),
 )]
-#[ApiFilter(CharteUtilisateurFilter::class)]
 class CharteUtilisateur
 {
     public const string COLLECTION_URI = '/utilisateurs/{uid}/chartes';

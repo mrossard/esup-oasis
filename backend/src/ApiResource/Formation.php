@@ -10,32 +10,38 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CaseInsensitiveOrderFilter;
 use App\Filter\InscriptionEnCoursFilter;
+use App\Filter\ResourceIriFilter;
 use ReflectionProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, parameters: [
+            'composante' => new QueryParameter(filter: ResourceIriFilter::class, property: 'composante'),
+            'order[:property]' => new QueryParameter(filter: new CaseInsensitiveOrderFilter(), properties: ['libelle']),
+            'avecInscriptions' => new QueryParameter(
+                filter: new InscriptionEnCoursFilter(),
+                property: 'avecInscriptions',
+            ),
+        ]),
     ],
     openapi: new Operation(tags: ['Referentiel']),
     stateOptions: new Options(entityClass: \App\Entity\Formation::class),
 )]
-#[ApiFilter(SearchFilter::class, properties: ['composante'])]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['libelle'])]
-#[ApiFilter(InscriptionEnCoursFilter::class)]
 final class Formation
 {
     public const string COLLECTION_URI = '/formations';
