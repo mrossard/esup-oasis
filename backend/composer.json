@@ -106,6 +106,7 @@
   },
   "require-dev": {
     "composer": "^2.2",
+    "igor-php/igor-php": "^0.10.1",
     "phpunit/phpunit": "^10.0",
     "symfony/css-selector": "8.0.*",
     "symfony/debug-bundle": "8.0.*",
