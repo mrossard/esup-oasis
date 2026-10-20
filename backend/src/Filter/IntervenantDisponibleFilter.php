@@ -13,15 +13,77 @@
 namespace App\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class IntervenantDisponibleFilter extends AbstractFilter
+class IntervenantDisponibleFilter extends AbstractFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
+        $value = $context['filters']['creneau'] ?? null;
+        if ($value === null && isset($context['parameter'])) {
+            $value = $context['parameter']->getValue();
+        }
+        if ($value === null || $value === '' || $value === []) {
+            return;
+        }
+
+        $this->filterProperty(
+            'creneau',
+            $value,
+            $queryBuilder,
+            $queryNameGenerator,
+            $resourceClass,
+            $operation,
+            $context,
+        );
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    {
+        return [
+            new Parameter(
+                name: 'creneau[debut]',
+                in: 'query',
+                description: 'début du créneau',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+            new Parameter(
+                name: 'creneau[fin]',
+                in: 'query',
+                description: 'fin du créneau',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+        ];
+    }
+
     public function getDescription(string $resourceClass): array
     {
         return [

@@ -12,22 +12,22 @@
 
 namespace App\ApiResource;
 
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\CampagneNonArchiveeFilter;
 use App\Filter\DemandeDisciplineSportiveFilter;
-use App\Filter\DemandeFormatFilter;
 use App\Filter\DerniereInscriptionSearchFilter;
 use App\Filter\NestedUtilisateurFilter;
+use App\Filter\ResourceIriFilter;
 use App\State\Demande\DemandeProvider;
 use App\State\Demande\DemandesUtilisateurProvider;
 use App\State\Demande\PatchDemandeProcessor;
@@ -48,10 +48,109 @@ use Symfony\Component\Validator\Constraints as Assert;
             security: "is_granted('" . self::VOIR_DEMANDE . "', object)",
             map: false,
         ),
-        new GetCollection(uriTemplate: self::COLLECTION_URI, map: false),
+        new GetCollection(
+            uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'demandeur.nom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'demandeur.nom'),
+                'demandeur.prenom' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'demandeur.prenom',
+                ),
+                'etat' => new QueryParameter(filter: ResourceIriFilter::class, property: 'etat'),
+                'campagne.typeDemande' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'campagne.typeDemande',
+                ),
+                'campagne.typeDemande.libelle' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'campagne.typeDemande.libelle',
+                ),
+                'campagne' => new QueryParameter(filter: ResourceIriFilter::class, property: 'campagne'),
+                'demandeur' => new QueryParameter(filter: NestedUtilisateurFilter::class, property: 'demandeur'),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedUtilisateurFilter::class,
+                    property: 'demandeur.beneficiaires.gestionnaire',
+                ),
+                'libelleComposante' => new QueryParameter(
+                    filter: DerniereInscriptionSearchFilter::class,
+                    property: 'libelleComposante',
+                ),
+                'libelleFormation' => new QueryParameter(
+                    filter: DerniereInscriptionSearchFilter::class,
+                    property: 'libelleFormation',
+                ),
+                'composante' => new QueryParameter(
+                    filter: DerniereInscriptionSearchFilter::class,
+                    property: 'composante',
+                ),
+                'formation' => new QueryParameter(
+                    filter: DerniereInscriptionSearchFilter::class,
+                    property: 'formation',
+                ),
+                'discipline' => new QueryParameter(
+                    filter: DemandeDisciplineSportiveFilter::class,
+                    property: 'discipline',
+                ),
+                'order[:property]' => new QueryParameter(
+                    filter: new SortFilter(),
+                    properties: ['demandeur.nom', 'dateDepot'],
+                ),
+                'format_simple' => new QueryParameter(schema: ['type' => 'boolean'], description: 'format simplifié'),
+                'archivees' => new QueryParameter(filter: CampagneNonArchiveeFilter::class, property: 'archivees'),
+            ],
+            map: false,
+        ),
         new GetCollection(
             uriTemplate: self::COLLECTION_UTILISATEUR_URI,
             uriVariables: ['uid'],
+            parameters: [
+                'demandeur.nom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'demandeur.nom'),
+                'demandeur.prenom' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'demandeur.prenom',
+                ),
+                'etat' => new QueryParameter(filter: ResourceIriFilter::class, property: 'etat'),
+                'campagne.typeDemande' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'campagne.typeDemande',
+                ),
+                'campagne.typeDemande.libelle' => new QueryParameter(
+                    filter: new PartialSearchFilter(),
+                    property: 'campagne.typeDemande.libelle',
+                ),
+                'campagne' => new QueryParameter(filter: ResourceIriFilter::class, property: 'campagne'),
+                'demandeur' => new QueryParameter(filter: NestedUtilisateurFilter::class, property: 'demandeur'),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedUtilisateurFilter::class,
+                    property: 'demandeur.beneficiaires.gestionnaire',
+                ),
+                'libelleComposante' => new QueryParameter(
+                    filter: DerniereInscriptionSearchFilter::class,
+                    property: 'libelleComposante',
+                ),
+                'libelleFormation' => new QueryParameter(
+                    filter: DerniereInscriptionSearchFilter::class,
+                    property: 'libelleFormation',
+                ),
+                'composante' => new QueryParameter(
+                    filter: DerniereInscriptionSearchFilter::class,
+                    property: 'composante',
+                ),
+                'formation' => new QueryParameter(
+                    filter: DerniereInscriptionSearchFilter::class,
+                    property: 'formation',
+                ),
+                'discipline' => new QueryParameter(
+                    filter: DemandeDisciplineSportiveFilter::class,
+                    property: 'discipline',
+                ),
+                'order[:property]' => new QueryParameter(
+                    filter: new SortFilter(),
+                    properties: ['demandeur.nom', 'dateDepot'],
+                ),
+                'format_simple' => new QueryParameter(schema: ['type' => 'boolean'], description: 'format simplifié'),
+                'archivees' => new QueryParameter(filter: CampagneNonArchiveeFilter::class, property: 'archivees'),
+            ],
             security: "is_granted('ROLE_GESTIONNAIRE') or request.attributes.get('uid') == user.getUid()",
             forceEager: false,
             provider: DemandesUtilisateurProvider::class,
@@ -81,48 +180,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     provider: DemandeProvider::class,
     stateOptions: new Options(entityClass: \App\Entity\Demande::class),
 )]
-#[ApiFilter(SearchFilter::class, properties: [
-    'demandeur.nom' => 'ipartial',
-    'demandeur.prenom' => 'ipartial',
-    'etat' => 'exact',
-    'campagne.typeDemande' => 'exact',
-    'campagne.typeDemande.libelle' => 'ipartial',
-    'campagne' => 'exact',
-])]
-#[ApiFilter(NestedUtilisateurFilter::class, properties: [
-    'demandeur' => 'demandeur',
-    'gestionnaire' => 'demandeur.beneficiaires.gestionnaire',
-])]
-#[ApiFilter(DerniereInscriptionSearchFilter::class, properties: [
-    'libelleComposante' => [
-        'type' => 'string',
-        'mapping' => 'demandeur.inscriptions.formation.composante.libelle',
-        'desc' => 'libellé de la composante',
-        'etudiant' => 'demandeur',
-    ],
-    'libelleFormation' => [
-        'type' => 'string',
-        'mapping' => 'demandeur.inscriptions.formation.libelle',
-        'desc' => 'libellé de la formation',
-        'etudiant' => 'demandeur',
-    ],
-    'composante' => [
-        'type' => 'relation',
-        'mapping' => 'demandeur.inscriptions.formation.composante',
-        'desc' => 'libellé de la composante',
-        'etudiant' => 'demandeur',
-    ],
-    'formation' => [
-        'type' => 'relation',
-        'mapping' => 'demandeur.inscriptions.formation',
-        'desc' => 'libellé de la formation',
-        'etudiant' => 'demandeur',
-    ],
-])]
-#[ApiFilter(DemandeDisciplineSportiveFilter::class)]
-#[ApiFilter(OrderFilter::class, properties: ['demandeur.nom', 'dateDepot'])]
-#[ApiFilter(DemandeFormatFilter::class)]
-#[ApiFilter(CampagneNonArchiveeFilter::class)]
 #[DemandeUniqueParCampagneConstraint]
 #[DemandeWorkflowConstraint(groups: [self::GROUP_CHANGEMENT_ETAT])]
 class Demande

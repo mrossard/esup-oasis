@@ -41,6 +41,7 @@ readonly class BeneficiaireProvider implements ProviderInterface
             $requestedFilters['date'] = $this->now();
         }
         $context['filters'][BeneficiaireFilter::PROPERTY] = $requestedFilters;
+        $operation->getParameters()?->get('filtreBeneficiaire')?->setValue($requestedFilters);
 
         /**
          * On veut toujours les inscriptions, les tags, les profils...on les charge dès la première requête

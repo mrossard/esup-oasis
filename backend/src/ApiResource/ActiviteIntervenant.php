@@ -10,19 +10,21 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\ActivitePeriodeFilter;
 use App\Filter\NestedUtilisateurFilter;
+use App\Filter\ResourceIriFilter;
 use App\State\Evenement\ActiviteIntervenantProvider;
 
 #[ApiResource(
@@ -31,6 +33,19 @@ use App\State\Evenement\ActiviteIntervenantProvider;
             uriTemplate: '/suivis/intervenants',
             openapi: new Operation(tags: ['Suivis']),
             paginationEnabled: false,
+            parameters: [
+                'type' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type'),
+                'campus' => new QueryParameter(filter: ResourceIriFilter::class, property: 'campus'),
+                'intervenant' => new QueryParameter(
+                    filter: NestedUtilisateurFilter::class,
+                    property: 'intervenant.utilisateur',
+                ),
+                'debut' => new QueryParameter(filter: new DateFilter(), property: 'debut'),
+                'fin' => new QueryParameter(filter: new DateFilter(), property: 'fin'),
+                'exists[intervenant]' => new QueryParameter(filter: new ExistsFilter(), property: 'intervenant'),
+                'exists[dateAnnulation]' => new QueryParameter(filter: new ExistsFilter(), property: 'dateAnnulation'),
+                'periode' => new QueryParameter(filter: ActivitePeriodeFilter::class, property: 'periode'),
+            ],
         ),
         new Get(
             uriTemplate: '/suivis/intervenants/{id}',
@@ -45,14 +60,6 @@ use App\State\Evenement\ActiviteIntervenantProvider;
     provider: ActiviteIntervenantProvider::class,
     stateOptions: new Options(entityClass: \App\Entity\Evenement::class),
 )]
-#[ApiFilter(SearchFilter::class, properties: [
-    'type' => 'exact',
-    'campus' => 'exact',
-])]
-#[ApiFilter(NestedUtilisateurFilter::class, properties: ['intervenant' => 'intervenant.utilisateur'])]
-#[ApiFilter(DateFilter::class, properties: ['debut', 'fin'])]
-#[ApiFilter(ExistsFilter::class, properties: ['intervenant', 'dateAnnulation'])]
-#[ApiFilter(ActivitePeriodeFilter::class)]
 class ActiviteIntervenant extends ActiviteUtilisateur
 {
     public const string OUT = 'ActiviteIntervenant:out';

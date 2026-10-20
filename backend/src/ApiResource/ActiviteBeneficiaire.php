@@ -10,19 +10,21 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\ActivitePeriodeFilter;
 use App\Filter\NestedUtilisateurFilter;
+use App\Filter\ResourceIriFilter;
 use App\State\Evenement\ActiviteBeneficiaireProvider;
 
 #[ApiResource(
@@ -31,6 +33,26 @@ use App\State\Evenement\ActiviteBeneficiaireProvider;
             uriTemplate: '/suivis/beneficiaires',
             openapi: new Operation(tags: ['Suivis']),
             paginationEnabled: false,
+            parameters: [
+                'type' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type'),
+                'campus' => new QueryParameter(filter: ResourceIriFilter::class, property: 'campus'),
+                'beneficiaires.profil' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'beneficiaires.profil',
+                ),
+                'beneficiaires.typologies' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'beneficiaires.typologies',
+                ),
+                'beneficiaires' => new QueryParameter(
+                    filter: NestedUtilisateurFilter::class,
+                    property: 'beneficiaires.utilisateur',
+                ),
+                'debut' => new QueryParameter(filter: new DateFilter(), property: 'debut'),
+                'fin' => new QueryParameter(filter: new DateFilter(), property: 'fin'),
+                'exists[dateAnnulation]' => new QueryParameter(filter: new ExistsFilter(), property: 'dateAnnulation'),
+                'periode' => new QueryParameter(filter: ActivitePeriodeFilter::class, property: 'periode'),
+            ],
         ),
         new Get(
             uriTemplate: '/suivis/beneficiaires/{id}',
@@ -45,16 +67,6 @@ use App\State\Evenement\ActiviteBeneficiaireProvider;
     provider: ActiviteBeneficiaireProvider::class,
     stateOptions: new Options(entityClass: \App\Entity\Evenement::class),
 )]
-#[ApiFilter(SearchFilter::class, properties: [
-    'type' => 'exact',
-    'campus' => 'exact',
-    'beneficiaires.profil' => 'exact',
-    'beneficiaires.typologies' => 'exact',
-])]
-#[ApiFilter(NestedUtilisateurFilter::class, properties: ['beneficiaires' => 'beneficiaires.utilisateur'])]
-#[ApiFilter(DateFilter::class, properties: ['debut', 'fin'])]
-#[ApiFilter(ExistsFilter::class, properties: ['dateAnnulation'])]
-#[ApiFilter(ActivitePeriodeFilter::class)]
 class ActiviteBeneficiaire extends ActiviteUtilisateur
 {
     public const string OUT = 'ActiviteBeneficiaire:out';

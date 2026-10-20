@@ -56,7 +56,7 @@ class DemandeProvider implements ResetInterface, ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            $context = $this->addFilters($context);
+            $context = $this->addFilters($context, $operation);
             $provider = $this->collectionProvider;
         } else {
             $provider = $this->itemProvider;
@@ -78,9 +78,10 @@ class DemandeProvider implements ResetInterface, ProviderInterface
 
     /**
      * @param array $context
+     * @param Operation $operation
      * @return array
      */
-    private function addFilters(array $context): array
+    private function addFilters(array $context, Operation $operation): array
     {
         $context['filters'] ??= [];
         /**
@@ -162,6 +163,7 @@ class DemandeProvider implements ResetInterface, ProviderInterface
                 } else {
                     $context['filters']['campagne'] = $campagnesAccessibles;
                 }
+                $operation->getParameters()?->get('campagne')?->setValue($context['filters']['campagne']);
             }
 
             return $context;
@@ -191,6 +193,10 @@ class DemandeProvider implements ResetInterface, ProviderInterface
                 } else {
                     $context['filters']['campagne.typeDemande'] = $iriTypesValides;
                 }
+                $operation
+                    ->getParameters()
+                    ?->get('campagne.typeDemande')
+                    ?->setValue($context['filters']['campagne.typeDemande']);
             }
 
             return $context;
@@ -198,6 +204,7 @@ class DemandeProvider implements ResetInterface, ProviderInterface
 
         //simple utilisateur, on filtre sur ses propres demandes
         $context['filters']['demandeur'] = Utilisateur::COLLECTION_URI . '/' . $user->getUserIdentifier();
+        $operation->getParameters()?->get('demandeur')?->setValue($context['filters']['demandeur']);
         return $context;
     }
 

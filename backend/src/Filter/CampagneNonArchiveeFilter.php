@@ -10,32 +10,44 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\Clock\ClockAwareTrait;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class CampagneNonArchiveeFilter extends AbstractFilter
+final class CampagneNonArchiveeFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     use ClockAwareTrait;
 
     public const string PROPERTY = 'archivees';
 
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== self::PROPERTY || !is_string($value) || $value != 'false') {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter === null) {
+            $value = $context['filters'][self::PROPERTY] ?? null;
+        } else {
+            $value = $parameter->getValue();
+        }
+
+        if ($value === null || !in_array($value, [false, 'false', 0, '0'], true)) {
             return;
         }
 
@@ -48,21 +60,24 @@ class CampagneNonArchiveeFilter extends AbstractFilter
             ->setParameter('now', $this->now());
     }
 
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'boolean'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return new OpenApiParameter(
+            name: self::PROPERTY,
+            in: 'query',
+            description: 'inclure les demandes des campagnes archivées ?',
+            required: false,
+            schema: ['type' => 'boolean'],
+        );
+    }
+
     public function getDescription(string $resourceClass): array
     {
-        return [
-            'archivees' => [
-                'property' => 'archivees',
-                'type' => TypeIdentifier::BOOL->value,
-                'required' => false,
-                'is_collection' => false,
-                'openapi' => new Parameter(
-                    name: 'archivees',
-                    in: 'query',
-                    description: 'inclure les demandes des campagnes archivées ?',
-                    schema: ['type' => 'boolean'],
-                ),
-            ],
-        ];
+        return [];
     }
 }

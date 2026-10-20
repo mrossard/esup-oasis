@@ -13,9 +13,13 @@
 namespace App\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\ApiResource\Composante;
 use App\ApiResource\Formation;
@@ -34,7 +38,10 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class ComposanteFormationFilter extends AbstractFilter
+class ComposanteFormationFilter extends AbstractFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     use ClockAwareTrait;
 
@@ -48,6 +55,90 @@ class ComposanteFormationFilter extends AbstractFilter
         protected ?NameConverterInterface $nameConverter = null,
     ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+    }
+
+    public function apply(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter !== null) {
+            $value = $parameter->getValue();
+            if ($value !== null && $value !== '' && $value !== []) {
+                $property = $parameter->getProperty() ?? $parameter->getKey();
+                $this->filterProperty(
+                    $property,
+                    $value,
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $resourceClass,
+                    $operation,
+                    $context,
+                );
+            }
+            return;
+        }
+
+        foreach ($context['filters'] ?? [] as $property => $value) {
+            if (in_array($property, ['composante', 'formation'])) {
+                $this->filterProperty(
+                    $property,
+                    $value,
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $resourceClass,
+                    $operation,
+                    $context,
+                );
+            }
+        }
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    {
+        $property = $parameter->getProperty() ?? $parameter->getKey();
+        $desc = match ($property) {
+            'composante' => "composante d'inscription du bénéficiaire",
+            'formation' => "formation d'inscription du bénéficiaire",
+            default => $property,
+        };
+        $descArray = match ($property) {
+            'composante' => "composante(s) d'inscription du bénéficiaire",
+            'formation' => "formation(s) d'inscription du bénéficiaire",
+            default => $property,
+        };
+
+        return [
+            new Parameter(
+                name: $property,
+                in: 'query',
+                description: $desc,
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+            new Parameter(
+                name: $property . '[]',
+                in: 'query',
+                description: $descArray,
+                required: false,
+                schema: [
+                    'type' => 'array',
+                    'items' => ['type' => 'string'],
+                ],
+                style: 'form',
+                explode: true,
+            ),
+        ];
     }
 
     #[Override]

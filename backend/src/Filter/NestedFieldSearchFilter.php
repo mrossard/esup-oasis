@@ -13,10 +13,14 @@
 namespace App\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\PropertyHelperTrait;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\ApiResource\Utilisateur;
 use Doctrine\ORM\QueryBuilder;
@@ -28,7 +32,11 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 use Symfony\Contracts\Service\ResetInterface;
 
-class NestedFieldSearchFilter extends AbstractFilter implements ResetInterface
+class NestedFieldSearchFilter extends AbstractFilter implements
+    ResetInterface,
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     use PropertyHelperTrait;
 
@@ -44,6 +52,78 @@ class NestedFieldSearchFilter extends AbstractFilter implements ResetInterface
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
     }
 
+    public function apply(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter !== null) {
+            $value = $parameter->getValue();
+            if ($value !== null && $value !== '') {
+                $property = $parameter->getProperty() ?? $parameter->getKey();
+                $this->filterProperty(
+                    $property,
+                    $value,
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $resourceClass,
+                    $operation,
+                    $context,
+                );
+            }
+            return;
+        }
+
+        foreach ($context['filters'] ?? [] as $property => $value) {
+            $this->filterProperty(
+                $property,
+                $value,
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass,
+                $operation,
+                $context,
+            );
+        }
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    {
+        $property = $parameter->getKey();
+        $desc = $this->properties[$property]['desc'] ?? $parameter->getDescription() ?? $property;
+        return [
+            new Parameter(
+                name: $property,
+                in: 'query',
+                description: $desc,
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+            new Parameter(
+                name: $property . '[]',
+                in: 'query',
+                description: $desc,
+                required: false,
+                schema: [
+                    'type' => 'array',
+                    'items' => ['type' => 'string'],
+                ],
+                style: 'form',
+                explode: true,
+            ),
+        ];
+    }
+
     public function getJoinAlias($path)
     {
         if (!array_key_exists($path, $this->joins)) {
@@ -56,20 +136,24 @@ class NestedFieldSearchFilter extends AbstractFilter implements ResetInterface
     public function getDescription(string $resourceClass): array
     {
         $description = [];
-        foreach ($this->getProperties() as $property => $value) {
+        foreach ($this->getProperties() ?? [] as $property => $value) {
             $description[$property] = [
                 'property' => $property,
                 'type' => TypeIdentifier::STRING->value,
                 'required' => false,
                 'is_collection' => false,
-                'openapi' => new Parameter(name: $property, in: 'query', description: $value['desc']),
+                'openapi' => new Parameter(name: $property, in: 'query', description: $value['desc'] ?? $property),
             ];
             $description[$property . '[]'] = [
                 'property' => $property . '[]',
                 'type' => TypeIdentifier::STRING->value,
                 'required' => false,
                 'is_collection' => true,
-                'openapi' => new Parameter(name: $property . '[]', in: 'query', description: $value['desc']),
+                'openapi' => new Parameter(
+                    name: $property . '[]',
+                    in: 'query',
+                    description: $value['desc'] ?? $property,
+                ),
             ];
         }
         return $description;
@@ -85,9 +169,13 @@ class NestedFieldSearchFilter extends AbstractFilter implements ResetInterface
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if (!in_array($property, array_keys($this->getProperties()))) {
+        $parameter = $context['parameter'] ?? null;
+        $targetField = $this->properties[$property]['mapping'] ?? $parameter?->getProperty() ?? null;
+        if ($targetField === null && !isset($this->properties[$property])) {
             return;
         }
+        $targetField ??= $property;
+
         if (!is_array($value)) {
             $value = [$value];
         }
@@ -96,8 +184,6 @@ class NestedFieldSearchFilter extends AbstractFilter implements ResetInterface
         }
 
         $alias = $queryBuilder->getRootAliases()[0];
-
-        $targetField = $this->getProperties()[$property]['mapping'];
 
         //on ajoute les jointures si besoin
         $currentResourceClass = $resourceClass;

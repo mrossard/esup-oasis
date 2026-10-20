@@ -13,8 +13,12 @@
 namespace App\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Entity\AvisEse;
 use Doctrine\ORM\Query\Expr\Join;
@@ -23,11 +27,63 @@ use RuntimeException;
 use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class EtatAvisEseUtilisateurFilter extends AbstractFilter
+class EtatAvisEseUtilisateurFilter extends AbstractFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     use ClockAwareTrait;
 
     protected const string PROPERTY = 'etatAvisEse';
+
+    public function apply(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter !== null) {
+            $value = $parameter->getValue();
+            if ($value !== null && $value !== '') {
+                $this->filterProperty(
+                    self::PROPERTY,
+                    $value,
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $resourceClass,
+                    $operation,
+                    $context,
+                );
+            }
+            return;
+        }
+
+        if (isset($context['filters'][self::PROPERTY])) {
+            $this->filterProperty(
+                self::PROPERTY,
+                $context['filters'][self::PROPERTY],
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass,
+                $operation,
+                $context,
+            );
+        }
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    {
+        return new Parameter(name: self::PROPERTY, in: 'query', description: 'Etat avis ESE', required: false, schema: [
+            'type' => 'string',
+        ]);
+    }
 
     protected function filterProperty(
         string $property,

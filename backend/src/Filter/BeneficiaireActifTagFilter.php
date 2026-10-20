@@ -13,9 +13,13 @@
 namespace App\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Entity\Tag;
 use Doctrine\ORM\QueryBuilder;
@@ -24,7 +28,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class BeneficiaireActifTagFilter extends AbstractFilter
+class BeneficiaireActifTagFilter extends AbstractFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     use BeneficiaireActifAwareFilterTrait;
 
@@ -38,6 +45,78 @@ class BeneficiaireActifTagFilter extends AbstractFilter
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
     }
 
+    public function apply(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter !== null) {
+            $value = $parameter->getValue();
+            if ($value !== null && $value !== '' && $value !== []) {
+                $property = $parameter->getProperty() ?? $parameter->getKey();
+                $this->filterProperty(
+                    $property,
+                    $value,
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $resourceClass,
+                    $operation,
+                    $context,
+                );
+            }
+            return;
+        }
+
+        foreach ($context['filters'] ?? [] as $property => $value) {
+            $this->filterProperty(
+                $property,
+                $value,
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass,
+                $operation,
+                $context,
+            );
+        }
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    {
+        $property = $parameter->getProperty() ?? $parameter->getKey();
+        $desc = $this->properties[$property]['description'] ?? $property;
+        return [
+            new Parameter(
+                name: $property,
+                in: 'query',
+                description: $desc,
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+            new Parameter(
+                name: $property . '[]',
+                in: 'query',
+                description: $desc,
+                required: false,
+                schema: [
+                    'type' => 'array',
+                    'items' => ['type' => 'string'],
+                ],
+                style: 'form',
+                explode: true,
+            ),
+        ];
+    }
+
     protected function filterProperty(
         string $property,
         $value,
@@ -47,7 +126,8 @@ class BeneficiaireActifTagFilter extends AbstractFilter
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if (!in_array($property, array_keys($this->getProperties()))) {
+        $allowedProperties = array_keys($this->getProperties() ?? ['tags' => 'tags']);
+        if (!in_array($property, $allowedProperties)) {
             return;
         }
 
@@ -72,7 +152,7 @@ class BeneficiaireActifTagFilter extends AbstractFilter
     public function getDescription(string $resourceClass): array
     {
         $description = [];
-        foreach ($this->getProperties() as $property => $value) {
+        foreach ($this->getProperties() ?? ['tags' => ['description' => 'tags']] as $property => $value) {
             $description[$property] = [
                 'property' => $property,
                 'type' => TypeIdentifier::STRING->value,

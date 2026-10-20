@@ -14,14 +14,14 @@ namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\PartialSearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
 use App\Filter\BeneficiaireActifTagFilter;
 use App\Filter\BeneficiaireAvecAmenagementEnCoursFilter;
@@ -34,17 +34,14 @@ use App\Filter\EtatAvisEseUtilisateurFilter;
 use App\Filter\EtatDecisionAmenagementFilter;
 use App\Filter\IntervenantArchiveFilter;
 use App\Filter\IntervenantDisponibleFilter;
-use App\Filter\IntervenantFilter;
 use App\Filter\IntervenantOrderedByBeneficiaireFilter;
-use App\Filter\LdapSearchFilter;
 use App\Filter\LibCampusIntervenantFilter;
 use App\Filter\LibComposanteBeneficiaireFilter;
 use App\Filter\NestedFieldSearchFilter;
 use App\Filter\NomGestionnaireFilter;
-use App\Filter\RenfortFilter;
+use App\Filter\ResourceIriFilter;
 use App\Filter\TypeAmenagementEnCoursFilter;
 use App\Filter\UtilisateurExistantSearchFilter;
-use App\Filter\UtilisateurRoleFilter;
 use App\Service\ErreurLdapException;
 use App\State\Amenagement\AmenagementsParUtilisateurProvider;
 use App\State\Utilisateur\BeneficiaireProvider;
@@ -63,6 +60,77 @@ use Symfony\Component\Validator\Constraints as Assert;
     operations: [
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
+            parameters: [
+                'term' => new QueryParameter(schema: ['type' => 'string'], description: 'term'),
+                'filtreBeneficiaire' => new QueryParameter(
+                    filter: BeneficiaireFilter::class,
+                    property: 'filtreBeneficiaire',
+                ),
+                'beneficiaire' => new QueryParameter(
+                    filter: IntervenantOrderedByBeneficiaireFilter::class,
+                    property: 'beneficiaire',
+                ),
+                'creneau' => new QueryParameter(filter: IntervenantDisponibleFilter::class, property: 'creneau'),
+                'recherche' => new QueryParameter(
+                    filter: UtilisateurExistantSearchFilter::class,
+                    property: 'recherche',
+                ),
+                'tags' => new QueryParameter(filter: BeneficiaireActifTagFilter::class, property: 'tags'),
+                'nom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'nom'),
+                'prenom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'prenom'),
+                'intervenant.typesEvenements' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.typesEvenements',
+                ),
+                'intervenant.campuses' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.campuses',
+                ),
+                'intervenant.competences' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.competences',
+                ),
+                'libelleCampus' => new QueryParameter(
+                    filter: LibCampusIntervenantFilter::class,
+                    property: 'libelleCampus',
+                ),
+                'libelleComposante' => new QueryParameter(
+                    filter: LibComposanteBeneficiaireFilter::class,
+                    property: 'libelleComposante',
+                ),
+                'nomGestionnaire' => new QueryParameter(
+                    filter: NomGestionnaireFilter::class,
+                    property: 'nomGestionnaire',
+                ),
+                'intervenantArchive' => new QueryParameter(
+                    filter: IntervenantArchiveFilter::class,
+                    property: 'intervenantArchive',
+                ),
+                'order[:property]' => new QueryParameter(filter: CaseInsensitiveOrderFilter::class, properties: [
+                    'nom',
+                ]),
+                'beneficiaires.avecAccompagnement' => new QueryParameter(
+                    filter: new BooleanFilter(),
+                    property: 'beneficiaires.avecAccompagnement',
+                ),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedFieldSearchFilter::class,
+                    property: 'beneficiaires.gestionnaire',
+                    description: 'gestionnaire du bénéficiaire',
+                ),
+                'exists[:property]' => new QueryParameter(filter: new ExistsFilter(), properties: ['numeroEtudiant']),
+                'composante' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'composante'),
+                'formation' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'formation'),
+                'etatAvisEse' => new QueryParameter(
+                    filter: EtatAvisEseUtilisateurFilter::class,
+                    property: 'etatAvisEse',
+                ),
+                'etatDecisionAmenagement' => new QueryParameter(
+                    filter: EtatDecisionAmenagementFilter::class,
+                    property: 'etatDecisionAmenagement',
+                ),
+            ],
+            order: ['nom' => 'ASC', 'prenom' => 'ASC'],
             security: "is_granted('" . \App\Entity\Utilisateur::ROLE_PLANIFICATEUR . "')",
             name: self::COLLECTION_URI,
             provider: UtilisateurProvider::class,
@@ -70,6 +138,77 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             uriTemplate: self::BENEFICIAIRE_COLLECTION_URI,
+            parameters: [
+                'term' => new QueryParameter(schema: ['type' => 'string'], description: 'term'),
+                'filtreBeneficiaire' => new QueryParameter(
+                    filter: BeneficiaireFilter::class,
+                    property: 'filtreBeneficiaire',
+                ),
+                'beneficiaire' => new QueryParameter(
+                    filter: IntervenantOrderedByBeneficiaireFilter::class,
+                    property: 'beneficiaire',
+                ),
+                'creneau' => new QueryParameter(filter: IntervenantDisponibleFilter::class, property: 'creneau'),
+                'recherche' => new QueryParameter(
+                    filter: UtilisateurExistantSearchFilter::class,
+                    property: 'recherche',
+                ),
+                'tags' => new QueryParameter(filter: BeneficiaireActifTagFilter::class, property: 'tags'),
+                'nom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'nom'),
+                'prenom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'prenom'),
+                'intervenant.typesEvenements' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.typesEvenements',
+                ),
+                'intervenant.campuses' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.campuses',
+                ),
+                'intervenant.competences' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.competences',
+                ),
+                'libelleCampus' => new QueryParameter(
+                    filter: LibCampusIntervenantFilter::class,
+                    property: 'libelleCampus',
+                ),
+                'libelleComposante' => new QueryParameter(
+                    filter: LibComposanteBeneficiaireFilter::class,
+                    property: 'libelleComposante',
+                ),
+                'nomGestionnaire' => new QueryParameter(
+                    filter: NomGestionnaireFilter::class,
+                    property: 'nomGestionnaire',
+                ),
+                'intervenantArchive' => new QueryParameter(
+                    filter: IntervenantArchiveFilter::class,
+                    property: 'intervenantArchive',
+                ),
+                'order[:property]' => new QueryParameter(filter: CaseInsensitiveOrderFilter::class, properties: [
+                    'nom',
+                ]),
+                'beneficiaires.avecAccompagnement' => new QueryParameter(
+                    filter: new BooleanFilter(),
+                    property: 'beneficiaires.avecAccompagnement',
+                ),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedFieldSearchFilter::class,
+                    property: 'beneficiaires.gestionnaire',
+                    description: 'gestionnaire du bénéficiaire',
+                ),
+                'exists[:property]' => new QueryParameter(filter: new ExistsFilter(), properties: ['numeroEtudiant']),
+                'composante' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'composante'),
+                'formation' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'formation'),
+                'etatAvisEse' => new QueryParameter(
+                    filter: EtatAvisEseUtilisateurFilter::class,
+                    property: 'etatAvisEse',
+                ),
+                'etatDecisionAmenagement' => new QueryParameter(
+                    filter: EtatDecisionAmenagementFilter::class,
+                    property: 'etatDecisionAmenagement',
+                ),
+            ],
+            order: ['nom' => 'ASC', 'prenom' => 'ASC'],
             security: "is_granted('" . \App\Entity\Utilisateur::ROLE_PLANIFICATEUR . "')",
             name: self::BENEFICIAIRE_COLLECTION_URI,
             provider: BeneficiaireProvider::class,
@@ -77,6 +216,77 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             uriTemplate: self::INTERVENANT_COLLECTION_URI,
+            parameters: [
+                'term' => new QueryParameter(schema: ['type' => 'string'], description: 'term'),
+                'filtreBeneficiaire' => new QueryParameter(
+                    filter: BeneficiaireFilter::class,
+                    property: 'filtreBeneficiaire',
+                ),
+                'beneficiaire' => new QueryParameter(
+                    filter: IntervenantOrderedByBeneficiaireFilter::class,
+                    property: 'beneficiaire',
+                ),
+                'creneau' => new QueryParameter(filter: IntervenantDisponibleFilter::class, property: 'creneau'),
+                'recherche' => new QueryParameter(
+                    filter: UtilisateurExistantSearchFilter::class,
+                    property: 'recherche',
+                ),
+                'tags' => new QueryParameter(filter: BeneficiaireActifTagFilter::class, property: 'tags'),
+                'nom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'nom'),
+                'prenom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'prenom'),
+                'intervenant.typesEvenements' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.typesEvenements',
+                ),
+                'intervenant.campuses' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.campuses',
+                ),
+                'intervenant.competences' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.competences',
+                ),
+                'libelleCampus' => new QueryParameter(
+                    filter: LibCampusIntervenantFilter::class,
+                    property: 'libelleCampus',
+                ),
+                'libelleComposante' => new QueryParameter(
+                    filter: LibComposanteBeneficiaireFilter::class,
+                    property: 'libelleComposante',
+                ),
+                'nomGestionnaire' => new QueryParameter(
+                    filter: NomGestionnaireFilter::class,
+                    property: 'nomGestionnaire',
+                ),
+                'intervenantArchive' => new QueryParameter(
+                    filter: IntervenantArchiveFilter::class,
+                    property: 'intervenantArchive',
+                ),
+                'order[:property]' => new QueryParameter(filter: CaseInsensitiveOrderFilter::class, properties: [
+                    'nom',
+                ]),
+                'beneficiaires.avecAccompagnement' => new QueryParameter(
+                    filter: new BooleanFilter(),
+                    property: 'beneficiaires.avecAccompagnement',
+                ),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedFieldSearchFilter::class,
+                    property: 'beneficiaires.gestionnaire',
+                    description: 'gestionnaire du bénéficiaire',
+                ),
+                'exists[:property]' => new QueryParameter(filter: new ExistsFilter(), properties: ['numeroEtudiant']),
+                'composante' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'composante'),
+                'formation' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'formation'),
+                'etatAvisEse' => new QueryParameter(
+                    filter: EtatAvisEseUtilisateurFilter::class,
+                    property: 'etatAvisEse',
+                ),
+                'etatDecisionAmenagement' => new QueryParameter(
+                    filter: EtatDecisionAmenagementFilter::class,
+                    property: 'etatDecisionAmenagement',
+                ),
+            ],
+            order: ['nom' => 'ASC', 'prenom' => 'ASC'],
             security: "is_granted('" . \App\Entity\Utilisateur::ROLE_PLANIFICATEUR . "')",
             name: self::INTERVENANT_COLLECTION_URI,
             provider: IntervenantProvider::class,
@@ -84,6 +294,77 @@ use Symfony\Component\Validator\Constraints as Assert;
         ),
         new GetCollection(
             uriTemplate: self::RENFORT_COLLECTION_URI,
+            parameters: [
+                'term' => new QueryParameter(schema: ['type' => 'string'], description: 'term'),
+                'filtreBeneficiaire' => new QueryParameter(
+                    filter: BeneficiaireFilter::class,
+                    property: 'filtreBeneficiaire',
+                ),
+                'beneficiaire' => new QueryParameter(
+                    filter: IntervenantOrderedByBeneficiaireFilter::class,
+                    property: 'beneficiaire',
+                ),
+                'creneau' => new QueryParameter(filter: IntervenantDisponibleFilter::class, property: 'creneau'),
+                'recherche' => new QueryParameter(
+                    filter: UtilisateurExistantSearchFilter::class,
+                    property: 'recherche',
+                ),
+                'tags' => new QueryParameter(filter: BeneficiaireActifTagFilter::class, property: 'tags'),
+                'nom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'nom'),
+                'prenom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'prenom'),
+                'intervenant.typesEvenements' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.typesEvenements',
+                ),
+                'intervenant.campuses' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.campuses',
+                ),
+                'intervenant.competences' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.competences',
+                ),
+                'libelleCampus' => new QueryParameter(
+                    filter: LibCampusIntervenantFilter::class,
+                    property: 'libelleCampus',
+                ),
+                'libelleComposante' => new QueryParameter(
+                    filter: LibComposanteBeneficiaireFilter::class,
+                    property: 'libelleComposante',
+                ),
+                'nomGestionnaire' => new QueryParameter(
+                    filter: NomGestionnaireFilter::class,
+                    property: 'nomGestionnaire',
+                ),
+                'intervenantArchive' => new QueryParameter(
+                    filter: IntervenantArchiveFilter::class,
+                    property: 'intervenantArchive',
+                ),
+                'order[:property]' => new QueryParameter(filter: CaseInsensitiveOrderFilter::class, properties: [
+                    'nom',
+                ]),
+                'beneficiaires.avecAccompagnement' => new QueryParameter(
+                    filter: new BooleanFilter(),
+                    property: 'beneficiaires.avecAccompagnement',
+                ),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedFieldSearchFilter::class,
+                    property: 'beneficiaires.gestionnaire',
+                    description: 'gestionnaire du bénéficiaire',
+                ),
+                'exists[:property]' => new QueryParameter(filter: new ExistsFilter(), properties: ['numeroEtudiant']),
+                'composante' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'composante'),
+                'formation' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'formation'),
+                'etatAvisEse' => new QueryParameter(
+                    filter: EtatAvisEseUtilisateurFilter::class,
+                    property: 'etatAvisEse',
+                ),
+                'etatDecisionAmenagement' => new QueryParameter(
+                    filter: EtatDecisionAmenagementFilter::class,
+                    property: 'etatDecisionAmenagement',
+                ),
+            ],
+            order: ['nom' => 'ASC', 'prenom' => 'ASC'],
             security: "is_granted('" . \App\Entity\Utilisateur::ROLE_PLANIFICATEUR . "')",
             name: self::RENFORT_COLLECTION_URI,
             provider: RenfortProvider::class,
@@ -92,6 +373,76 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: '/roles/{roleId}/utilisateurs',
             uriVariables: ['roleId'],
+            parameters: [
+                'term' => new QueryParameter(schema: ['type' => 'string'], description: 'term'),
+                'filtreBeneficiaire' => new QueryParameter(
+                    filter: BeneficiaireFilter::class,
+                    property: 'filtreBeneficiaire',
+                ),
+                'beneficiaire' => new QueryParameter(
+                    filter: IntervenantOrderedByBeneficiaireFilter::class,
+                    property: 'beneficiaire',
+                ),
+                'creneau' => new QueryParameter(filter: IntervenantDisponibleFilter::class, property: 'creneau'),
+                'recherche' => new QueryParameter(
+                    filter: UtilisateurExistantSearchFilter::class,
+                    property: 'recherche',
+                ),
+                'tags' => new QueryParameter(filter: BeneficiaireActifTagFilter::class, property: 'tags'),
+                'nom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'nom'),
+                'prenom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'prenom'),
+                'intervenant.typesEvenements' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.typesEvenements',
+                ),
+                'intervenant.campuses' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.campuses',
+                ),
+                'intervenant.competences' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.competences',
+                ),
+                'libelleCampus' => new QueryParameter(
+                    filter: LibCampusIntervenantFilter::class,
+                    property: 'libelleCampus',
+                ),
+                'libelleComposante' => new QueryParameter(
+                    filter: LibComposanteBeneficiaireFilter::class,
+                    property: 'libelleComposante',
+                ),
+                'nomGestionnaire' => new QueryParameter(
+                    filter: NomGestionnaireFilter::class,
+                    property: 'nomGestionnaire',
+                ),
+                'intervenantArchive' => new QueryParameter(
+                    filter: IntervenantArchiveFilter::class,
+                    property: 'intervenantArchive',
+                ),
+                'order[:property]' => new QueryParameter(filter: CaseInsensitiveOrderFilter::class, properties: [
+                    'nom',
+                ]),
+                'beneficiaires.avecAccompagnement' => new QueryParameter(
+                    filter: new BooleanFilter(),
+                    property: 'beneficiaires.avecAccompagnement',
+                ),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedFieldSearchFilter::class,
+                    property: 'beneficiaires.gestionnaire',
+                    description: 'gestionnaire du bénéficiaire',
+                ),
+                'exists[:property]' => new QueryParameter(filter: new ExistsFilter(), properties: ['numeroEtudiant']),
+                'composante' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'composante'),
+                'formation' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'formation'),
+                'etatAvisEse' => new QueryParameter(
+                    filter: EtatAvisEseUtilisateurFilter::class,
+                    property: 'etatAvisEse',
+                ),
+                'etatDecisionAmenagement' => new QueryParameter(
+                    filter: EtatDecisionAmenagementFilter::class,
+                    property: 'etatDecisionAmenagement',
+                ),
+            ],
             security: "is_granted('" . self::LISTER_PAR_ROLE . "', request)",
             provider: UtilisateurRoleProvider::class,
             map: false,
@@ -100,11 +451,93 @@ use Symfony\Component\Validator\Constraints as Assert;
             uriTemplate: '/amenagements/utilisateurs',
             normalizationContext: ['groups' => [self::AMENAGEMENTS_UTILISATEURS_OUT]],
             security: "is_granted('" . Amenagement::VOIR_AMENAGEMENTS . "')",
-            filters: [
-                BeneficiaireAvecAmenagementEnCoursFilter::class,
-                CategorieAmenagementEnCoursFilter::class,
-                TypeAmenagementEnCoursFilter::class,
-                DomaineAmenagementEnCoursFilter::class,
+            parameters: [
+                'term' => new QueryParameter(schema: ['type' => 'string'], description: 'term'),
+                'filtreBeneficiaire' => new QueryParameter(
+                    filter: BeneficiaireFilter::class,
+                    property: 'filtreBeneficiaire',
+                ),
+                'beneficiaire' => new QueryParameter(
+                    filter: IntervenantOrderedByBeneficiaireFilter::class,
+                    property: 'beneficiaire',
+                ),
+                'creneau' => new QueryParameter(filter: IntervenantDisponibleFilter::class, property: 'creneau'),
+                'recherche' => new QueryParameter(
+                    filter: UtilisateurExistantSearchFilter::class,
+                    property: 'recherche',
+                ),
+                'tags' => new QueryParameter(filter: BeneficiaireActifTagFilter::class, property: 'tags'),
+                'nom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'nom'),
+                'prenom' => new QueryParameter(filter: new PartialSearchFilter(), property: 'prenom'),
+                'intervenant.typesEvenements' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.typesEvenements',
+                ),
+                'intervenant.campuses' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.campuses',
+                ),
+                'intervenant.competences' => new QueryParameter(
+                    filter: ResourceIriFilter::class,
+                    property: 'intervenant.competences',
+                ),
+                'libelleCampus' => new QueryParameter(
+                    filter: LibCampusIntervenantFilter::class,
+                    property: 'libelleCampus',
+                ),
+                'libelleComposante' => new QueryParameter(
+                    filter: LibComposanteBeneficiaireFilter::class,
+                    property: 'libelleComposante',
+                ),
+                'nomGestionnaire' => new QueryParameter(
+                    filter: NomGestionnaireFilter::class,
+                    property: 'nomGestionnaire',
+                ),
+                'intervenantArchive' => new QueryParameter(
+                    filter: IntervenantArchiveFilter::class,
+                    property: 'intervenantArchive',
+                ),
+                'order[:property]' => new QueryParameter(filter: CaseInsensitiveOrderFilter::class, properties: [
+                    'nom',
+                ]),
+                'beneficiaires.avecAccompagnement' => new QueryParameter(
+                    filter: new BooleanFilter(),
+                    property: 'beneficiaires.avecAccompagnement',
+                ),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedFieldSearchFilter::class,
+                    property: 'beneficiaires.gestionnaire',
+                    description: 'gestionnaire du bénéficiaire',
+                ),
+                'exists[:property]' => new QueryParameter(filter: new ExistsFilter(), properties: ['numeroEtudiant']),
+                'composante' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'composante'),
+                'formation' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'formation'),
+                'etatAvisEse' => new QueryParameter(
+                    filter: EtatAvisEseUtilisateurFilter::class,
+                    property: 'etatAvisEse',
+                ),
+                'etatDecisionAmenagement' => new QueryParameter(
+                    filter: EtatDecisionAmenagementFilter::class,
+                    property: 'etatDecisionAmenagement',
+                ),
+                'App\Filter\BeneficiaireAvecAmenagementEnCoursFilter' => new QueryParameter(
+                    filter: BeneficiaireAvecAmenagementEnCoursFilter::class,
+                    property: BeneficiaireAvecAmenagementEnCoursFilter::class,
+                ),
+                'categorie' => new QueryParameter(
+                    filter: CategorieAmenagementEnCoursFilter::class,
+                    property: 'categorie',
+                ),
+                'type' => new QueryParameter(filter: TypeAmenagementEnCoursFilter::class, property: 'type'),
+                'examens' => new QueryParameter(filter: DomaineAmenagementEnCoursFilter::class, property: 'examens'),
+                'pedagogique' => new QueryParameter(
+                    filter: DomaineAmenagementEnCoursFilter::class,
+                    property: 'pedagogique',
+                ),
+                'aideHumaine' => new QueryParameter(
+                    filter: DomaineAmenagementEnCoursFilter::class,
+                    property: 'aideHumaine',
+                ),
             ],
             provider: AmenagementsParUtilisateurProvider::class,
             map: false,
@@ -130,39 +563,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: UtilisateurProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\Utilisateur::class),
 )]
-#[ApiFilter(LdapSearchFilter::class)]
-#[ApiFilter(RenfortFilter::class)]
-#[ApiFilter(BeneficiaireFilter::class)]
-#[ApiFilter(IntervenantFilter::class)]
-#[ApiFilter(IntervenantOrderedByBeneficiaireFilter::class)]
-#[ApiFilter(IntervenantDisponibleFilter::class)]
-#[ApiFilter(UtilisateurExistantSearchFilter::class, properties: ['nom', 'prenom', 'uid', 'numeroAnonyme' => 'int'])]
-#[ApiFilter(BeneficiaireActifTagFilter::class, properties: ['tags' => ['description' => 'filtrer par tag']])]
-#[ApiFilter(SearchFilter::class, properties: [
-    'nom' => 'ipartial',
-    'prenom' => 'ipartial',
-    'intervenant.typesEvenements',
-    'intervenant.campuses',
-    'intervenant.competences',
-])]
-#[ApiFilter(LibCampusIntervenantFilter::class)]
-#[ApiFilter(LibComposanteBeneficiaireFilter::class)]
-#[ApiFilter(NomGestionnaireFilter::class)]
-#[ApiFilter(IntervenantArchiveFilter::class)]
-#[ApiFilter(CaseInsensitiveOrderFilter::class, properties: ['nom'])]
-#[ApiFilter(BooleanFilter::class, properties: ['beneficiaires.avecAccompagnement'])]
-#[ApiFilter(NestedFieldSearchFilter::class, properties: [
-    'gestionnaire' => [
-        'type' => 'string',
-        'mapping' => 'beneficiaires.gestionnaire',
-        'desc' => 'gestionnaire du bénéficiaire',
-    ],
-])]
-#[ApiFilter(ExistsFilter::class, properties: ['numeroEtudiant'])]
-#[ApiFilter(ComposanteFormationFilter::class, properties: ['composante', 'formation'])]
-#[ApiFilter(EtatAvisEseUtilisateurFilter::class)]
-#[ApiFilter(EtatDecisionAmenagementFilter::class)]
-#[ApiFilter(UtilisateurRoleFilter::class)]
 #[NumeroAnonymeUniqueConstraint]
 final class Utilisateur
 {

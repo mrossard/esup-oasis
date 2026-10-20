@@ -13,23 +13,21 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
-use ApiPlatform\Doctrine\Orm\Filter\OrderFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SortFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use ApiPlatform\OpenApi\Model\Operation;
-use App\Filter\AmenagementBeneficiaireActifFilter;
-use App\Filter\AmenagementUtilisateurFilter;
 use App\Filter\BeneficiaireActifTagFilter;
 use App\Filter\CaseInsensitiveSearchFilter;
 use App\Filter\ComposanteFormationFilter;
 use App\Filter\NestedFieldSearchFilter;
+use App\Filter\ResourceIriFilter;
 use App\State\Amenagement\AmenagementProcessor;
 use App\State\Amenagement\AmenagementProvider;
 use App\State\Amenagement\AmenagementSansFiltreProvider;
@@ -46,11 +44,61 @@ use Symfony\Component\Validator\Constraints as Assert;
         new GetCollection(
             uriTemplate: self::COLLECTION_URI,
             uriVariables: ['uid'],
+            parameters: [
+                'type' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type'),
+                'type.categorie' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type.categorie'),
+                'suivi' => new QueryParameter(filter: ResourceIriFilter::class, property: 'suivi'),
+                'nom' => new QueryParameter(
+                    filter: CaseInsensitiveSearchFilter::class,
+                    property: 'beneficiaires.utilisateur.nom',
+                    description: 'Nom du bénéficiaire',
+                ),
+                'type.pedagogique' => new QueryParameter(filter: new BooleanFilter(), property: 'type.pedagogique'),
+                'type.examens' => new QueryParameter(filter: new BooleanFilter(), property: 'type.examens'),
+                'type.aideHumaine' => new QueryParameter(filter: new BooleanFilter(), property: 'type.aideHumaine'),
+                'composante' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'composante'),
+                'formation' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'formation'),
+                'tags' => new QueryParameter(filter: BeneficiaireActifTagFilter::class, property: 'tags'),
+                'order[:property]' => new QueryParameter(
+                    filter: new SortFilter(),
+                    properties: ['beneficiaires.utilisateur.nom'],
+                ),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedFieldSearchFilter::class,
+                    property: 'beneficiaires.gestionnaire',
+                    description: "gestionnaire du bénéficiaire de l'aménagement",
+                ),
+            ],
             security: "is_granted('" . self::VOIR_AMENAGEMENTS_UTILISATEUR . "', request.attributes.get('uid'))",
             map: false,
         ),
         new GetCollection(
             uriTemplate: '/amenagements',
+            parameters: [
+                'type' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type'),
+                'type.categorie' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type.categorie'),
+                'suivi' => new QueryParameter(filter: ResourceIriFilter::class, property: 'suivi'),
+                'nom' => new QueryParameter(
+                    filter: CaseInsensitiveSearchFilter::class,
+                    property: 'beneficiaires.utilisateur.nom',
+                    description: 'Nom du bénéficiaire',
+                ),
+                'type.pedagogique' => new QueryParameter(filter: new BooleanFilter(), property: 'type.pedagogique'),
+                'type.examens' => new QueryParameter(filter: new BooleanFilter(), property: 'type.examens'),
+                'type.aideHumaine' => new QueryParameter(filter: new BooleanFilter(), property: 'type.aideHumaine'),
+                'composante' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'composante'),
+                'formation' => new QueryParameter(filter: ComposanteFormationFilter::class, property: 'formation'),
+                'tags' => new QueryParameter(filter: BeneficiaireActifTagFilter::class, property: 'tags'),
+                'order[:property]' => new QueryParameter(
+                    filter: new SortFilter(),
+                    properties: ['beneficiaires.utilisateur.nom'],
+                ),
+                'gestionnaire' => new QueryParameter(
+                    filter: NestedFieldSearchFilter::class,
+                    property: 'beneficiaires.gestionnaire',
+                    description: "gestionnaire du bénéficiaire de l'aménagement",
+                ),
+            ],
             security: "is_granted('" . self::VOIR_AMENAGEMENTS . "')",
             provider: AmenagementSansFiltreProvider::class,
             map: false,
@@ -89,39 +137,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     stateOptions: new Options(entityClass: \App\Entity\Amenagement::class),
 )]
 #[UtilisateurBeneficiaireAmenagementConstraint]
-#[ApiFilter(AmenagementUtilisateurFilter::class)]
-#[ApiFilter(AmenagementBeneficiaireActifFilter::class)]
-#[ApiFilter(SearchFilter::class, properties: [
-    'type',
-    'type.categorie',
-    'suivi',
-])]
-#[ApiFilter(CaseInsensitiveSearchFilter::class, properties: [
-    'nom' => [
-        'type' => 'string',
-        'mapping' => 'beneficiaires.utilisateur.nom',
-        'desc' => 'Nom du bénéficiaire',
-    ],
-])]
-#[ApiFilter(BooleanFilter::class, properties: [
-    'type.pedagogique',
-    'type.examens',
-    'type.aideHumaine',
-])]
-#[ApiFilter(ComposanteFormationFilter::class, properties: ['composante', 'formation'])]
-#[ApiFilter(BeneficiaireActifTagFilter::class, properties: ['tags'])]
-#[ApiFilter(
-    OrderFilter::class,
-    properties: ['beneficiaires.utilisateur.nom'],
-    arguments: ['orderParameterName' => 'order'],
-)]
-#[ApiFilter(NestedFieldSearchFilter::class, properties: [
-    'gestionnaire' => [
-        'type' => 'string',
-        'mapping' => 'beneficiaires.gestionnaire',
-        'desc' => "gestionnaire du bénéficiaire de l'aménagement",
-    ],
-])]
 #[AmenagementDatesConstraint]
 class Amenagement
 {

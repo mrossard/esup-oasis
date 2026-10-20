@@ -24,6 +24,33 @@ use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
 class DerniereInscriptionSearchFilter extends NestedFieldSearchFilter
 {
+    public const array DEFAULT_PROPERTIES = [
+        'libelleComposante' => [
+            'type' => 'string',
+            'mapping' => 'demandeur.inscriptions.formation.composante.libelle',
+            'desc' => 'libellé de la composante',
+            'etudiant' => 'demandeur',
+        ],
+        'libelleFormation' => [
+            'type' => 'string',
+            'mapping' => 'demandeur.inscriptions.formation.libelle',
+            'desc' => 'libellé de la formation',
+            'etudiant' => 'demandeur',
+        ],
+        'composante' => [
+            'type' => 'relation',
+            'mapping' => 'demandeur.inscriptions.formation.composante',
+            'desc' => 'libellé de la composante',
+            'etudiant' => 'demandeur',
+        ],
+        'formation' => [
+            'type' => 'relation',
+            'mapping' => 'demandeur.inscriptions.formation',
+            'desc' => 'libellé de la formation',
+            'etudiant' => 'demandeur',
+        ],
+    ];
+
     private array $decorated;
 
     public function __construct(
@@ -33,6 +60,7 @@ class DerniereInscriptionSearchFilter extends NestedFieldSearchFilter
         ?array $properties = null,
         ?NameConverterInterface $nameConverter = null,
     ) {
+        $properties ??= self::DEFAULT_PROPERTIES;
         foreach ($properties as $name => $property) {
             $type = $property['type'];
             $this->decorated[$name] = match ($type) {

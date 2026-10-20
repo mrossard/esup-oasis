@@ -44,6 +44,7 @@ readonly class InterventionForfaitProvider implements ProviderInterface
             if (!$this->security->isGranted(\App\Entity\Utilisateur::ROLE_PLANIFICATEUR)) {
                 $user = $this->security->getUser();
                 $context['filters']['intervenant'] = Utilisateur::COLLECTION_URI . '/' . $user->getUserIdentifier();
+                $operation->getParameters()?->get('intervenant')?->setValue($context['filters']['intervenant']);
             }
 
             //preload

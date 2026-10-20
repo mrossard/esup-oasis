@@ -12,11 +12,11 @@
 
 namespace App\ApiResource;
 
+use ApiPlatform\Doctrine\Orm\Filter\BooleanFilter;
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
+use ApiPlatform\Doctrine\Orm\Filter\ExactFilter;
 use ApiPlatform\Doctrine\Orm\Filter\ExistsFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -24,11 +24,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Entity\Beneficiaire;
 use App\Filter\EvenementsAValiderFilter;
 use App\Filter\NestedUtilisateurFilter;
 use App\Filter\NomIntervenantFilter;
-use App\Filter\UtilisateurConcerneParEvenementFilter;
+use App\Filter\ResourceIriFilter;
 use App\State\Evenement\EvenementProcessor;
 use App\State\Evenement\EvenementProvider;
 use App\Validator\BeneficiaireNonNullConstraint;
@@ -43,7 +44,39 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     operations: [
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, parameters: [
+            'type' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type'),
+            'campus' => new QueryParameter(filter: ResourceIriFilter::class, property: 'campus'),
+            'type.avecValidation' => new QueryParameter(filter: new BooleanFilter(), property: 'type.avecValidation'),
+            'type.forfait' => new QueryParameter(filter: new BooleanFilter(), property: 'type.forfait'),
+            'exists[periodePriseEnCompteRH]' => new QueryParameter(
+                filter: new ExistsFilter(),
+                property: 'periodePriseEnCompteRH',
+            ),
+            'exists[dateAnnulation]' => new QueryParameter(filter: new ExistsFilter(), property: 'dateAnnulation'),
+            'exists[intervenant]' => new QueryParameter(filter: new ExistsFilter(), property: 'intervenant'),
+            'exists[beneficiaires]' => new QueryParameter(filter: new ExistsFilter(), property: 'beneficiaires'),
+            'debut' => new QueryParameter(filter: new DateFilter(), property: 'debut'),
+            'fin' => new QueryParameter(filter: new DateFilter(), property: 'fin'),
+            'intervenant' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'intervenant.utilisateur',
+            ),
+            'beneficiaires' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'beneficiaires.utilisateur',
+            ),
+            'suppleants' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'suppleants.utilisateur',
+            ),
+            'utilisateurCreation' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'utilisateurCreation',
+            ),
+            'aValider' => new QueryParameter(filter: EvenementsAValiderFilter::class, property: 'aValider'),
+            'nomIntervenant' => new QueryParameter(filter: NomIntervenantFilter::class, property: 'nomIntervenant'),
+        ]),
         new Get(
             uriTemplate: self::ITEM_URI,
             uriVariables: ['id'],
@@ -77,28 +110,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: EvenementProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\Evenement::class),
 )]
-#[ApiFilter(SearchFilter::class, properties: [
-    'type' => 'exact',
-    'campus' => 'exact',
-    'type.avecValidation' => 'exact',
-    'type.forfait' => 'exact',
-])]
-#[ApiFilter(ExistsFilter::class, properties: [
-    'periodePriseEnCompteRH',
-    'dateAnnulation',
-    'intervenant',
-    'beneficiaires',
-])]
-#[ApiFilter(DateFilter::class, properties: ['debut', 'fin'])]
-#[ApiFilter(NestedUtilisateurFilter::class, properties: [
-    'intervenant' => 'intervenant.utilisateur',
-    'beneficiaires' => 'beneficiaires.utilisateur',
-    'suppleants' => 'suppleants.utilisateur',
-    'utilisateurCreation' => 'utilisateurCreation',
-])]
-#[ApiFilter(EvenementsAValiderFilter::class)]
-#[ApiFilter(NomIntervenantFilter::class)]
-#[ApiFilter(UtilisateurConcerneParEvenementFilter::class)]
 #[UtilisateurBeneficiaireEvenementConstraint]
 #[EvenementSansChevauchementConstraint]
 #[NonEnvoyeRHConstraint]

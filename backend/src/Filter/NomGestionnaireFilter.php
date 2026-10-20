@@ -13,14 +13,74 @@
 namespace App\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use Doctrine\ORM\QueryBuilder;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class NomGestionnaireFilter extends AbstractFilter
+class NomGestionnaireFilter extends AbstractFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
+    public function apply(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter !== null) {
+            $value = $parameter->getValue();
+            if ($value !== null && $value !== '') {
+                $this->filterProperty(
+                    'nomGestionnaire',
+                    $value,
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $resourceClass,
+                    $operation,
+                    $context,
+                );
+            }
+            return;
+        }
+
+        if (isset($context['filters']['nomGestionnaire'])) {
+            $this->filterProperty(
+                'nomGestionnaire',
+                $context['filters']['nomGestionnaire'],
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass,
+                $operation,
+                $context,
+            );
+        }
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    {
+        return new Parameter(
+            name: 'nomGestionnaire',
+            in: 'query',
+            description: 'Recherche sur le nom du gestionnaire',
+            required: false,
+            schema: ['type' => 'string'],
+        );
+    }
+
     protected function filterProperty(
         string $property,
         $value,

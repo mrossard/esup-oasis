@@ -29,6 +29,10 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
+use function in_array;
+use function is_array;
+use function is_string;
+
 class CaseInsensitiveOrderFilter implements
     FilterInterface,
     JsonSchemaFilterInterface,
@@ -68,12 +72,12 @@ class CaseInsensitiveOrderFilter implements
         Parameter $parameter,
     ): void {
         $value = $parameter->getValue(null);
-        if (!\is_string($value)) {
+        if (!is_string($value)) {
             return;
         }
 
         $direction = strtoupper($value);
-        if (!\in_array($direction, ['ASC', 'DESC'], true)) {
+        if (!in_array($direction, ['ASC', 'DESC'], true)) {
             return;
         }
 
@@ -101,7 +105,7 @@ class CaseInsensitiveOrderFilter implements
         array $filters,
     ): void {
         $orderValues = $filters[$this->orderParameterName] ?? null;
-        if (!\is_array($orderValues)) {
+        if (!is_array($orderValues)) {
             return;
         }
 
@@ -114,7 +118,7 @@ class CaseInsensitiveOrderFilter implements
                 $queryNameGenerator,
                 $alias,
                 (string) $prop,
-                \in_array($dir, ['ASC', 'DESC'], true) ? $dir : 'ASC',
+                in_array($dir, ['ASC', 'DESC'], true) ? $dir : 'ASC',
             );
         }
     }
@@ -136,8 +140,7 @@ class CaseInsensitiveOrderFilter implements
     {
         return [
             'type' => 'string',
-            'default' => 'asc',
-            'enum' => ['asc', 'desc'],
+            'enum' => ['asc', 'desc', 'ASC', 'DESC'],
         ];
     }
 
@@ -159,8 +162,8 @@ class CaseInsensitiveOrderFilter implements
         $description = [];
 
         foreach ($this->properties ?? [] as $property => $propertyOptions) {
-            $prop = \is_string($property) ? $property : (string) $propertyOptions;
-            $defaultDir = \is_array($propertyOptions) ? $propertyOptions['default_direction'] ?? 'asc' : 'asc';
+            $prop = is_string($property) ? $property : (string) $propertyOptions;
+            $defaultDir = is_array($propertyOptions) ? $propertyOptions['default_direction'] ?? 'asc' : 'asc';
 
             $description[sprintf('%s[%s]', $this->orderParameterName, $prop)] = [
                 'property' => $prop,

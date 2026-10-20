@@ -10,60 +10,46 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\Entity\TypeEvenement;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
-use Psr\Log\LoggerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class EvenementsAValiderFilter extends AbstractFilter
+final readonly class EvenementsAValiderFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     public function __construct(
-        ManagerRegistry $managerRegistry,
-        private readonly Security $security,
-        ?LoggerInterface $logger = null,
-        ?array $properties = null,
-        ?NameConverterInterface $nameConverter = null,
-    ) {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
-    }
+        private Security $security,
+    ) {}
 
-    public function getDescription(string $resourceClass): array
-    {
-        return [
-            'aValider' => [
-                'property' => 'aValider',
-                'type' => TypeIdentifier::BOOL->value,
-                'required' => false,
-                'openapi' => new Parameter(
-                    name: 'aValider',
-                    in: 'query',
-                    description: 'uniquement les événements à valider ?',
-                    schema: ['type' => 'boolean'],
-                ),
-            ],
-        ];
-    }
-
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== 'aValider') {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter === null) {
+            $value = $context['filters']['aValider'] ?? null;
+        } else {
+            $value = $parameter->getValue();
+        }
+
+        if ($value === null || $value === '' || $value === false || $value === 'false' || $value === '0') {
             return;
         }
 
@@ -72,23 +58,44 @@ class EvenementsAValiderFilter extends AbstractFilter
         $typeAlias = $queryNameGenerator->generateJoinAlias('type');
 
         $queryBuilder
-            ->join($alias . '.type', $typeAlias, Join::WITH, $typeAlias . '.id=:typeRenfort')
-            ->andWhere($alias . '.dateValidation is null')
+            ->join(sprintf('%s.type', $alias), $typeAlias, Join::WITH, sprintf('%s.id = :typeRenfort', $typeAlias))
+            ->andWhere(sprintf('%s.dateValidation IS NULL', $alias))
             ->setParameter('typeRenfort', TypeEvenement::TYPE_RENFORT);
+
         if (!$this->security->isGranted('ROLE_ADMIN')) {
-            //il faut regarder les événements des renforts qui sont sur le même service que l'utilisateur connecté
             $renfortAlias = $queryNameGenerator->generateJoinAlias('utilisateurCreation');
             $renfortServiceAlias = $queryNameGenerator->generateJoinAlias('services');
 
             $queryBuilder
-                ->join($alias . '.utilisateurCreation', $renfortAlias)
+                ->join(sprintf('%s.utilisateurCreation', $alias), $renfortAlias)
                 ->join(
-                    $renfortAlias . '.services',
+                    sprintf('%s.services', $renfortAlias),
                     $renfortServiceAlias,
                     Join::WITH,
-                    ':user MEMBER OF ' . $renfortServiceAlias . '.utilisateurs',
+                    sprintf(':user MEMBER OF %s.utilisateurs', $renfortServiceAlias),
                 )
                 ->setParameter('user', $user);
         }
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'boolean'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return new OpenApiParameter(
+            name: 'aValider',
+            in: 'query',
+            description: 'uniquement les événements à valider ?',
+            required: false,
+            schema: ['type' => 'boolean'],
+        );
+    }
+
+    public function getDescription(string $resourceClass): array
+    {
+        return [];
     }
 }

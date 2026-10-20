@@ -16,7 +16,6 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Link;
 use ApiPlatform\Metadata\Operation;
 use App\ApiResource\Amenagement;
-use App\Filter\AmenagementUtilisateurFilter;
 use Override;
 
 class AmenagementProvider extends AmenagementSansFiltreProvider
@@ -25,8 +24,7 @@ class AmenagementProvider extends AmenagementSansFiltreProvider
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            //ajout d'un filtre sur utilisateur!
-            $context['filters'][AmenagementUtilisateurFilter::PROPERTY] = $uriVariables['uid'];
+            $context['amenagement_user_uid'] = $uriVariables['uid'];
             unset($uriVariables['uid']);
 
             return parent::provide($operation, $uriVariables, $context);

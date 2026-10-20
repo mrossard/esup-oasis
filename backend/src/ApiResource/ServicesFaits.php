@@ -28,10 +28,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/intervenants/{uid}/services_faits',
             uriVariables: ['uid'],
             parameters: [
-                'order[:property]' => new QueryParameter(
-                    filter: new ServicesFaitsPeriodeOrderFilter(),
-                    properties: ['debut'],
-                ),
+                'order[debut]' => new QueryParameter(filter: new ServicesFaitsPeriodeOrderFilter(), property: 'debut'),
             ],
             security: "is_granted('ROLE_ADMIN') or request.attributes.get('uid') == user.getUid()",
             provider: IntervenantServicesFaitsProvider::class,

@@ -22,6 +22,7 @@ class DemandesUtilisateurProvider extends DemandeProvider
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         $context['filters']['demandeur'] = Utilisateur::COLLECTION_URI . '/' . $uriVariables['uid'];
+        $operation->getParameters()?->get('demandeur')?->setValue($context['filters']['demandeur']);
 
         unset($uriVariables['uid']);
 

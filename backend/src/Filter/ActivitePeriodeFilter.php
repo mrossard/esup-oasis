@@ -10,143 +10,166 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
-use ApiPlatform\Metadata\IdentifiersExtractorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
-use App\ApiResource\PeriodeRH;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\Entity\Evenement;
 use App\Entity\InterventionForfait;
+use App\Entity\PeriodeRH;
+use App\Filter\Util\IriToIdResolver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class ActivitePeriodeFilter extends AbstractFilter
+final readonly class ActivitePeriodeFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
+    private IriToIdResolver $resolver;
+
     public function __construct(
-        private readonly IriConverterInterface $iriConverter,
-        private readonly PropertyAccessorInterface $propertyAccessor,
-        private readonly IdentifiersExtractorInterface $identifiersExtractor,
-        ManagerRegistry $managerRegistry,
-        ?LoggerInterface $logger = null,
-        ?array $properties = null,
-        ?NameConverterInterface $nameConverter = null,
+        private ManagerRegistry $managerRegistry,
+        IriConverterInterface $iriConverter,
     ) {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+        $this->resolver = new IriToIdResolver($iriConverter);
     }
 
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        $entityClass = $operation->getStateOptions()?->getEntityClass() ?? $operation->getClass();
-
-        if (!in_array($entityClass, [Evenement::class, InterventionForfait::class]) || $property !== 'periode') {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter === null) {
             return;
         }
 
-        /**
-         * Si on est sur les interventions au forfait, on prend la période directement liée
-         * Si on est sur les événements, on prend:
-         *  => si période fermée, les événements liés
-         *  => si période non fermée, les événements antérieurs à la date de fin de période et non associés à une période
-         */
-
-        //cas simple, InterventionForfait : on appelle le SearchFilter d'APIP
-        if ($entityClass === InterventionForfait::class) {
-            $searchFilter = new SearchFilter(
-                $this->managerRegistry,
-                $this->iriConverter,
-                $this->propertyAccessor,
-                $this->logger,
-                ['periode' => 'exact'],
-                $this->identifiersExtractor,
-                $this->nameConverter,
-            );
-
-            $searchFilter->filterProperty(
-                'periode',
-                $value,
-                $queryBuilder,
-                $queryNameGenerator,
-                $resourceClass,
-                $operation,
-                $context,
-            );
+        $value = $parameter->getValue();
+        if ($value === null || $value === '') {
             return;
         }
 
-        //cas pénible, Evenement...
+        $entityClass = $operation?->getStateOptions()?->getEntityClass() ?? $operation?->getClass() ?? $resourceClass;
+
+        if (!in_array($entityClass, [Evenement::class, InterventionForfait::class], true)) {
+            return;
+        }
+
+        $rawValues = is_array($value) ? $value : [$value];
+        $ids = array_values(array_filter(
+            array_map($this->resolver->resolve(...), $rawValues),
+            static fn(?int $id): bool => $id !== null,
+        ));
+
+        if ($ids === []) {
+            return;
+        }
+
         $alias = $queryBuilder->getRootAliases()[0];
-        $values = is_array($value) ? $value : [$value];
+
+        if ($entityClass === InterventionForfait::class) {
+            $paramName = $queryNameGenerator->generateParameterName('periode');
+            $clause = is_array($value)
+                ? sprintf('%s.periode IN (:%s)', $alias, $paramName)
+                : sprintf('%s.periode = :%s', $alias, $paramName);
+
+            $queryBuilder->andWhere($clause)->setParameter($paramName, is_array($value) ? $ids : $ids[0]);
+            return;
+        }
+
+        // Evenement
+        $em = $this->managerRegistry->getManagerForClass(PeriodeRH::class);
+        $periodeRepo = $em->getRepository(PeriodeRH::class);
+
         $whereConditions = [];
-        foreach ($values as $value) {
-            /**
-             * @var PeriodeRH $periode
-             */
-            $periode = $this->iriConverter->getResourceFromIri($value);
+        foreach ($ids as $periodeId) {
+            /** @var PeriodeRH|null $periode */
+            $periode = $periodeRepo->find($periodeId);
+            if ($periode === null) {
+                continue;
+            }
+
             $periodeAlias = $queryNameGenerator->generateJoinAlias('periodePriseEnCompteRH');
             $periodeIdParameter = $queryNameGenerator->generateParameterName('periodeId');
 
-            $queryBuilder->setParameter($periodeIdParameter, $periode->id);
+            $queryBuilder->setParameter($periodeIdParameter, $periode->getId());
 
-            if ($periode->envoyee) {
+            if ($periode->getDateEnvoi() !== null) {
                 $queryBuilder->leftJoin(
-                    $alias . '.periodePriseEnCompteRH',
+                    sprintf('%s.periodePriseEnCompteRH', $alias),
                     $periodeAlias,
                     Join::WITH,
-                    $periodeAlias . '.id = :' . $periodeIdParameter,
+                    sprintf('%s.id = :%s', $periodeAlias, $periodeIdParameter),
                 );
-                $whereConditions[] = $periodeAlias . '.id is not null';
+                $whereConditions[] = sprintf('%s.id IS NOT NULL', $periodeAlias);
             } else {
                 $queryBuilder->join(
-                    'App\Entity\PeriodeRH',
+                    PeriodeRH::class,
                     $periodeAlias,
                     Join::WITH,
-                    $periodeAlias . '.id = :' . $periodeIdParameter,
+                    sprintf('%s.id = :%s', $periodeAlias, $periodeIdParameter),
                 );
 
-                $whereCondition = $alias . '.periodePriseEnCompteRH is null';
-                $whereCondition .= ' and ' . $periodeAlias . '.fin > ' . $alias . '.fin';
-                $whereConditions[] = $whereCondition;
+                $whereConditions[] = sprintf(
+                    '(%s.periodePriseEnCompteRH IS NULL AND %s.fin > %s.fin)',
+                    $alias,
+                    $periodeAlias,
+                    $alias,
+                );
             }
         }
-        $queryBuilder->andWhere($queryBuilder->expr()->orX(...$whereConditions));
+
+        if ($whereConditions !== []) {
+            $queryBuilder->andWhere($queryBuilder->expr()->orX(...$whereConditions));
+        }
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return [
+            new OpenApiParameter(
+                name: 'periode',
+                in: 'query',
+                description: 'Période RH concernée',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: false,
+            ),
+            new OpenApiParameter(
+                name: 'periode[]',
+                in: 'query',
+                description: 'Périodes RH concernées',
+                required: false,
+                schema: [
+                    'type' => 'array',
+                    'items' => ['type' => 'string'],
+                ],
+                style: 'form',
+                explode: true,
+            ),
+        ];
     }
 
     public function getDescription(string $resourceClass): array
     {
-        return [
-            'periode' => [
-                'property' => 'periode',
-                'type' => TypeIdentifier::STRING->value,
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => false,
-                'openapi' => new Parameter(name: 'periode', in: 'query', description: 'Période RH concernée'),
-            ],
-            'periode[]' => [
-                'property' => 'periode',
-                'type' => TypeIdentifier::STRING->value,
-                'required' => false,
-                'strategy' => 'exact',
-                'is_collection' => true,
-                'openapi' => new Parameter(name: 'periode[]', in: 'query', description: 'Périodes RH concernées'),
-            ],
-        ];
+        return [];
     }
 }

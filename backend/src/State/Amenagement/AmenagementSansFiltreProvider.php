@@ -20,7 +20,6 @@ use App\ApiResource\Amenagement;
 use App\ApiResource\Composante;
 use App\Doctrine\Extension\PreloadAssociationsExtension;
 use App\Entity\Utilisateur;
-use App\Filter\AmenagementBeneficiaireActifFilter;
 use App\State\MappedCollectionPaginator;
 use Override;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -40,9 +39,6 @@ class AmenagementSansFiltreProvider implements ProviderInterface
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|array|null
     {
         if ($operation instanceof GetCollection) {
-            //on ne veut que les aménagements sur les bénéficiaires actifs
-            $context['filters'][AmenagementBeneficiaireActifFilter::PROPERTY] = true;
-
             //preload
             $context[PreloadAssociationsExtension::PROPERTY] = [
                 'beneficiaires' => ['sourceEntity' => 'root', 'relationName' => 'beneficiaires'],
@@ -54,11 +50,14 @@ class AmenagementSansFiltreProvider implements ProviderInterface
             if ($this->security->isGranted(Utilisateur::ROLE_RENFORT)) {
                 $context['filters']['type.examens'] = false;
                 $context['filters']['type.pedagogique'] = false;
+                $operation->getParameters()?->get('type.examens')?->setValue(false);
+                $operation->getParameters()?->get('type.pedagogique')?->setValue(false);
             }
 
             //les référents composante ne voient que les aménagements d'examens et pédagogiques de leur composante
             if ($this->security->isGranted(Utilisateur::ROLE_REFERENT_COMPOSANTE)) {
                 $context['filters']['type.aideHumaine'] = false;
+                $operation->getParameters()?->get('type.aideHumaine')?->setValue(false);
                 /**
                  * @var Utilisateur $user
                  */
@@ -70,6 +69,7 @@ class AmenagementSansFiltreProvider implements ProviderInterface
                         $user->getComposantes()->toArray(),
                     );
                 }
+                $operation->getParameters()?->get('composante')?->setValue($context['filters']['composante']);
             }
             $results = $this->collectionProvider->provide($operation, $uriVariables, $context);
             assert($results instanceof PaginatorInterface);

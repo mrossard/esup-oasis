@@ -32,7 +32,7 @@ class ServicesFaitsPeriodeOrderFilter implements
      * @param array<string, mixed>|null $properties
      */
     public function __construct(
-        protected ?array $properties = null,
+        protected ?array $properties = ['debut' => null],
     ) {}
 
     public function getProperties(): ?array

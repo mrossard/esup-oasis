@@ -13,10 +13,14 @@
 namespace App\Filter;
 
 use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\Exception\ItemNotFoundException;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
+use ApiPlatform\Metadata\Parameter as MetadataParameter;
 use ApiPlatform\OpenApi\Model\Parameter;
 use App\Entity\Utilisateur;
 use Doctrine\ORM\Query\Expr\Join;
@@ -28,7 +32,10 @@ use Symfony\Component\Clock\ClockAwareTrait;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class BeneficiaireFilter extends AbstractFilter
+class BeneficiaireFilter extends AbstractFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     use ClockAwareTrait;
 
@@ -42,6 +49,79 @@ class BeneficiaireFilter extends AbstractFilter
         ?NameConverterInterface $nameConverter = null,
     ) {
         parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+    }
+
+    public function apply(
+        QueryBuilder $queryBuilder,
+        QueryNameGeneratorInterface $queryNameGenerator,
+        string $resourceClass,
+        ?Operation $operation = null,
+        array $context = [],
+    ): void {
+        $value = $context['filters'][self::PROPERTY] ?? null;
+        if ($value === null && isset($context['parameter'])) {
+            $value = $context['parameter']->getValue();
+        }
+        if ($value === null || $value === '' || $value === []) {
+            return;
+        }
+
+        $this->filterProperty(
+            self::PROPERTY,
+            $value,
+            $queryBuilder,
+            $queryNameGenerator,
+            $resourceClass,
+            $operation,
+            $context,
+        );
+    }
+
+    public function getSchema(MetadataParameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(MetadataParameter $parameter): Parameter|array|null
+    {
+        return [
+            new Parameter(
+                name: self::PROPERTY . '[date]',
+                in: 'query',
+                description: 'date pour laquelle on veut les bénéficiaires valides',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+            new Parameter(
+                name: self::PROPERTY . '[avant]',
+                in: 'query',
+                description: 'date avant laquelle on veut les bénéficiaires valides',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+            new Parameter(
+                name: self::PROPERTY . '[apres]',
+                in: 'query',
+                description: 'date après laquelle on veut les bénéficiaires valides',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+            new Parameter(
+                name: self::PROPERTY . '[profil]',
+                in: 'query',
+                description: 'profil pour lequel on veut les bénéficiaires valides',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: true,
+            ),
+        ];
     }
 
     protected function filterProperty(

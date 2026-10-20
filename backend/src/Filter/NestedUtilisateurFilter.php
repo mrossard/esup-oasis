@@ -26,8 +26,13 @@ use Doctrine\Persistence\ManagerRegistry;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 use Symfony\Component\TypeInfo\TypeIdentifier;
+use Throwable;
 
-class NestedUtilisateurFilter implements FilterInterface, PropertyAwareFilterInterface, JsonSchemaFilterInterface, OpenApiParameterFilterInterface
+class NestedUtilisateurFilter implements
+    FilterInterface,
+    PropertyAwareFilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     /**
      * @param array<string, string>|null $properties
@@ -59,13 +64,21 @@ class NestedUtilisateurFilter implements FilterInterface, PropertyAwareFilterInt
     ): void {
         if (isset($context['parameter'])) {
             $parameter = $context['parameter'];
-            $value = $parameter->getValue();
-            if (null === $value) {
+            $propertyKey = $parameter->getKey();
+            $targetField = $parameter->getProperty() ?? $this->properties[$propertyKey] ?? $propertyKey;
+            $value = $context['filters'][$propertyKey] ?? $parameter->getValue();
+            if (null === $value || '' === $value || [] === $value) {
                 return;
             }
-            $propertyKey = $parameter->getKey();
-            $targetField = $parameter->getProperty() ?? ($this->properties[$propertyKey] ?? $propertyKey);
-            $this->filterByTargetField($propertyKey, $targetField, $value, $queryBuilder, $queryNameGenerator, $resourceClass, $operation);
+            $this->filterByTargetField(
+                $propertyKey,
+                $targetField,
+                $value,
+                $queryBuilder,
+                $queryNameGenerator,
+                $resourceClass,
+                $operation,
+            );
             return;
         }
 
@@ -75,7 +88,15 @@ class NestedUtilisateurFilter implements FilterInterface, PropertyAwareFilterInt
 
         foreach ($this->properties as $property => $targetField) {
             if (isset($context['filters'][$property])) {
-                $this->filterByTargetField($property, $targetField, $context['filters'][$property], $queryBuilder, $queryNameGenerator, $resourceClass, $operation);
+                $this->filterByTargetField(
+                    $property,
+                    $targetField,
+                    $context['filters'][$property],
+                    $queryBuilder,
+                    $queryNameGenerator,
+                    $resourceClass,
+                    $operation,
+                );
             }
         }
     }
@@ -100,7 +121,7 @@ class NestedUtilisateurFilter implements FilterInterface, PropertyAwareFilterInt
         foreach ($value as $val) {
             try {
                 $utilisateurs[] = $this->iriConverter->getResourceFromIri($val);
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // Ignore invalid IRIs
             }
         }
@@ -192,4 +213,3 @@ class NestedUtilisateurFilter implements FilterInterface, PropertyAwareFilterInt
         return $description;
     }
 }
-

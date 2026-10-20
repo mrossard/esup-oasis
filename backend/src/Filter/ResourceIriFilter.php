@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Parameter;
 use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use App\Filter\Util\IriToIdResolver;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\Persistence\ManagerRegistry;
 
 final readonly class ResourceIriFilter implements
     FilterInterface,
@@ -32,8 +33,10 @@ final readonly class ResourceIriFilter implements
 {
     private IriToIdResolver $resolver;
 
-    public function __construct(IriConverterInterface $iriConverter)
-    {
+    public function __construct(
+        IriConverterInterface $iriConverter,
+        private ?ManagerRegistry $managerRegistry = null,
+    ) {
         $this->resolver = new IriToIdResolver($iriConverter);
     }
 
@@ -49,13 +52,14 @@ final readonly class ResourceIriFilter implements
             return;
         }
 
-        $value = $parameter->getValue();
-        if ($value === null) {
+        $property = $parameter->getProperty() ?? $parameter->getKey();
+        $value = $context['filters'][$property] ?? $parameter->getValue();
+        if ($value === null || $value === '') {
             return;
         }
 
-        $property = $parameter->getProperty() ?? $parameter->getKey();
-        $this->applyFilter($property, $value, $queryBuilder, $queryNameGenerator);
+        $entityClass = $operation?->getStateOptions()?->getEntityClass() ?? $operation?->getClass() ?? $resourceClass;
+        $this->applyFilter($property, $value, $queryBuilder, $queryNameGenerator, $entityClass);
     }
 
     private function applyFilter(
@@ -63,6 +67,7 @@ final readonly class ResourceIriFilter implements
         mixed $value,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
+        string $entityClass,
     ): void {
         $rawValues = is_array($value) ? $value : [$value];
         $ids = array_values(array_filter(
@@ -71,16 +76,19 @@ final readonly class ResourceIriFilter implements
         ));
 
         if ($ids === []) {
+            $queryBuilder->andWhere('1 = 0');
             return;
         }
 
-        [$targetAlias, $targetField] = $this->resolveTargetAliasAndField(
-            $property,
-            $queryBuilder,
-            $queryNameGenerator,
-        );
+        $target = $this->resolveTargetAliasAndField($property, $queryBuilder, $queryNameGenerator, $entityClass);
 
-        $paramName = $queryNameGenerator->generateParameterName($property);
+        if ($target === null) {
+            return;
+        }
+
+        [$targetAlias, $targetField] = $target;
+
+        $paramName = $queryNameGenerator->generateParameterName(str_replace('.', '_', $property));
 
         $clause = is_array($value)
             ? sprintf('%s.%s IN (:%s)', $targetAlias, $targetField, $paramName)
@@ -90,28 +98,63 @@ final readonly class ResourceIriFilter implements
     }
 
     /**
-     * @return array{0: string, 1: string}
+     * @return array{0: string, 1: string}|null
      */
     private function resolveTargetAliasAndField(
         string $property,
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
-    ): array {
+        string $entityClass,
+    ): ?array {
         $alias = $queryBuilder->getRootAliases()[0];
-        if (!str_contains($property, '.')) {
-            return [$alias, $property];
+        $em = $this->managerRegistry?->getManagerForClass($entityClass);
+
+        if ($em === null) {
+            if (!str_contains($property, '.')) {
+                return [$alias, $property];
+            }
+
+            $parts = explode('.', $property);
+            $finalField = array_pop($parts);
+
+            foreach ($parts as $part) {
+                $joinAlias = $queryNameGenerator->generateJoinAlias($part);
+                $queryBuilder->join(sprintf('%s.%s', $alias, $part), $joinAlias);
+                $alias = $joinAlias;
+            }
+
+            return [$alias, $finalField];
         }
 
+        $currentMeta = $em->getClassMetadata($entityClass);
         $parts = explode('.', $property);
-        $finalField = array_pop($parts);
+        $totalParts = count($parts);
 
-        foreach ($parts as $part) {
-            $joinAlias = $queryNameGenerator->generateJoinAlias($part);
-            $queryBuilder->join(sprintf('%s.%s', $alias, $part), $joinAlias);
-            $alias = $joinAlias;
+        foreach ($parts as $i => $part) {
+            $isLast = $i === ($totalParts - 1);
+
+            if ($currentMeta->hasAssociation($part)) {
+                $joinAlias = $queryNameGenerator->generateJoinAlias($part);
+                $queryBuilder->join(sprintf('%s.%s', $alias, $part), $joinAlias);
+                $alias = $joinAlias;
+                $targetClass = $currentMeta->getAssociationTargetClass($part);
+                $currentMeta = $em->getClassMetadata($targetClass);
+
+                if ($isLast) {
+                    $idField = $currentMeta->getSingleIdentifierFieldName();
+                    return [$alias, $idField];
+                }
+            } elseif ($currentMeta->hasField($part)) {
+                if ($isLast) {
+                    return [$alias, $part];
+                }
+                return null;
+            } else {
+                return null;
+            }
         }
 
-        return [$alias, $finalField];
+        return [$alias, $currentMeta->getSingleIdentifierFieldName()];
     }
 
     public function getSchema(Parameter $parameter): array

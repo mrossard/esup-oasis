@@ -10,56 +10,72 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
 use Doctrine\ORM\QueryBuilder;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class NomIntervenantFilter extends AbstractFilter
+final readonly class NomIntervenantFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== 'nomIntervenant') {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter === null) {
+            $value = $context['filters']['nomIntervenant'] ?? null;
+        } else {
+            $value = $parameter->getValue();
+        }
+
+        if ($value === null || $value === '') {
             return;
         }
 
         $alias = $queryBuilder->getRootAliases()[0];
         $joinAlias = $queryNameGenerator->generateJoinAlias('intervenant');
         $utilisateurAlias = $queryNameGenerator->generateJoinAlias('utilisateur');
-
-        $condition = $queryBuilder->expr()->like('lower(unaccent(' . $utilisateurAlias . '.nom' . '))', 'unaccent(?1)');
+        $paramName = $queryNameGenerator->generateParameterName('nomIntervenant');
 
         $queryBuilder
-            ->join($alias . '.intervenant', $joinAlias)
-            ->join($joinAlias . '.utilisateur', $utilisateurAlias)
-            ->andWhere($condition)
-            ->setParameter('1', '%' . strtolower($value) . '%');
+            ->join(sprintf('%s.intervenant', $alias), $joinAlias)
+            ->join(sprintf('%s.utilisateur', $joinAlias), $utilisateurAlias)
+            ->andWhere(sprintf('lower(unaccent(%s.nom)) LIKE unaccent(:%s)', $utilisateurAlias, $paramName))
+            ->setParameter($paramName, '%' . strtolower((string) $value) . '%');
+    }
+
+    public function getSchema(Parameter $parameter): array
+    {
+        return ['type' => 'string'];
+    }
+
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return new OpenApiParameter(
+            name: 'nomIntervenant',
+            in: 'query',
+            description: "Recherche sur le nom de l'intervenant",
+            required: false,
+            schema: ['type' => 'string'],
+        );
     }
 
     public function getDescription(string $resourceClass): array
     {
-        return [
-            'nomIntervenant' => [
-                'property' => 'nomIntervenant',
-                'type' => TypeIdentifier::STRING->value,
-                'required' => false,
-                'openapi' => new Parameter(
-                    name: 'nomIntervenant',
-                    in: 'query',
-                    description: "Recherche sur le nom de l'intervenant",
-                ),
-            ],
-        ];
+        return [];
     }
 }

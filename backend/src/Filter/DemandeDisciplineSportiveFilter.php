@@ -10,52 +10,63 @@
  *
  */
 
+declare(strict_types=1);
+
 namespace App\Filter;
 
-use ApiPlatform\Doctrine\Orm\Filter\AbstractFilter;
+use ApiPlatform\Doctrine\Orm\Filter\FilterInterface;
 use ApiPlatform\Doctrine\Orm\Util\QueryNameGeneratorInterface;
 use ApiPlatform\Metadata\IriConverterInterface;
+use ApiPlatform\Metadata\JsonSchemaFilterInterface;
+use ApiPlatform\Metadata\OpenApiParameterFilterInterface;
 use ApiPlatform\Metadata\Operation;
-use ApiPlatform\OpenApi\Model\Parameter;
-use App\ApiResource\Tag;
+use ApiPlatform\Metadata\Parameter;
+use ApiPlatform\OpenApi\Model\Parameter as OpenApiParameter;
+use App\Filter\Util\IriToIdResolver;
 use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
-use Psr\Log\LoggerInterface;
-use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
-use Symfony\Component\TypeInfo\TypeIdentifier;
 
-class DemandeDisciplineSportiveFilter extends AbstractFilter
+final readonly class DemandeDisciplineSportiveFilter implements
+    FilterInterface,
+    JsonSchemaFilterInterface,
+    OpenApiParameterFilterInterface
 {
     public const string PROPERTY = 'discipline';
 
-    public function __construct(
-        private readonly IriConverterInterface $iriConverter,
-        ManagerRegistry $managerRegistry,
-        ?LoggerInterface $logger = null,
-        ?array $properties = null,
-        ?NameConverterInterface $nameConverter = null,
-    ) {
-        parent::__construct($managerRegistry, $logger, $properties, $nameConverter);
+    private IriToIdResolver $resolver;
+
+    public function __construct(IriConverterInterface $iriConverter)
+    {
+        $this->resolver = new IriToIdResolver($iriConverter);
     }
 
-    protected function filterProperty(
-        string $property,
-        $value,
+    public function apply(
         QueryBuilder $queryBuilder,
         QueryNameGeneratorInterface $queryNameGenerator,
         string $resourceClass,
         ?Operation $operation = null,
         array $context = [],
     ): void {
-        if ($property !== self::PROPERTY) {
+        $parameter = $context['parameter'] ?? null;
+        if ($parameter === null) {
+            $value = $context['filters'][self::PROPERTY] ?? null;
+        } else {
+            $value = $parameter->getValue();
+        }
+
+        if ($value === null || $value === '') {
             return;
         }
 
-        $values = array_map($this->getDisciplineIdFromIriOrId(...), match (true) {
-            is_array($value) => $value,
-            default => [$value],
-        });
+        $rawValues = is_array($value) ? $value : [$value];
+        $values = array_values(array_filter(
+            array_map($this->resolver->resolve(...), $rawValues),
+            static fn(?int $id): bool => $id !== null,
+        ));
+
+        if ($values === []) {
+            return;
+        }
 
         $alias = $queryBuilder->getRootAliases()[0];
         $reponseAlias = $queryNameGenerator->generateJoinAlias('reponse');
@@ -81,36 +92,40 @@ class DemandeDisciplineSportiveFilter extends AbstractFilter
             ->setParameter($disciplineIdsParameter, $values);
     }
 
-    /**
-     * @param string|int $val
-     * @return int
-     */
-    public function getDisciplineIdFromIriOrId(string|int $val): int
+    public function getSchema(Parameter $parameter): array
     {
-        if (is_numeric($val)) {
-            $val = Tag::COLLECTION_URI . '/' . $val;
-        }
+        return ['type' => 'string'];
+    }
 
-        return $this->iriConverter->getResourceFromIri($val)->id;
+    public function getOpenApiParameters(Parameter $parameter): OpenApiParameter|array|null
+    {
+        return [
+            new OpenApiParameter(
+                name: self::PROPERTY,
+                in: 'query',
+                description: 'discipline sportive',
+                required: false,
+                schema: ['type' => 'string'],
+                style: 'form',
+                explode: false,
+            ),
+            new OpenApiParameter(
+                name: self::PROPERTY . '[]',
+                in: 'query',
+                description: 'discipline sportive',
+                required: false,
+                schema: [
+                    'type' => 'array',
+                    'items' => ['type' => 'string'],
+                ],
+                style: 'form',
+                explode: true,
+            ),
+        ];
     }
 
     public function getDescription(string $resourceClass): array
     {
-        return [
-            self::PROPERTY => [
-                'property' => self::PROPERTY,
-                'type' => TypeIdentifier::STRING->value,
-                'required' => false,
-                'is_collection' => false,
-                'openapi' => new Parameter(name: self::PROPERTY, in: 'query', description: 'discipline sportive'),
-            ],
-            self::PROPERTY . '[]' => [
-                'property' => self::PROPERTY,
-                'type' => TypeIdentifier::STRING->value,
-                'required' => false,
-                'is_collection' => true,
-                'openapi' => new Parameter(name: self::PROPERTY, in: 'query', description: 'discipline sportive'),
-            ],
-        ];
+        return [];
     }
 }

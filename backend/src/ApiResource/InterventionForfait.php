@@ -13,9 +13,7 @@
 namespace App\ApiResource;
 
 use ApiPlatform\Doctrine\Orm\Filter\DateFilter;
-use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
-use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -23,10 +21,12 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\QueryParameter;
 use App\Entity\Beneficiaire;
-use App\Filter\InterventionForfaitNomIntervenantOrderFilter;
+use App\Filter\CaseInsensitiveOrderFilter;
 use App\Filter\NestedUtilisateurFilter;
 use App\Filter\NomIntervenantFilter;
+use App\Filter\ResourceIriFilter;
 use App\State\InterventionForfait\InterventionForfaitProcessor;
 use App\State\InterventionForfait\InterventionForfaitProvider;
 use DateTimeInterface;
@@ -38,7 +38,25 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new Get(uriTemplate: self::ITEM_URI, uriVariables: ['id']),
-        new GetCollection(uriTemplate: self::COLLECTION_URI),
+        new GetCollection(uriTemplate: self::COLLECTION_URI, parameters: [
+            'periode' => new QueryParameter(filter: ResourceIriFilter::class, property: 'periode'),
+            'type' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type'),
+            'intervenant' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'intervenant.utilisateur',
+            ),
+            'utilisateurCreation' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'utilisateurCreation',
+            ),
+            'nomIntervenant' => new QueryParameter(filter: NomIntervenantFilter::class, property: 'nomIntervenant'),
+            'order[:property]' => new QueryParameter(
+                filter: new CaseInsensitiveOrderFilter(),
+                properties: ['intervenant.utilisateur.nom'],
+            ),
+            'periode.debut' => new QueryParameter(filter: new DateFilter(), property: 'periode.debut'),
+            'periode.fin' => new QueryParameter(filter: new DateFilter(), property: 'periode.fin'),
+        ]),
         new Post(
             uriTemplate: self::COLLECTION_URI,
             securityPostDenormalize: "is_granted('" . self::AJOUTER_INTERVENTION . "', object)",
@@ -61,14 +79,6 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: InterventionForfaitProcessor::class,
     stateOptions: new Options(entityClass: \App\Entity\InterventionForfait::class),
 )]
-#[ApiFilter(SearchFilter::class, properties: ['periode', 'type'])]
-#[ApiFilter(NestedUtilisateurFilter::class, properties: [
-    'intervenant' => 'intervenant.utilisateur',
-    'utilisateurCreation' => 'utilisateurCreation',
-])]
-#[ApiFilter(NomIntervenantFilter::class)]
-#[ApiFilter(InterventionForfaitNomIntervenantOrderFilter::class, properties: ['intervenant.utilisateur.nom'])]
-#[ApiFilter(DateFilter::class, properties: ['periode.debut', 'periode.fin'])]
 #[Assert\Expression(expression: 'this.type.forfait == true', message: "Type d'événement incompatible")]
 class InterventionForfait
 {
