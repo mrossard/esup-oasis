@@ -38,6 +38,30 @@ class EvenementsTest extends ApiTestCaseCustom
         $this->assertJsonContains(['hydra:member' => [['@id' => '/evenements/1']]]);
     }
 
+    public function testQueryEvenementsWithJsonBody(): void
+    {
+        $client = $this->createClientWithCredentials('admin');
+        $client->request('QUERY', '/evenements', [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/ld+json',
+            ],
+            'json' => [
+                'exists' => [
+                    'periodePriseEnCompteRH' => false,
+                ],
+            ],
+        ]);
+
+        $this->assertResponseIsSuccessful();
+        $this->assertJsonContains([
+            '@context' => '/contexts/Evenement',
+            '@type' => 'hydra:Collection',
+            'hydra:totalItems' => 1,
+        ]);
+        $this->assertJsonContains(['hydra:member' => [['@id' => '/evenements/1']]]);
+    }
+
     public function testPagination(): void
     {
         $client = $this->createClientWithCredentials('admin');

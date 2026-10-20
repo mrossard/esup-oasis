@@ -12,6 +12,7 @@
 
 namespace App\State\Evenement;
 
+use ApiPlatform\Metadata\CollectionOperationInterface;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\Pagination\PaginatorInterface;
@@ -38,7 +39,7 @@ readonly class EvenementProvider implements ProviderInterface
     {
         $utilisateur = $this->security->getUser();
 
-        if ($operation instanceof GetCollection) {
+        if ($operation instanceof CollectionOperationInterface) {
             //on ajoute "de force" un filtre sur l'utilisateur courant
             if (!$this->security->isGranted(ApplicationCliente::ROLE_APPLICATION_CLIENTE)) {
                 $user = $utilisateur;

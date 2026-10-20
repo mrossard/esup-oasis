@@ -24,6 +24,7 @@ use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Query;
 use ApiPlatform\Metadata\QueryParameter;
 use App\Entity\Beneficiaire;
 use App\Filter\EvenementsAValiderFilter;
@@ -45,6 +46,39 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ApiResource(
     operations: [
         new GetCollection(uriTemplate: self::COLLECTION_URI, parameters: [
+            'type' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type'),
+            'campus' => new QueryParameter(filter: ResourceIriFilter::class, property: 'campus'),
+            'type.avecValidation' => new QueryParameter(filter: new BooleanFilter(), property: 'type.avecValidation'),
+            'type.forfait' => new QueryParameter(filter: new BooleanFilter(), property: 'type.forfait'),
+            'exists[periodePriseEnCompteRH]' => new QueryParameter(
+                filter: new ExistsFilter(),
+                property: 'periodePriseEnCompteRH',
+            ),
+            'exists[dateAnnulation]' => new QueryParameter(filter: new ExistsFilter(), property: 'dateAnnulation'),
+            'exists[intervenant]' => new QueryParameter(filter: new ExistsFilter(), property: 'intervenant'),
+            'exists[beneficiaires]' => new QueryParameter(filter: new ExistsFilter(), property: 'beneficiaires'),
+            'debut' => new QueryParameter(filter: new DateFilter(), property: 'debut'),
+            'fin' => new QueryParameter(filter: new DateFilter(), property: 'fin'),
+            'intervenant' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'intervenant.utilisateur',
+            ),
+            'beneficiaires' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'beneficiaires.utilisateur',
+            ),
+            'suppleants' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'suppleants.utilisateur',
+            ),
+            'utilisateurCreation' => new QueryParameter(
+                filter: NestedUtilisateurFilter::class,
+                property: 'utilisateurCreation',
+            ),
+            'aValider' => new QueryParameter(filter: EvenementsAValiderFilter::class, property: 'aValider'),
+            'nomIntervenant' => new QueryParameter(filter: NomIntervenantFilter::class, property: 'nomIntervenant'),
+        ]),
+        new Query(uriTemplate: self::COLLECTION_URI, parameters: [
             'type' => new QueryParameter(filter: ResourceIriFilter::class, property: 'type'),
             'campus' => new QueryParameter(filter: ResourceIriFilter::class, property: 'campus'),
             'type.avecValidation' => new QueryParameter(filter: new BooleanFilter(), property: 'type.avecValidation'),
