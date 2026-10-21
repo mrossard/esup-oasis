@@ -6,7 +6,7 @@ on:
       - 'v*.*.*'
       - 'v*.*.*-*'
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "2.4" ]
   workflow_dispatch:
 
 env:
