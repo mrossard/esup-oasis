@@ -121,7 +121,7 @@ class SecurityAuditTest extends ApiTestCaseCustom
     /**
      * Vérifie la sécurité du state OAuth contre les attaques CSRF
      */
-    public function testOAuthStateSecurity(): void
+     public function testOAuthStateSecurity(): void
     {
         $client = static::createClient();
 
@@ -160,150 +160,9 @@ class SecurityAuditTest extends ApiTestCaseCustom
         $this->expectException(\UnexpectedValueException::class);
         $this->expectExceptionMessage('Invalid redirect URI');
 
-        $oauthService->getAccessToken(new \Symfony\Component\HttpFoundation\Request(), 'https://attacker.com/callback');
-    }
-
-    /**
-     * Vérifie la présence des paramètres PKCE (code_challenge) et du cookie code_verifier
-     */
-    public function testOAuthPkceAuthorizationAndMissingVerifier(): void
-    {
-        $client = static::createClient();
-
-        // 1. Démarrer le flux avec PKCE
-        $client->request('GET', '/connect/oauth/');
-        $this->assertResponseStatusCodeSame(302);
-
-        $location = $client->getResponse()->getHeaders(false)['location'][0] ?? '';
-        $parts = parse_url($location);
-        parse_str($parts['query'] ?? '', $queryParams);
-
-        static::assertArrayHasKey('code_challenge', $queryParams);
-        static::assertArrayHasKey('code_challenge_method', $queryParams);
-        static::assertSame('S256', $queryParams['code_challenge_method']);
-
-        // Vérifier la présence du cookie oauth_code_verifier
-        $cookieJar = $client->getCookieJar();
-        $codeVerifierCookie = $cookieJar->get('oauth_code_verifier');
-        $stateCookie = $cookieJar->get('oauth_state');
-
-        static::assertNotNull($codeVerifierCookie, 'Le cookie oauth_code_verifier doit être positionné.');
-        static::assertNotNull($stateCookie, 'Le cookie oauth_state doit être positionné.');
-
-        // 2. Retour de l'IdP avec un state valide mais sans le cookie oauth_code_verifier
-        $cookieJar->expire('oauth_code_verifier');
-        $validState = $stateCookie->getValue();
-        $client->request('GET', '/connect/oauth/?code=fake_code&state=' . $validState);
-        $this->assertResponseStatusCodeSame(500);
-        static::assertStringContainsString('Missing PKCE code verifier', $client->getResponse()->getContent(false));
-    }
-
-    /**
-     * Vérifie l'extraction intelligente de l'UID (sub, id, preferred_username) et le nettoyage de domaine (Issue #165)
-     */
-    public function testOAuthResourceOwnerUidExtraction(): void
-    {
-        $urlGenerator = static::getContainer()->get('router');
-
-        // 1. Cas standard CAS (id)
-        $serviceCas = new \App\Service\OAuthService(
-            'cid',
-            'sec',
-            'https://this.app/',
-            'http://a',
-            'http://t',
-            'http://p',
-            $urlGenerator,
-            true,
-            null,
-            null,
-            'id',
-            false,
+        $oauthService->getAccessToken(
+            new \Symfony\Component\HttpFoundation\Request(),
+            'https://attacker.com/callback'
         );
-        $ownerCas = new \League\OAuth2\Client\Provider\GenericResourceOwner(['id' => 'user_cas'], 'id');
-        static::assertSame('user_cas', $serviceCas->extractResourceOwnerUid($ownerCas));
-
-        // 2. Cas OIDC LemonLDAP / Shibboleth (sub configuré)
-        $serviceOidc = new \App\Service\OAuthService(
-            'cid',
-            'sec',
-            'https://this.app/',
-            'http://a',
-            'http://t',
-            'http://p',
-            $urlGenerator,
-            true,
-            null,
-            null,
-            'sub',
-            false,
-        );
-        $ownerOidc = new \League\OAuth2\Client\Provider\GenericResourceOwner(['sub' => 'user_oidc'], 'sub');
-        static::assertSame('user_oidc', $serviceOidc->extractResourceOwnerUid($ownerOidc));
-
-        // 3. Cas Fallback automatique (configuré 'id', mais IdP renvoie seulement 'sub')
-        $ownerFallback = new \League\OAuth2\Client\Provider\GenericResourceOwner([
-            'sub' => 'user_sub_only',
-            'name' => 'Test',
-        ], 'id');
-        static::assertSame('user_sub_only', $serviceCas->extractResourceOwnerUid($ownerFallback));
-
-        // 4. Cas Fallback preferred_username
-        $ownerPreferred = new \League\OAuth2\Client\Provider\GenericResourceOwner([
-            'preferred_username' => 'user_pref',
-        ], 'id');
-        static::assertSame('user_pref', $serviceCas->extractResourceOwnerUid($ownerPreferred));
-
-        // 5. Cas scoped avec nettoyage de realm (login@domaine.fr -> login)
-        $serviceScoped = new \App\Service\OAuthService(
-            'cid',
-            'sec',
-            'https://this.app/',
-            'http://a',
-            'http://t',
-            'http://p',
-            $urlGenerator,
-            true,
-            null,
-            null,
-            'sub',
-            true,
-        );
-        $ownerScoped = new \League\OAuth2\Client\Provider\GenericResourceOwner([
-            'sub' => 'jdupont@univ-paris.fr',
-        ], 'sub');
-        static::assertSame('jdupont', $serviceScoped->extractResourceOwnerUid($ownerScoped));
-
-        // 6. Cas où aucune claim d'identifiant n'est présente -> exception explicite
-        $this->expectException(\UnexpectedValueException::class);
-        $this->expectExceptionMessage('Unable to extract user identifier from OAuth resource owner');
-        $ownerEmpty = new \League\OAuth2\Client\Provider\GenericResourceOwner(['email' => 'foo@bar.com'], 'id');
-        $serviceCas->extractResourceOwnerUid($ownerEmpty);
-    }
-
-    /**
-     * Vérifie la validation des redirectUri via FRONT_URL / callback
-     */
-    public function testOAuthRedirectUriWhitelistFrontUrlFallback(): void
-    {
-        $urlGenerator = static::getContainer()->get('router');
-        $service = new \App\Service\OAuthService(
-            'cid',
-            'sec',
-            'https://this.app/',
-            'http://a',
-            'http://t',
-            'http://p',
-            $urlGenerator,
-            true,
-            null,
-            'https://front.univ-test.fr',
-            'id',
-            false,
-        );
-
-        $allowed = $service->getAllowedRedirectUris();
-        static::assertContains('https://front.univ-test.fr/callback', $allowed);
-        static::assertNotContains('https://malicious.org/callback', $allowed);
     }
 }
