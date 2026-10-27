@@ -37,6 +37,7 @@ l'[expression de besoins](docs/Documentation_Fonctionnelle_Oasis_1.0.pdf), remis
 Des documentations techniques sont disponibles séparément pour les deux briques applicatives et pour l'installation
 tout-en-un:
 
+* [architecture](docs/architecture.md)
 * [frontend](docs/frontend/README.md)
 * [backend](docs/backend/README.md)
 * [installation](docs/installation/README.md)
