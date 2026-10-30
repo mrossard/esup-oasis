@@ -27,6 +27,7 @@ use App\State\AvisEse\AvisEseDeleteProcessor;
 use App\State\AvisEse\AvisEsePatchProcessor;
 use App\State\AvisEse\AvisEsePostProcessor;
 use App\State\AvisEse\AvisEseProvider;
+use App\Validator\PieceJustificativeValideConstraint;
 use DateTimeInterface;
 use ReflectionProperty;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -157,6 +158,7 @@ class AvisEse
         }
     }
     #[Groups([self::GROUP_IN, self::GROUP_OUT])]
+    #[PieceJustificativeValideConstraint]
     public ?Telechargement $fichier {
         get {
             $prop = new ReflectionProperty(self::class, 'fichier');
