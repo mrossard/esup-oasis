@@ -34,3 +34,11 @@ Pour un bénéficiaire dont au moins un profil de handicap, sur la période de l
 l'option, la demande d'édition du gestionnaire comme l'envoi par l'administrateur sont refusés tant
 que la date manque, et l'interface l'annonce avant de laisser confirmer. Les observations et la date
 elle-même se saisissent tant que la décision n'est pas envoyée, sans changer son état.
+
+## Personnalisation du lieu et de l'adresse postale
+
+Deux paramètres d'administration permettent de renseigner l'adresse et le lieu d'édition pour les gabarits de la décision :
+
+* **`LIEU_COURRIER`** : lieu d'édition (par exemple « Bordeaux »), accessible dans le gabarit Twig via `data.lieu` (imprimé par défaut sous la forme « *Fait à {{ data.lieu }}, le {{ date }}* »).
+* **`ADRESSE_POSTALE`** : adresse postale institutionnelle de l'établissement, accessible dans le gabarit via `data.adresse_postale`.
+

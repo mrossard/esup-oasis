@@ -83,16 +83,17 @@ sql disponibles dans le dossier `config/apogee` (attention à bien respecter les
     * numéro de téléphone perso
     * témoin "boursier"
     * régime d'inscription
+    * témoin "inscription principale" (`tem_iae_prm`)
 
 Les versions livrées des requêtes obligatoires s'appuient sur une table locale `extern_niveau_etape` pour remonter le
 niveau LMD, vous devrez donc les adapter. Le niveau LMD peut être simplement laissé vide si vous le souhaitez.
 
 #### Récupération des informations complémentaires
 
-Une troisième requête, optionnelle, `apogee_get_informations_complementaires.sql`, peut récupèrer des informations "non
-utiles" pour le bonfonctionnement de l'application mais qui peuvent être utiles au travail des gestionnaires; elles
-seront affichées dansle dossier des bénéficiaires. Ce fichier peut être laissé vide si aucune donnée supplémentaire
-n'est nécessaire (laversion livrée contient un exemple commenté).
+Une troisième requête, optionnelle, `apogee_get_informations_complementaires.sql`, peut récupérer des informations "non
+utiles" pour le bon fonctionnement de l'application mais qui peuvent être utiles au travail des gestionnaires ; elles
+seront affichées dans le dossier des bénéficiaires. Ce fichier peut être laissé vide si aucune donnée supplémentaire
+n'est nécessaire (la version livrée contient un exemple commenté).
 
 A l'usage, les résultats de cette requête sont mis en cache afin d'éviter de surcharger le SI scolarité (les appels se
 font à la demande sur consultation, contrairement aux données obligatoires qui sont dupliquées dans la base Oasis et
@@ -128,8 +129,8 @@ Voir [la section dédiée aux pièces justificatives](pieces_justificatives.md)
 ## Signature électronique
 
 Oasis peut faire signer électroniquement la décision d'aménagements d'examens par un parapheur électronique : au
-lieu d'être envoyé par e-mail, le PDF est déposé dans un circuit de signature configuré dans le parapheur
-(signataires, ordre des étapes, relances), puis récupéré signé une fois le circuit terminé. OASIS en dépose une
+lieu d'être envoyé par e-mail, le PDF est déposé dans un circuit de signature configuré dans le parapheur (signataires,
+ordre des étapes, relances), puis récupéré signé une fois le circuit terminé. OASIS en dépose une
 copie au dossier du bénéficiaire et l'envoie à l'étudiant par l'e-mail habituel, le document signé en pièce
 jointe.
 
@@ -186,8 +187,8 @@ La fréquence d'interrogation se règle par le paramètre `FREQUENCE_SUIVI_SIGNA
 paramètres), au format du Scheduler Symfony (`15 minutes`, `2 hours`…), une heure par défaut ; le worker le relit
 à son redémarrage. Aucune interrogation n'est planifiée sans parapheur. La commande `app:signature:suivi`
 effectue le même traitement à la demande. Sur la fiche du bénéficiaire, le bouton de rafraîchissement d'une
-décision en signature interroge le parapheur pour cette seule décision, sans attendre le passage suivant
-(Patch de la décision avec `{"verifierSignature": true}`, réservé aux gestionnaires ; le reste de la requête est
+décision en signature interroge le parapheur pour cette seule décision, sans attendre le passage suivant (Patch de la
+décision avec `{"verifierSignature": true}`, réservé aux gestionnaires ; le reste de la requête est
 ignoré).
 
 Si aucune décision du lot n'a pu être vérifiée, un message de niveau `critical` signale que le parapheur semble
@@ -200,7 +201,8 @@ inclus dans la décision et les avis de santé du bénéficiaire sont refusés e
 le retour du parapheur. Une décision refusée reste verrouillée de
 la même façon, jusqu'à sa reprise par un gestionnaire (bouton « Reprendre » sur la fiche du bénéficiaire, qui la
 repasse à l'état `ATTENTE_VALIDATION_CAS` par le Patch de la décision) : elle redevient alors modifiable, on
-corrige, puis on redemande l'édition, ce qui dépose un nouveau document. Une décision dont la période est terminée ne verrouille
+corrige, puis on redemande l'édition, ce qui dépose un nouveau document. Une décision dont la période est terminée ne
+verrouille
 plus rien, même restée refusée. L'interface désactive les actions verrouillées et en donne le motif, dès la demande
 et le temps du dépôt, dont elle affiche la fin sans recharger la page ; elle ne connaît que la décision de
 l'année en cours, le serveur refusant dans tous les cas.
@@ -219,7 +221,7 @@ l'image de signature scannée :
 
 ```twig
 {% if not data.signature_electronique %}
-    {# signature scannée… #}
+{# signature scannée… #}
 {% endif %}
 ```
 
@@ -228,8 +230,10 @@ l'image de signature scannée :
 Un parapheur s'ajoute en étendant la classe abstraite
 [`App\Service\Signature\AbstractParapheur`](../../backend/src/Service/Signature/AbstractParapheur.php) : `deposer`
 dépose le PDF dans un circuit, avec l'adresse à laquelle transmettre le document signé quand
-`PARAPHEUR_ENVOIE_DOCUMENT` est vrai (`null` sinon), et retourne l'identifiant du document, `suivre` retourne son état et, une fois
-signé, la date de signature, `telecharger` retourne le PDF signé. L'état retourné par `suivre` est l'une des constantes `ETAT_SIGNATURE_*` de la décision :
+`PARAPHEUR_ENVOIE_DOCUMENT` est vrai (`null` sinon), et retourne l'identifiant du document, `suivre` retourne son état
+et, une fois
+signé, la date de signature, `telecharger` retourne le PDF signé. L'état retourné par `suivre` est l'une des constantes
+`ETAT_SIGNATURE_*` de la décision :
 `EN_SIGNATURE`, `SIGNEE`, `REFUSEE`, `EXPIREE` (circuit interrompu), `REMPLACEE` (document remplacé dans le
 parapheur) ou `ERREUR` ; tout état autre que `EN_SIGNATURE` et `SIGNEE` passe la décision à l'état `REFUSEE`. Les
 erreurs d'appel sont levées en `App\Service\Signature\ParapheurException` (`DocumentInconnuException` pour un
@@ -259,7 +263,8 @@ Le suivi planifié, ou `app:signature:suivi`, reporte ensuite l'état sur la dé
 
 `PARAPHEUR=fast` fait signer les décisions par FAST-Parapheur (Docaposte), en dépôt standard : le document est
 déposé dans le circuit renseigné sur la composante, FAST notifie et relance les signataires. Le document signé
-est envoyé à l'étudiant par OASIS, ou par FAST avec `PARAPHEUR_ENVOIE_DOCUMENT=true`. Le fichier déposé est nommé d'après le libellé de la décision et la date du dépôt,
+est envoyé à l'étudiant par OASIS, ou par FAST avec `PARAPHEUR_ENVOIE_DOCUMENT=true`. Le fichier déposé est nommé
+d'après le libellé de la décision et la date du dépôt,
 ce qui distingue les versions successives d'une même décision.
 
 L'état est déduit de l'historique du document, FAST n'exposant pas d'état courant : « Visa désapprouvé »,
@@ -326,9 +331,9 @@ supérieur).
 Cette fonctionnalité est totalement optionnelle, si vous laissez la configuration par défaut l'application affichera des
 silhouettes à la place des photos.
 
-La récupération des photos est réalisée à l'Université de Bordeaux en interrogeant directement la base de données Oracle
-de l'application Uni'Campus de Monécarte, mais cette solution est spécifique à nos usages et peut difficilement être
-généralisée.
+La récupération des photos est réalisée à l'Université de Bordeaux en interrogeant directement la base de données
+(Oracle ou PostgreSQL, via la variable `UNICAMPUS_SGBD`) de l'application Uni'Campus de Monécarte, mais cette
+solution est spécifique à nos usages et peut difficilement être généralisée.
 
 Il est donc prévu de pouvoir implémenter la récupération des photos avec la méthode de votre choix, simplement en
 implémentant l'interface `App\Service\Photo\PhotoProviderInterface` et en référençant votre propre implémentation comme

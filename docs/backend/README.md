@@ -89,9 +89,13 @@ disponibles dans le fichier
 * **GOTENBERG_DSN** : URL de l'instance Gotenberg
 * **SI_SCOL** : implémentation à utiliser pour l'accès au SI de scol (cf la section sur
   les [connecteurs](connecteurs.md#personnalisation))
+* [OPTIONNEL] **SI_SCOL_DUREE_VALIDITE_CACHE** : durée de validité du cache des données de scolarité
+  complémentaires en secondes (3600 par défaut)
 * **APOGEE_USER** : utilisateur avec droits de lecture dans la base Apogée
 * **APOGEE_PWD** : mot de passe de l'utilisateur Apogée
 * **APOGEE_DB** : url de la base Apogée (`//serveur:port/SID`)
+* [OPTIONNEL] **APOGEE_REQUETE_INSCRIPTIONS**, **APOGEE_REQUETE_FORMATION**, **APOGEE_REQUETE_INFOS_COMPLEMENTAIRES** :
+  chemins vers les fichiers SQL personnalisés pour l'accès à Apogée
 * [OPTION NUXEO] **NUXEO_API_URL** : url de l'api nuxeo
 * [OPTION NUXEO] **NUXEO_API_USER** : utilisateur nuxeo
 * [OPTION NUXEO] **NUXEO_API_PASS** : mot de passe nuxeo
@@ -142,6 +146,9 @@ par le backend :
 * **APP_SERVICE_SPORTIFS_ARTICLE** : article (`le`, `la` ou `l'`) à utiliser devant le nom du service qui gère les
   demandes des sportifs
 * **APP_SERVICE_SPORTIFS_EMAIL** : courriel du service qui gère les demandes des sportifs
+* **APP_DECISION_ETAB_LIB** : libellé de la décision d'établissement (ex : « PAEH » ; repris dans le nom du document
+  envoyé au parapheur)
+* **APP_DECISION_ETAB_ARTICLE** : article (`le`, `la` ou `l'`) associé à la décision d'établissement (défaut : « la »)
 * **APP_LOGO** : chemin relatif de l'image contenant le logo de l'application sur le serveur backend (par rapport au
   dossier "public" - ex: "/images/logo.svg")
 * **APP_LOGO_FOOTER_MAILS** : chemin relatif de l'image contenant le logo à ajouter au footer des courriels sur le

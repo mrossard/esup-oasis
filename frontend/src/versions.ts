@@ -98,6 +98,17 @@ export const VERSIONS: IVersion[] = [
         description: "Un aménagement reste actif jusqu'à la fin de son dernier jour",
         type: "fix",
       },
+      {
+        description:
+          "Affichage immédiat de la décision archivée dans la liste des documents du bénéficiaire",
+        roles: [RoleValues.ROLE_GESTIONNAIRE],
+        type: "fix",
+      },
+      {
+        description:
+          "Déconnexion complète de l'application avec suppression du cookie de session",
+        type: "add",
+      },
     ],
   },
   {
